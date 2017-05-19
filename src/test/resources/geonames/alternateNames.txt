@@ -1,0 +1,30 @@
+1611557	260114	de	Chania	1			
+1611558	260114	en	Chania	1			
+1611562	260114	fr	La Canée	1			
+1983689	2982652	fr	Rouen				
+1983690	2982652	de	Rouen				
+1983691	2982652	en	Rouen				
+1983692	2982652	pl	Rouen				
+11071624	10738429	zh	西庄				
+11285039	11071624	link	http://en.wikipedia.org/wiki/Nord-Pas-de-Calais-Picardie				
+11712765	11071624	fr	Nord-Pas-de-Calais-Picardie				1
+11763941	11071624	it	Nord-Passo di Calais-Piccardia	1			
+11775203	11071624	link	http://en.wikipedia.org/wiki/Hauts-de-France	1			
+11803164	11071624	fr	Hauts-de-France				
+1556738	2510769	fr	Espagne	1			
+1972233	2510769	frp	Èspagne				
+1555696	2635167	fr	Royaume-Uni	1			
+1972714	2635167	frp	Royômo-Uni				
+2296433	2635167	fr	Grande-Bretagne				
+1559981	2750405	fr	Pays-Bas	1			
+1973789	2750405	frp	Payis-Bâs				
+1245782	2750405	nl	Koninkrijk der Nederlanden				
+1245786	2750405		Nederlanden				
+1559973	2750405	en	Netherlands	1	1		
+1560010	2750405	sq	Vendet e Ulëta				
+1973800	2750405	ku	Holenda				
+1973807	2750405	nds	Nedderlannen				
+2428498	2750405	en	Holland				
+2428649	2750405	en	The Netherlands				
+2919920	2750405	link	http://en.wikipedia.org/wiki/Netherlands				
+4124489	2750405	en	Kingdom of the Netherlands				

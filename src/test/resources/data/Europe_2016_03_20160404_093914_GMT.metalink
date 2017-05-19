@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<metalink xmlns="http://www.metalinker.org/" pubdate="04 Apr 2016 09:39:14 GMT"
+	type="static" version="3.0">
+	<publisher>
+		<name>TomTom</name>
+		<url>https://partnerlink.tomtom.com</url>
+	</publisher>
+	<identity>Europe_2016_03_20160404_093914_GMT.metalink</identity>
+	<description>METALINK EXPIRES AFTER: Wed May 04 09:39:17 UTC 2016
+		This
+		download set contains 7989 files sorted by [RELEASE, REGION, PRODUCT,
+		FORMAT, COUNTRY] for: Europe 2016_03.IMPORTANT: the product files
+		listed below can only be downloaded by MAPPY SA from IP address
+		193.203.34.228 (as seen by our download server).
+		ANY ATTEMPT TO
+		DOWNLOAD FROM ANOTHER IP ADDRESS WILL FAIL.
+	</description>
+	<files>
+		<file name="eur2016_06-shpd-sp-fra-f10.7z.001">
+			<size>10805284</size>
+			<mimetype>application/x-7z-compressed</mimetype>
+			<verification>
+				<hash type="md5">dca389ea050d60bab3e729a0e6990398</hash>
+			</verification>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
+			</logo>
+			<description>file #1: Europe 2016_06 Speed Profiles Shape Data Set
+				Level FRA: eur2016_06/shpd/sp/fra/f10.7z.001. ONLY DOWNLOADABLE FROM
+				81.252.32.75
+			</description>
+			<resources>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_06/shpd/sp/fra/f10.7z.001?Policy=ewogICAiU3RhdGVtZW50IjogW3sKICAgICAgIlJlc291cmNlIjoiaHR0cDovL2VkZWxpdmVyeTIudG9tdG9tLmNvbS9ldXIyMDE2XzA2L3NocGQvc3AvZnJhLyoiLAogICAgICAiQ29uZGl0aW9uIjp7CiAgICAgICAgICJJcEFkZHJlc3MiOnsiQVdTOlNvdXJjZUlwIjoiODEuMjUyLjMyLjc1LzMyIn0sCiAgICAgICAgICJEYXRlR3JlYXRlclRoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3MTM0MTQzNX0sCiAgICAgICAgICJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3NDAxOTgzNX0KICAgICAgfQogICB9XSwKICAgIkN1c3RvbWVySWQiOiIxMTk5Igp9&amp;Signature=d~~t2XF4qn4dWohnC4C2Tl2rJDpuzWKD496ckFh93PO1j5WBzCQQ~x1Bf2hCvJ87aJqrhZgd8cXIdhf0lyniqM3GmeKDKH6~G~EIlfvE5hA-H23cEvp1cBBtJEb8wb5XLzAJNF0A1kWsSS6dNDbleasX-pz-3MCQDOTuAdZmqFQ_&amp;Key-Pair-Id=APKAJYYGFKNPXLMNCHHQ
+				</url>
+			</resources>
+		</file>
+		<file name="eur2016_06-shpd-sp-fra-f11.7z.001">
+			<size>12113159</size>
+			<mimetype>application/x-7z-compressed</mimetype>
+			<verification>
+				<hash type="md5">31976aea7dbc77000c262711f9bc1974</hash>
+			</verification>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
+			</logo>
+			<description>file #2: Europe 2016_06 Speed Profiles Shape Data Set
+				Level FRA: eur2016_06/shpd/sp/fra/f11.7z.001. ONLY DOWNLOADABLE FROM
+				81.252.32.75
+			</description>
+			<resources>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_06/shpd/sp/fra/f11.7z.001?Policy=ewogICAiU3RhdGVtZW50IjogW3sKICAgICAgIlJlc291cmNlIjoiaHR0cDovL2VkZWxpdmVyeTIudG9tdG9tLmNvbS9ldXIyMDE2XzA2L3NocGQvc3AvZnJhLyoiLAogICAgICAiQ29uZGl0aW9uIjp7CiAgICAgICAgICJJcEFkZHJlc3MiOnsiQVdTOlNvdXJjZUlwIjoiODEuMjUyLjMyLjc1LzMyIn0sCiAgICAgICAgICJEYXRlR3JlYXRlclRoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3MTM0MTQzNX0sCiAgICAgICAgICJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3NDAxOTgzNX0KICAgICAgfQogICB9XSwKICAgIkN1c3RvbWVySWQiOiIxMTk5Igp9&amp;Signature=d~~t2XF4qn4dWohnC4C2Tl2rJDpuzWKD496ckFh93PO1j5WBzCQQ~x1Bf2hCvJ87aJqrhZgd8cXIdhf0lyniqM3GmeKDKH6~G~EIlfvE5hA-H23cEvp1cBBtJEb8wb5XLzAJNF0A1kWsSS6dNDbleasX-pz-3MCQDOTuAdZmqFQ_&amp;Key-Pair-Id=APKAJYYGFKNPXLMNCHHQ
+				</url>
+			</resources>
+		</file>
+		<file name="eur2016_06-shpd-mn-fra-f10.7z.001">
+			<size>420189311</size>
+			<mimetype>application/x-7z-compressed</mimetype>
+			<verification>
+				<hash type="md5">a04040516edbe67ad0b4a80a0eba6492</hash>
+			</verification>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
+			</logo>
+			<description>file #2: Europe 2016_06 MultiNet Shape Data Set Level
+				FRA: eur2016_06/shpd/mn/fra/f10.7z.001. ONLY DOWNLOADABLE FROM
+				81.252.32.75
+			</description>
+			<resources>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_06/shpd/mn/fra/f10.7z.001?Policy=ewogICAiU3RhdGVtZW50IjogW3sKICAgICAgIlJlc291cmNlIjoiaHR0cDovL2VkZWxpdmVyeTIudG9tdG9tLmNvbS9ldXIyMDE2XzA2L3NocGQvbW4vZnJhLyoiLAogICAgICAiQ29uZGl0aW9uIjp7CiAgICAgICAgICJJcEFkZHJlc3MiOnsiQVdTOlNvdXJjZUlwIjoiODEuMjUyLjMyLjc1LzMyIn0sCiAgICAgICAgICJEYXRlR3JlYXRlclRoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3MTI1NTAzOX0sCiAgICAgICAgICJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3MzkzMzQzOX0KICAgICAgfQogICB9XSwKICAgIkN1c3RvbWVySWQiOiIxMTk5Igp9&amp;Signature=ZT~vWhCz9aKIvS26RAeF0IiHA0hPiOY8lRD8d~99vNedDxBvdt5skOnPOOxC6vPv-fLL-IPfU3VHHkM7Mum~iyuTvoiNMFKeFk46XWKJoaR3JeIwD0ltVyGY5nqlqJvMenTMi2rbqUXrvtN5iqDXgSC-2MicbVyBFapsKhJE3U8_&amp;Key-Pair-Id=APKAJYYGFKNPXLMNCHHQ
+				</url>
+			</resources>
+		</file>
+		<file name="eur2016_06-shpd-mn-fra-f11.7z.001">
+			<size>451511942</size>
+			<mimetype>application/x-7z-compressed</mimetype>
+			<verification>
+				<hash type="md5">8c9ddc2157d28dab45bf4a9fe9e3d9be</hash>
+			</verification>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
+			</logo>
+			<description>file #3: Europe 2016_06 MultiNet Shape Data Set Level
+				FRA: eur2016_06/shpd/mn/fra/f11.7z.001. ONLY DOWNLOADABLE FROM
+				81.252.32.75
+			</description>
+			<resources>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_06/shpd/mn/fra/f11.7z.001?Policy=ewogICAiU3RhdGVtZW50IjogW3sKICAgICAgIlJlc291cmNlIjoiaHR0cDovL2VkZWxpdmVyeTIudG9tdG9tLmNvbS9ldXIyMDE2XzA2L3NocGQvbW4vZnJhLyoiLAogICAgICAiQ29uZGl0aW9uIjp7CiAgICAgICAgICJJcEFkZHJlc3MiOnsiQVdTOlNvdXJjZUlwIjoiODEuMjUyLjMyLjc1LzMyIn0sCiAgICAgICAgICJEYXRlR3JlYXRlclRoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3MTI1NTAzOX0sCiAgICAgICAgICJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3MzkzMzQzOX0KICAgICAgfQogICB9XSwKICAgIkN1c3RvbWVySWQiOiIxMTk5Igp9&amp;Signature=ZT~vWhCz9aKIvS26RAeF0IiHA0hPiOY8lRD8d~99vNedDxBvdt5skOnPOOxC6vPv-fLL-IPfU3VHHkM7Mum~iyuTvoiNMFKeFk46XWKJoaR3JeIwD0ltVyGY5nqlqJvMenTMi2rbqUXrvtN5iqDXgSC-2MicbVyBFapsKhJE3U8_&amp;Key-Pair-Id=APKAJYYGFKNPXLMNCHHQ
+				</url>
+			</resources>
+		</file>
+		<file name="eur2016_06-shp-2dcmnb-fra-f10.7z.001">
+			<size>6553932</size>
+			<mimetype>application/x-7z-compressed</mimetype>
+			<verification>
+				<hash type="md5">c3038bfa67a6edd00a66f109af2056df</hash>
+			</verification>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
+			</logo>
+			<description>file #1: Europe 2016_06 2DCMNB Shape FRA:
+				eur2016_06/shp/2dcmnb/fra/f10.7z.001. ONLY DOWNLOADABLE FROM
+				81.252.32.75</description>
+			<resources>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_06/shp/2dcmnb/fra/f10.7z.001?Policy=ewogICAiU3RhdGVtZW50IjogW3sKICAgICAgIlJlc291cmNlIjoiaHR0cDovL2VkZWxpdmVyeTIudG9tdG9tLmNvbS9ldXIyMDE2XzA2L3NocC8yZGNtbmIvZnJhLyoiLAogICAgICAiQ29uZGl0aW9uIjp7CiAgICAgICAgICJJcEFkZHJlc3MiOnsiQVdTOlNvdXJjZUlwIjoiODEuMjUyLjMyLjc1LzMyIn0sCiAgICAgICAgICJEYXRlR3JlYXRlclRoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3MTM1MjI4NH0sCiAgICAgICAgICJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3NDAzMDY4NH0KICAgICAgfQogICB9XSwKICAgIkN1c3RvbWVySWQiOiIxMTk5Igp9&amp;Signature=hczdSvK0B3aUYmH3CeM~DgAVrbCViBy2GiOu3t8s~EDTonASRnGSdoc8TNe10QilKmIaE5Tqj~sEIxlACxLdIlrHpgYSem3fE5orFP1wPwMcrdqy1q6B3M4fcF2mL5FYi5mzZw1W0383SLBa4kOfvV5mX1cw19gDUzQm3dgTNHE_&amp;Key-Pair-Id=APKAJYYGFKNPXLMNCHHQ
+				</url>
+			</resources>
+		</file>
+		<file name="eur2016_06-shp-2dcmnb-fra-f11.7z.001">
+			<size>9926351</size>
+			<mimetype>application/x-7z-compressed</mimetype>
+			<verification>
+				<hash type="md5">b8613e900756f7c50e8f13f17b1b59d6</hash>
+			</verification>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
+			</logo>
+			<description>file #2: Europe 2016_06 2DCMNB Shape FRA:
+				eur2016_06/shp/2dcmnb/fra/f11.7z.001. ONLY DOWNLOADABLE FROM
+				81.252.32.75</description>
+			<resources>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_06/shp/2dcmnb/fra/f11.7z.001?Policy=ewogICAiU3RhdGVtZW50IjogW3sKICAgICAgIlJlc291cmNlIjoiaHR0cDovL2VkZWxpdmVyeTIudG9tdG9tLmNvbS9ldXIyMDE2XzA2L3NocC8yZGNtbmIvZnJhLyoiLAogICAgICAiQ29uZGl0aW9uIjp7CiAgICAgICAgICJJcEFkZHJlc3MiOnsiQVdTOlNvdXJjZUlwIjoiODEuMjUyLjMyLjc1LzMyIn0sCiAgICAgICAgICJEYXRlR3JlYXRlclRoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3MTM1MjI4NH0sCiAgICAgICAgICJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTQ3NDAzMDY4NH0KICAgICAgfQogICB9XSwKICAgIkN1c3RvbWVySWQiOiIxMTk5Igp9&amp;Signature=hczdSvK0B3aUYmH3CeM~DgAVrbCViBy2GiOu3t8s~EDTonASRnGSdoc8TNe10QilKmIaE5Tqj~sEIxlACxLdIlrHpgYSem3fE5orFP1wPwMcrdqy1q6B3M4fcF2mL5FYi5mzZw1W0383SLBa4kOfvV5mX1cw19gDUzQm3dgTNHE_&amp;Key-Pair-Id=APKAJYYGFKNPXLMNCHHQ
+				</url>
+			</resources>
+		</file>
+	</files>
+</metalink>
