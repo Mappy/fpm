@@ -30,4 +30,5 @@ unzip -o -j 10m_physical.zi
 ## Generate
 ```bash
 mvn exec:java -Dexec.mainClass="com.mappy.data.batches.GenerateFullPbf" -Dexec.args="Belgique,Luxembourg /tmp/tomtomfiles /tmp/data Europe.osm.pbf 2"
+mvn exec:java -Dexec.mainClass="com.mappy.data.batches.merge.MergeNaturalEarthTomtom" -Dexec.args="/tmp/naturalEarth /tmp/data"
 ```
