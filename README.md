@@ -18,7 +18,7 @@ mvn clean install
 ## Download
 
 ```bash
-mvn exec:java -Dexec.mainClass="com.mappy.data.batches.tomtom.download.TomtomDownloader" -Dexec.args="/tmp/tomtomfiles 2016_09 yourLogin yourPassword"
+mvn exec:java -Dexec.mainClass="com.mappy.fpm.batches.tomtom.download.TomtomDownloader" -Dexec.args="/tmp/tomtomfiles 2016_09 yourLogin yourPassword"
 
 cd /tmp/naturalEarth
 wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/10m_cultural.zip
@@ -28,6 +28,6 @@ unzip -o -j 10m_physical.zip
 ```
 ## Generate
 ```bash
-mvn exec:java -Dexec.mainClass="com.mappy.data.batches.GenerateFullPbf" -Dexec.args="Belgique,Luxembourg /tmp/tomtomfiles /tmp/data Europe.osm.pbf 2"
-mvn exec:java -Dexec.mainClass="com.mappy.data.batches.merge.MergeNaturalEarthTomtom" -Dexec.args="/tmp/naturalEarth /tmp/data"
+mvn exec:java -Dexec.mainClass="com.mappy.fpm.batches.GenerateFullPbf" -Dexec.args="Belgique,Luxembourg /tmp/tomtomfiles /tmp/data Europe.osm.pbf 2"
+mvn exec:java -Dexec.mainClass="com.mappy.fpm.batches.merge.MergeNaturalEarthTomtom" -Dexec.args="/tmp/naturalEarth /tmp/data"
 ```
