@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/Mappy/fpm.svg?branch=master)](https://travis-ci.org/Mappy/fpm)
+[![Coverage Status](https://coveralls.io/repos/github/Mappy/fpm/badge.svg?branch=master)](https://coveralls.io/github/Mappy/fpm?branch=master)
+
+[![GitHub release](https://img.shields.io/github/release/mappy/fpm.svg)]()
+
 # How to install
 
 ## Compile source code
