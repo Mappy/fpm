@@ -14,7 +14,7 @@ public class WorldRoadsShapefile extends RoadsShapefile {
     private static final Set<String> rejectedCountries = newHashSet("USA", "CAN", "MEX");
 
     @Inject
-    public WorldRoadsShapefile(@Named("com.mappy.data.naturalearth.data") String input) {
+    public WorldRoadsShapefile(@Named("com.mappy.fpm.naturalearth.data") String input) {
         super(input + "/ne_10m_roads.shp");
     }
 

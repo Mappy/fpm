@@ -24,11 +24,11 @@ public class Tomtom2OsmModule extends AbstractModule {
     @Override
     protected void configure() {
         addMetrics(zone);
-        bindConstant().annotatedWith(Names.named("com.mappy.data.tomtom.input")).to(inputFolder);
-        bindConstant().annotatedWith(Names.named("com.mappy.data.splitter.output")).to(splitterFolder);
-        bindConstant().annotatedWith(Names.named("com.mappy.data.tomtom.zone")).to(zone);
-        bindConstant().annotatedWith(Names.named("com.mappy.data.serializer.output")).to(output + File.separator + zone + ".osm.pbf");
-        bindConstant().annotatedWith(Names.named("com.mappy.data.serializer.username")).to("Tomtom");
+        bindConstant().annotatedWith(Names.named("com.mappy.fpm.tomtom.input")).to(inputFolder);
+        bindConstant().annotatedWith(Names.named("com.mappy.fpm.splitter.output")).to(splitterFolder);
+        bindConstant().annotatedWith(Names.named("com.mappy.fpm.tomtom.zone")).to(zone);
+        bindConstant().annotatedWith(Names.named("com.mappy.fpm.serializer.output")).to(output + File.separator + zone + ".osm.pbf");
+        bindConstant().annotatedWith(Names.named("com.mappy.fpm.serializer.username")).to("Tomtom");
     }
 
     private void addMetrics(String product) {

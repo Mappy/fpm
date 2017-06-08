@@ -15,11 +15,11 @@ public class MergeNaturalEarthTomtomModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bindConstant().annotatedWith(named("com.mappy.data.geonames")).to("/inputFolder/geonames");
-        bindConstant().annotatedWith(named("com.mappy.data.tomtom.data")).to("/inputFolder/tomtomfiles");
-        bindConstant().annotatedWith(named("com.mappy.data.naturalearth.data")).to("/inputFolder/naturalearth");
-        bindConstant().annotatedWith(named("com.mappy.data.serializer.output")).to("/workspace/merge.osm.pbf");
-        bindConstant().annotatedWith(named("com.mappy.data.serializer.username")).to("boss");
+        bindConstant().annotatedWith(named("com.mappy.fpm.geonames")).to("/inputFolder/geonames");
+        bindConstant().annotatedWith(named("com.mappy.fpm.tomtom.data")).to("/inputFolder/tomtomfiles");
+        bindConstant().annotatedWith(named("com.mappy.fpm.naturalearth.data")).to("/inputFolder/naturalearth");
+        bindConstant().annotatedWith(named("com.mappy.fpm.serializer.output")).to("/workspace/merge.osm.pbf");
+        bindConstant().annotatedWith(named("com.mappy.fpm.serializer.username")).to("boss");
     }
 
     @Provides

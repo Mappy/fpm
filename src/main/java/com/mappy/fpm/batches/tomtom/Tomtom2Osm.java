@@ -26,7 +26,7 @@ public class Tomtom2Osm {
     private final String outputFile;
 
     @Inject
-    public Tomtom2Osm(GeometrySerializer serializer, Injector injector, Splitter splitter, @Named("com.mappy.data.serializer.output") String outputFile) {
+    public Tomtom2Osm(GeometrySerializer serializer, Injector injector, Splitter splitter, @Named("com.mappy.fpm.serializer.output") String outputFile) {
         this.serializer = serializer;
         this.injector = injector;
         this.splitter = splitter;

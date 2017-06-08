@@ -29,7 +29,7 @@ public class Splitter {
     private final SplitterSerializers kml;
 
     @Inject
-    public Splitter(@Named("com.mappy.data.serializer.output") String filename, SplitterSerializers kml) {
+    public Splitter(@Named("com.mappy.fpm.serializer.output") String filename, SplitterSerializers kml) {
         this.filename = filename;
         this.kml = kml;
     }

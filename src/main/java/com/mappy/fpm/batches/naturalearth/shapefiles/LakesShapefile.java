@@ -11,7 +11,7 @@ import javax.inject.Named;
 public class LakesShapefile extends NaturalEarthShapefile {
 
     @Inject
-    public LakesShapefile(@Named("com.mappy.data.naturalearth.data") String input) {
+    public LakesShapefile(@Named("com.mappy.fpm.naturalearth.data") String input) {
         super(input + "/ne_10m_lakes.shp");
     }
 

@@ -17,7 +17,7 @@ public class TomtomStats {
 
     public void increment(String key) {
         stats.incrementAndGet(key);
-        metrics.counter("com.mappy.data.tomtom." + key).inc();
+        metrics.counter("com.mappy.fpm.tomtom." + key).inc();
     }
 
     public AtomicLongMap<String> getStats() {

@@ -28,7 +28,7 @@ public class Geonames {
     private final Map<String, Integer> idByCountry;
 
     @Inject
-    public Geonames(@Named("com.mappy.data.geonames") String path) {
+    public Geonames(@Named("com.mappy.fpm.geonames") String path) {
         alternateNames = alternateNames(path + "/alternateNames.txt");
         idByCountry = idByCountry(path + "/countryInfo.txt");
     }

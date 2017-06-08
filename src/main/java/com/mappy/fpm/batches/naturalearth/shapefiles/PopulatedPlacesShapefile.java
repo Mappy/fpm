@@ -27,7 +27,7 @@ public class PopulatedPlacesShapefile extends NaturalEarthShapefile {
     private final Geonames geonames;
 
     @Inject
-    public PopulatedPlacesShapefile(@Named("com.mappy.data.naturalearth.data") String input, Geonames geonames) {
+    public PopulatedPlacesShapefile(@Named("com.mappy.fpm.naturalearth.data") String input, Geonames geonames) {
         super(input + "/ne_10m_populated_places.shp");
         this.geonames = geonames;
     }

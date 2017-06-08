@@ -22,7 +22,7 @@ public class NaturalEarthWorldFactory {
     private final MultiPolygon cuttingPolygon;
 
     @Inject
-    public NaturalEarthWorldFactory(@Named("com.mappy.data.naturalearth.data") String input, MultiPolygon cuttingPolygon) {
+    public NaturalEarthWorldFactory(@Named("com.mappy.fpm.naturalearth.data") String input, MultiPolygon cuttingPolygon) {
         this.input = input;
         this.cuttingPolygon = cuttingPolygon;
     }

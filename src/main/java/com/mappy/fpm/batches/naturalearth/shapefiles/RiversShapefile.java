@@ -11,7 +11,7 @@ import javax.inject.Named;
 public class RiversShapefile extends NaturalEarthShapefile {
 
     @Inject
-    public RiversShapefile(@Named("com.mappy.data.naturalearth.data") String input) {
+    public RiversShapefile(@Named("com.mappy.fpm.naturalearth.data") String input) {
         super(input + "/ne_10m_rivers_lake_centerlines.shp");
     }
 

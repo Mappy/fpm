@@ -18,7 +18,7 @@ public class CountriesShapefile extends NaturalEarthShapefile {
     private final Geonames geonames;
 
     @Inject
-    public CountriesShapefile(@Named("com.mappy.data.naturalearth.data") String input, Geonames geonames) {
+    public CountriesShapefile(@Named("com.mappy.fpm.naturalearth.data") String input, Geonames geonames) {
         super(input + "/ne_10m_admin_0_countries.shp");
         this.geonames = geonames;
     }

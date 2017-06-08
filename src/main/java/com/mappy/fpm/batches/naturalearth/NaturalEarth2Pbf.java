@@ -61,10 +61,10 @@ public class NaturalEarth2Pbf {
 
         @Override
         protected void configure() {
-            bindConstant().annotatedWith(named("com.mappy.data.geonames")).to(input + "/geonames");
-            bindConstant().annotatedWith(named("com.mappy.data.naturalearth.data")).to(input + "/naturalearth");
-            bindConstant().annotatedWith(named("com.mappy.data.serializer.output")).to(input + "/naturalearth.osm.pbf");
-            bindConstant().annotatedWith(named("com.mappy.data.serializer.username")).to("NaturalEarth");
+            bindConstant().annotatedWith(named("com.mappy.fpm.geonames")).to(input + "/geonames");
+            bindConstant().annotatedWith(named("com.mappy.fpm.naturalearth.data")).to(input + "/naturalearth");
+            bindConstant().annotatedWith(named("com.mappy.fpm.serializer.output")).to(input + "/naturalearth.osm.pbf");
+            bindConstant().annotatedWith(named("com.mappy.fpm.serializer.username")).to("NaturalEarth");
         }
     }
 }

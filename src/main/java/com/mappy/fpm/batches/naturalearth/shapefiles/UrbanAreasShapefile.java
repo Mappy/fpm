@@ -10,7 +10,7 @@ import javax.inject.Named;
 
 public class UrbanAreasShapefile extends NaturalEarthShapefile {
     @Inject
-    public UrbanAreasShapefile(@Named("com.mappy.data.naturalearth.data") String input) {
+    public UrbanAreasShapefile(@Named("com.mappy.fpm.naturalearth.data") String input) {
         super(input + "/ne_10m_urban_areas.shp");
     }
 

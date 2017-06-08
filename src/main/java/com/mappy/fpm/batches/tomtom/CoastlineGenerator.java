@@ -46,8 +46,8 @@ public class CoastlineGenerator {
     }
 
     @Inject
-    public CoastlineGenerator(@Named("com.mappy.data.coastline.tomtomFolder") String tomtomFolder, //
-                              @Named("com.mappy.data.coastline.workspace") String workspace, //
+    public CoastlineGenerator(@Named("com.mappy.fpm.coastline.tomtomFolder") String tomtomFolder, //
+                              @Named("com.mappy.fpm.coastline.workspace") String workspace, //
                               OsmosisSerializer serializer) {
         this.tomtomFolder = tomtomFolder;
         this.workspace = workspace;
@@ -133,10 +133,10 @@ public class CoastlineGenerator {
         return new AbstractModule() {
             @Override
             protected void configure() {
-                bindConstant().annotatedWith(Names.named("com.mappy.data.coastline.workspace")).to(workspace);
-                bindConstant().annotatedWith(Names.named("com.mappy.data.coastline.tomtomFolder")).to(tomtomFolder);
-                bindConstant().annotatedWith(Names.named("com.mappy.data.serializer.output")).to(workspace + "/coastline.osm.pbf");
-                bindConstant().annotatedWith(Names.named("com.mappy.data.serializer.username")).to("Mappy");
+                bindConstant().annotatedWith(Names.named("com.mappy.fpm.coastline.workspace")).to(workspace);
+                bindConstant().annotatedWith(Names.named("com.mappy.fpm.coastline.tomtomFolder")).to(tomtomFolder);
+                bindConstant().annotatedWith(Names.named("com.mappy.fpm.serializer.output")).to(workspace + "/coastline.osm.pbf");
+                bindConstant().annotatedWith(Names.named("com.mappy.fpm.serializer.username")).to("Mappy");
             }
         };
     }

@@ -15,7 +15,7 @@ public class OceansLabelsShapefile extends NaturalEarthShapefile {
     private static final Map<String, String> clazzes = ImmutableMap.of("ocean", "ocean", "sea", "sea");
 
     @Inject
-    public OceansLabelsShapefile(@Named("com.mappy.data.naturalearth.data") String input) {
+    public OceansLabelsShapefile(@Named("com.mappy.fpm.naturalearth.data") String input) {
         super(input + "/ne_10m_geography_marine_polys.shp");
     }
 

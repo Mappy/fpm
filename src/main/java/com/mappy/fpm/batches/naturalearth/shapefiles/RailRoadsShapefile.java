@@ -10,7 +10,7 @@ import javax.inject.Named;
 
 public class RailRoadsShapefile extends NaturalEarthShapefile {
     @Inject
-    public RailRoadsShapefile(@Named("com.mappy.data.naturalearth.data") String input) {
+    public RailRoadsShapefile(@Named("com.mappy.fpm.naturalearth.data") String input) {
         super(input + "/ne_10m_railroads.shp");
     }
 

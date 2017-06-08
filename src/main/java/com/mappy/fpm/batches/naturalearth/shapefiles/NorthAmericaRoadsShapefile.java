@@ -9,7 +9,7 @@ import javax.inject.Named;
 public class NorthAmericaRoadsShapefile extends RoadsShapefile {
 
     @Inject
-    public NorthAmericaRoadsShapefile(@Named("com.mappy.data.naturalearth.data") String input) {
+    public NorthAmericaRoadsShapefile(@Named("com.mappy.fpm.naturalearth.data") String input) {
         super(input + "/ne_10m_roads_north_america.shp");
     }
 

@@ -28,7 +28,7 @@ public class SplitterSerializers {
     private final String parent;
 
     @Inject
-    public SplitterSerializers(@Named("com.mappy.data.splitter.output") String parent, @Named("com.mappy.data.tomtom.zone") String pbf) {
+    public SplitterSerializers(@Named("com.mappy.fpm.splitter.output") String parent, @Named("com.mappy.fpm.tomtom.zone") String pbf) {
         this.parent = parent;
         this.pbf = pbf + ".osm.pbf";
     }

@@ -41,7 +41,7 @@ public class OsmosisSerializer implements GeometrySerializer {
     }
 
     @Inject
-    public OsmosisSerializer(@Named("com.mappy.data.serializer.output") String filename, @Named("com.mappy.data.serializer.username") String userName) throws FileNotFoundException {
+    public OsmosisSerializer(@Named("com.mappy.fpm.serializer.output") String filename, @Named("com.mappy.fpm.serializer.username") String userName) throws FileNotFoundException {
         this(new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(filename), false)), userName, DateTime.now().toDate());
     }
 

@@ -9,8 +9,8 @@ public class TomtomFolder {
 
     @Inject
     public TomtomFolder(
-            @Named("com.mappy.data.tomtom.input") String inputFolder,
-            @Named("com.mappy.data.tomtom.zone") String zone) {
+            @Named("com.mappy.fpm.tomtom.input") String inputFolder,
+            @Named("com.mappy.fpm.tomtom.zone") String zone) {
         this.inputFolder = inputFolder;
         this.zone = zone;
     }

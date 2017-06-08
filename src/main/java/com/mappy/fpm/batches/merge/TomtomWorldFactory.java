@@ -25,7 +25,7 @@ public class TomtomWorldFactory {
     private final String input;
 
     @Inject
-    public TomtomWorldFactory(@Named("com.mappy.data.tomtom.data") String input, MultiPolygon cuttingPolygon) {
+    public TomtomWorldFactory(@Named("com.mappy.fpm.tomtom.data") String input, MultiPolygon cuttingPolygon) {
         this.input = input;
         this.cuttingPolygon = cuttingPolygon;
     }

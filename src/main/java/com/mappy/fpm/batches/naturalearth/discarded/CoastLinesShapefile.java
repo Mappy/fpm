@@ -23,7 +23,7 @@ public class CoastLinesShapefile extends NaturalEarthShapefile {
     private static final Polygon bbox = world();
 
     @Inject
-    public CoastLinesShapefile(@Named("com.mappy.data.naturalearth.data") String input) {
+    public CoastLinesShapefile(@Named("com.mappy.fpm.naturalearth.data") String input) {
         super(input + "/ne_10m_land.shp");
     }
 
