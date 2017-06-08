@@ -4,6 +4,7 @@ import com.mappy.data.batches.tomtom.download.MetalinkParser.Metalink;
 import com.mappy.data.batches.tomtom.download.MetalinkParser.MetalinkUrl;
 import com.mappy.data.batches.tomtom.download.TomtomCountries.TomtomCountry;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import static com.mappy.data.batches.tomtom.download.TomtomCountries.outerworld;
 
 @Slf4j
 public class TomtomDownloader {
+
     private final MetalinkDownloader downloader;
     private final ShapefileDownloader shpDownloader;
     private final List<TomtomCountry> countries;
@@ -30,7 +32,7 @@ public class TomtomDownloader {
         checkState(!metalink.isEmpty(), "No data in metalink");
 
         countries.stream().parallel().forEach(country -> {
-            log.info("Processing {}", country.getLabel());
+            log.info("Downloading {}", country.getLabel());
 
             Metalink local = metalink.forCountry(country.getId().toLowerCase());
             checkState(!local.isEmpty(), "No data for " + country.getLabel());
@@ -62,9 +64,6 @@ public class TomtomDownloader {
         List<TomtomCountry> countries = countries();
         countries.addAll(outerworld());
 
-        String tomtomVersion = args[1];
-        String login = args[2];
-        String password = args[3];
-        new TomtomDownloader(new MetalinkDownloader(login, password, tomtomVersion), new ShapefileDownloader(outputDirectory), countries).run();
+        new TomtomDownloader(new MetalinkDownloader(args[2], args[3], args[1], HttpClientBuilder.create().build()), new ShapefileDownloader(outputDirectory), countries).run();
     }
 }
