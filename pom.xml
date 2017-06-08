@@ -161,6 +161,8 @@
             <groupId>net.morbz</groupId>
             <artifactId>osmonaut</artifactId>
             <version>1.0.2.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/osmonaut-1.0.2.4.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
