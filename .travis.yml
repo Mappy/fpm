@@ -1,5 +1,7 @@
 language: java
 jdk:
   - oraclejdk8
+before_install:
+  - mvn install:install-file -Dfile=./libs/osmonaut-1.0.2.4.jar -DgroupId=net.morbz -DartifactId=osmonaut -Dversion=1.0.2.4 -Dpackaging=jar
 after_success:
   - mvn clean cobertura:cobertura coveralls:report

@@ -5,6 +5,14 @@
 
 # How to install
 
+## Add third party libs to in the local maven repo
+
+In the project root directory :
+
+```bash
+mvn install:install-file -Dfile=./libs/osmonaut-1.0.2.4.jar -DgroupId=net.morbz -DartifactId=osmonaut -Dversion=1.0.2.4 -Dpackaging=jar
+```
+
 ## Compile source code
 
 This project use maven in order to compile source file :
