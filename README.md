@@ -19,6 +19,9 @@ This project use maven in order to compile source file :
 
 ```bash
 mvn clean install
+
+cd src/main/docker/fpm
+docker build -t mappy/fpm .
 ```
 
 # How to use
@@ -26,16 +29,20 @@ mvn clean install
 ## Download
 
 ```bash
-mvn exec:java -Dexec.mainClass="com.mappy.fpm.batches.tomtom.download.TomtomDownloader" -Dexec.args="/tmp/tomtomfiles 2016_09 yourLogin yourPassword"
+docker run --rm -v /tmp/tomtomfiles:/workspace -p 9501:9501 -t mappy/fpm com.mappy.fpm.batches.tomtom.download.TomtomDownloader /workspace 2016_09  yourLogin yourPassword
+```
 
+```bash
 cd /tmp/naturalEarth
 wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/10m_cultural.zip
 wget http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/physical/10m_physical.zip
 unzip -o -j 10m_cultural.zip
 unzip -o -j 10m_physical.zip
 ```
+
 ## Generate
+
 ```bash
-mvn exec:java -Dexec.mainClass="com.mappy.fpm.batches.GenerateFullPbf" -Dexec.args="Belgique,Luxembourg /tmp/tomtomfiles /tmp/data Europe.osm.pbf 2"
-mvn exec:java -Dexec.mainClass="com.mappy.fpm.batches.merge.MergeNaturalEarthTomtom" -Dexec.args="/tmp/naturalEarth /tmp/data"
+docker run --rm -v /tmp/tomtomfiles:/input -v /tmp/data:/output -p 9501:9501 -t mappy/fpm com.mappy.fpm.batches.GenerateFullPbf "Belgique,Luxembourg" "/input" "/output" Europe.osm.pbf 2
+docker run --rm -v /tmp/data:/workspace -v /tmp:/inputFolder -t mappy/fpm com.mappy.fpm.batches.merge.MergeNaturalEarthTomtom
 ```
