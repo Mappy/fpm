@@ -22,7 +22,7 @@ public class LaneDirection {
     private static List<Direction> parseDirection(int direction) {
         List<Direction> dirs = newArrayList();
         for (Direction dir : Direction.values()) {
-            if ((direction & (1 << dir.mask)) != 0) {
+            if ((direction & 1 << dir.mask) != 0) {
                 dirs.add(dir);
             }
         }

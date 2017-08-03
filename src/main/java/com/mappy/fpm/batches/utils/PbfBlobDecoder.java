@@ -165,7 +165,7 @@ public class PbfBlobDecoder {
         List<Long> lonList = nodes.getLonList();
 
         // Ensure parallel lists are of equal size.
-        if ((idList.size() != latList.size()) || (idList.size() != lonList.size())) {
+        if (idList.size() != latList.size() || idList.size() != lonList.size()) {
             throw new OsmosisRuntimeException("Number of ids (" + idList.size() + "), latitudes (" + latList.size()
                     + "), and longitudes (" + lonList.size() + ") don't match");
         }
@@ -291,7 +291,7 @@ public class PbfBlobDecoder {
         List<RelationMember> members = relation.getMembers();
 
         // Ensure parallel lists are of equal size.
-        if ((memberIds.size() != memberRoles.size()) || (memberIds.size() != memberTypes.size())) {
+        if (memberIds.size() != memberRoles.size() || memberIds.size() != memberTypes.size()) {
             throw new OsmosisRuntimeException("Number of member ids (" + memberIds.size() + "), member roles ("
                     + memberRoles.size() + "), and member types (" + memberTypes.size() + ") don't match");
         }

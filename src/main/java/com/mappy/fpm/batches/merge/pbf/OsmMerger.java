@@ -38,7 +38,7 @@ public class OsmMerger {
                     serializer.process(merge.next());
                 }
             }
-            double size = ((double) new File(outputFile).length()) / 1024 / 1024;
+            double size = new File(outputFile).length() / 1024.0 / 1024.0;
             log.info("Done writing {} ({} Mo) in {}.", outputFile, String.format("%.2f", size), watch);
         }
     }

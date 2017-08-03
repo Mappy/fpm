@@ -75,6 +75,6 @@ public class BoundComputerAndSorterSink implements Sink {
     }
 
     private static long mapRawDegrees(double degrees) {
-        return (long) ((degrees / .000000001));
+        return (long) (degrees / .000000001);
     }
 }

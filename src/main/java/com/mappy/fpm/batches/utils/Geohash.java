@@ -16,7 +16,7 @@ public class Geohash {
         String stringEncode = GeoHash.encodeHash(y, x, 11);
         long decode = encodeString(stringEncode);
         checkState(layer >= 0 && layer < 8);
-        long mask = ((long) layer) << 55;
+        long mask = (long) layer << 55;
         return decode | mask;
     }
 
@@ -30,12 +30,12 @@ public class Geohash {
     }
 
     public static long withoutLayer(long geohash) {
-        long mask = ((long) 0b111) << 55;
+        long mask = (long) 0b111 << 55;
         return geohash & ~mask;
     }
 
     public static long getLayer(long geohash) {
-        long mask = ((long) 0b111) << 55;
+        long mask = (long) 0b111 << 55;
         return (geohash & mask) >> 55;
     }
 

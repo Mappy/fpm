@@ -15,7 +15,7 @@ public class LargePolygonSplitter {
     private static final GeometryFactory gf = new GeometryFactory();
 
     public static List<Geometry> split(Geometry given, double maxArea) {
-        return split(given, maxArea, (g) -> false);
+        return split(given, maxArea, g -> false);
     }
 
     public static List<Geometry> split(Geometry given, double maxArea, Predicate<Geometry> predicate) {

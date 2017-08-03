@@ -1,7 +1,6 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import com.mappy.fpm.batches.tomtom.TomtomStats;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
@@ -10,6 +9,7 @@ import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
 import com.mappy.fpm.batches.utils.Feature;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -196,9 +196,9 @@ public class RoadTagger {
 
     private static String duration(Feature feature) {
         Double minutes = feature.getDouble("MINUTES");
-        Double hours = (minutes / 60) % 24;
+        Double hours = minutes / 60 % 24;
         Double mins = minutes % 60;
-        Double sec = ((minutes * 60) % 60);
+        Double sec = minutes * 60 % 60;
         return String.format("%02d:%02d:%02d", hours.intValue(), mins.intValue(), sec.intValue());
     }
 }

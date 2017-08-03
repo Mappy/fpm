@@ -57,7 +57,7 @@ public class HsprDbf {
 
     private static String profile(Collection<SpeedProfile> speeds) {
         return speeds.stream().findFirst().get().getId() + ":"
-                + speeds.stream().map(timeSlotSpeed -> String.valueOf((int) (100 - (timeSlotSpeed.getTimeSlotSpeed().getRelSpeed())))).collect(joining("_"));
+                + speeds.stream().map(timeSlotSpeed -> String.valueOf((int) (100 - timeSlotSpeed.getTimeSlotSpeed().getRelSpeed()))).collect(joining("_"));
     }
 
     private static Double min(Collection<SpeedProfile> speeds) {
