@@ -29,6 +29,7 @@ public class BoundariesShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
         String name = feature.getString("NAME");
+        Long extId = feature.getLong("ID");
         if (name != null) {
             MultiPolygon multiPolygon = feature.getMultiPolygon();
             List<RelationMember> members = Lists.newArrayList();
@@ -39,7 +40,9 @@ public class BoundariesShapefile extends TomtomShapefile {
                             "boundary",
                             "administrative",
                             "admin_level",
-                            adminLevel));
+                            adminLevel,
+                            "ref:tomtom",
+                            extId.toString()));
                     members.add(new RelationMember(way.getId(), Way, "outer"));
                 }
             }
