@@ -6,20 +6,25 @@ import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.LongLineSplitter;
+import com.mappy.fpm.batches.utils.WriteFirst;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+import lombok.Getter;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
-
+@WriteFirst
 public class BoundariesShapefile extends TomtomShapefile {
 
     private final String adminLevel;
+
 
     protected BoundariesShapefile(String filename, int adminLevel) {
         super(filename);
@@ -57,4 +62,5 @@ public class BoundariesShapefile extends TomtomShapefile {
                     name));
         }
     }
+
 }
