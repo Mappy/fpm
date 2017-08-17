@@ -6,9 +6,11 @@ import com.mappy.fpm.batches.tomtom.helpers.PopulationProvider;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 
+import com.mappy.fpm.batches.utils.Order;
+
 import javax.inject.Inject;
 
-
+@Order(1)
 public class BoundariesA8Shapefile extends BoundariesShapefile {
 
     PopulationProvider populationProvider;
@@ -16,7 +18,8 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
 
     @Inject
     public BoundariesA8Shapefile(TomtomFolder folder, PopulationProvider populationProvider) {
-        super(folder.getFile("a8.shp"), 8);
+
+        super(folder.getFile("___a8.shp"), 8);
         this.populationProvider = populationProvider;
     }
 

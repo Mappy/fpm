@@ -6,12 +6,14 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.PopulationProvider;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
+import com.mappy.fpm.batches.utils.Order;
 
 import javax.inject.Inject;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
 
+@Order(2)
 public class TownShapefile extends TomtomShapefile {
 
     private final NameProvider nameProvider;
