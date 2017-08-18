@@ -3,25 +3,29 @@ package com.mappy.fpm.batches.tomtom.shapefiles;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.helpers.PopulationProvider;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.WriteFirst;
+import com.mappy.fpm.batches.utils.Order;
 
 import javax.inject.Inject;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
 
-@WriteFirst
+@Order(2)
 public class TownShapefile extends TomtomShapefile {
 
     private final NameProvider nameProvider;
+    private PopulationProvider populationProvider;
+
 
     @Inject
-    public TownShapefile(NameProvider nameProvider, TomtomFolder folder) {
+    public TownShapefile(NameProvider nameProvider, TomtomFolder folder, PopulationProvider populationProvider) {
         super(folder.getFile("sm.shp"));
         this.nameProvider = nameProvider;
         this.nameProvider.loadFromFile("smnm.dbf", "NAME", false);
+        this.populationProvider = populationProvider;
     }
 
     public void serialize(GeometrySerializer geometrySerializer, Feature feature) {
@@ -48,6 +52,7 @@ public class TownShapefile extends TomtomShapefile {
                 break;
         }
         tags.putAll(nameProvider.getAlternateNames(feature.getLong("ID")));
+        populationProvider.getPop(feature.getLong("ID")).ifPresent((pop) -> tags.put("population", pop));
         geometrySerializer.write(feature.getPoint(), tags);
     }
 }

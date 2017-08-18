@@ -6,7 +6,7 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import com.google.inject.Injector;
 import com.mappy.fpm.batches.splitter.Splitter;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.WriteFirst;
+import com.mappy.fpm.batches.utils.Order;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
@@ -57,7 +57,8 @@ public class Tomtom2Osm {
     }
 
     private static Comparator<ClassInfo> conparator() {
-        Comparator<ClassInfo> writeFirst = comparing(clazz -> !clazz.load().isAnnotationPresent(WriteFirst.class));
+        Comparator<ClassInfo> writeFirst = comparing(clazz -> !clazz.load().isAnnotationPresent(Order.class) ? Integer.MAX_VALUE : clazz.load().getAnnotation(Order.class).value() );
         return writeFirst.thenComparing(comparing(ClassInfo::getSimpleName));
     }
+
 }

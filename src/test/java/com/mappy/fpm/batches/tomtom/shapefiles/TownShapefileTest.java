@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,4 +26,18 @@ public class TownShapefileTest {
                 .filteredOn(node -> node.getTags().hasKeyValue("name:fr", "Bruxelles"))
                 .hasSize(1);
     }
+
+
+    @Test
+    public void should_have_tag_population() throws Exception {
+        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "belbe3")).getInstance(Tomtom2Osm.class);
+        launcher.run();
+        Tomtom2OsmTestUtils.PbfContent pbfContent = read(new File("target/belbe3.osm.pbf"));
+
+        assertThat(pbfContent.getNodes().stream().flatMap( n ->  newArrayList( n.getTags()).stream()).filter( t -> t.equals("population")).toArray()).hasSize(2) ;
+
+    }
+
+
+
 }
