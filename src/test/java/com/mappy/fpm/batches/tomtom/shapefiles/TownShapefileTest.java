@@ -4,15 +4,21 @@ import com.google.inject.Guice;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
+import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import org.junit.Test;
 
+import javax.annotation.meta.When;
 import java.io.File;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TownShapefileTest {
+
+
 
     @Test
     public void should_change_name_to_french_when_available() throws Exception {
@@ -34,8 +40,8 @@ public class TownShapefileTest {
         launcher.run();
         Tomtom2OsmTestUtils.PbfContent pbfContent = read(new File("target/belbe3.osm.pbf"));
 
-        assertThat(pbfContent.getNodes().stream().flatMap( n ->  newArrayList( n.getTags()).stream()).filter( t -> t.equals("population")).toArray()).hasSize(2) ;
-
+        assertThat(pbfContent.getNodes().stream().flatMap( n ->  newArrayList( n.getTags()).stream()).filter( t -> t.equals("population")).toArray()).hasSize(2);
+        assertThat(pbfContent.getRelations()).hasSize(5);
     }
 
 

@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 
-public class BoundariesShapefile extends TomtomShapefile {
+public class    BoundariesShapefile extends TomtomShapefile {
 
     private final String adminLevel;
 
@@ -29,11 +29,14 @@ public class BoundariesShapefile extends TomtomShapefile {
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
+        serialize(serializer, feature, Lists.newArrayList());
+    }
+
+    public void serialize(GeometrySerializer serializer, Feature feature, List<RelationMember> members) {
         String name = feature.getString("NAME");
         Long extId = feature.getLong("ID");
         if (name != null) {
             MultiPolygon multiPolygon = feature.getMultiPolygon();
-            List<RelationMember> members = Lists.newArrayList();
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
                 for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
@@ -42,11 +45,14 @@ public class BoundariesShapefile extends TomtomShapefile {
                             "administrative",
                             "admin_level",
                             adminLevel,
+                            "name",
+                            name,
                             "ref:tomtom",
                             extId.toString()));
                     members.add(new RelationMember(way.getId(), Way, "outer"));
                 }
             }
+
             serializer.writeRelation(members, ImmutableMap.of(
                     "type",
                     "boundary",
