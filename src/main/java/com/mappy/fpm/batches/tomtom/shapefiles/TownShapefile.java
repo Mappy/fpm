@@ -1,31 +1,36 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
+import com.google.common.collect.ImmutableMap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
-import com.mappy.fpm.batches.tomtom.helpers.PopulationProvider;
+import com.mappy.fpm.batches.tomtom.helpers.RelationProvider;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.Order;
+import org.openstreetmap.osmosis.core.domain.v0_6.Node;
+import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 
 @Order(2)
 public class TownShapefile extends TomtomShapefile {
 
     private final NameProvider nameProvider;
-    private PopulationProvider populationProvider;
+    private RelationProvider relationProvider;
 
 
     @Inject
-    public TownShapefile(NameProvider nameProvider, TomtomFolder folder, PopulationProvider populationProvider) {
+    public TownShapefile(NameProvider nameProvider, TomtomFolder folder, RelationProvider relationProvider) {
         super(folder.getFile("sm.shp"));
         this.nameProvider = nameProvider;
         this.nameProvider.loadFromFile("smnm.dbf", "NAME", false);
-        this.populationProvider = populationProvider;
+        this.relationProvider = relationProvider;
     }
 
     public void serialize(GeometrySerializer geometrySerializer, Feature feature) {
@@ -52,7 +57,23 @@ public class TownShapefile extends TomtomShapefile {
                 break;
         }
         tags.putAll(nameProvider.getAlternateNames(feature.getLong("ID")));
-        populationProvider.getPop(feature.getLong("ID")).ifPresent((pop) -> tags.put("population", pop));
-        geometrySerializer.write(feature.getPoint(), tags);
+        relationProvider.getPop(feature.getLong("ID")).ifPresent(pop -> tags.put("population", pop));
+        Optional<Node> node = geometrySerializer.writePoint(feature.getPoint(), tags);
+
+        relationProvider.getMembers(feature.getLong("ID")).ifPresent(relationMembers -> {
+                    node.ifPresent(node1 ->
+                            relationMembers.getRelationMembers().add(new RelationMember(node1.getId(), Node, "admin_center"))
+                    );
+                    geometrySerializer.writeRelation(relationMembers.getRelationMembers(), ImmutableMap.of(
+                            "type",
+                            "boundary",
+                            "boundary",
+                            "administrative",
+                            "admin_level",
+                            "8",
+                            "name",
+                            relationMembers.getName()));
+                }
+        );
     }
 }

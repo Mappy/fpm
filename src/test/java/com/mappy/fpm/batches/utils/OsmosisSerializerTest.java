@@ -13,11 +13,11 @@ import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 
 public class OsmosisSerializerTest {
@@ -37,33 +37,28 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_refuse_to_forget_a_point() throws Exception {
-        serializer.write(point(42.0, 3.0), ImmutableMap.of("place", "city"));
+    public void should_refuse_to_forget_a_point() {
+        serializer.writePoint(point(42.0, 3.0), ImmutableMap.of("place", "city"));
 
-        try {
-            serializer.write(point(42.0, 3.0), ImmutableMap.of("amenity", "hotel"));
-            fail("Unreachable");
-        }
-        catch (IllegalStateException ise) {
-            assertThat(ise.getMessage()).isEqualTo("Rejecting a point because already present: {amenity=hotel}");
-        }
+        Optional<Node> node2 = serializer.writePoint(point(42.0, 3.0), ImmutableMap.of("amenity", "hotel"));
+        assertThat(node2).isEmpty();
     }
 
     @Test
     public void should_not_write_duplicate_points_on_ways() throws Exception {
         serializer.write(
                 linestring(
-                        new Coordinate[] {
+                        new Coordinate[]{
                                 new Coordinate(0.0, 0.0),
                                 new Coordinate(1.0, 0.0),
-                                new Coordinate(2.0, 0.0) }),
+                                new Coordinate(2.0, 0.0)}),
                 Maps.newHashMap());
         serializer.write(
                 linestring(
-                        new Coordinate[] {
+                        new Coordinate[]{
                                 new Coordinate(-1.0, 0.0),
                                 new Coordinate(1.0, 0.0),
-                                new Coordinate(3.0, 0.0) }),
+                                new Coordinate(3.0, 0.0)}),
                 Maps.newHashMap());
 
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Node).hasSize(5);
@@ -74,15 +69,15 @@ public class OsmosisSerializerTest {
     public void should_increment_way_id_if_aready_exists() throws Exception {
         serializer.write(
                 linestring(
-                        new Coordinate[] {
+                        new Coordinate[]{
                                 new Coordinate(0.0, 0.0),
-                                new Coordinate(1.0, 1.0) }),
+                                new Coordinate(1.0, 1.0)}),
                 Maps.newHashMap());
         serializer.write(
                 linestring(
-                        new Coordinate[] {
+                        new Coordinate[]{
                                 new Coordinate(1.0, 1.0),
-                                new Coordinate(0.0, 0.0) }),
+                                new Coordinate(0.0, 0.0)}),
                 Maps.newHashMap());
 
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Way).extracting(Entity::getId).containsExactly(
@@ -94,15 +89,15 @@ public class OsmosisSerializerTest {
     public void should_generate_relation_id() throws Exception {
         serializer.write(
                 linestring(
-                        new Coordinate[] {
+                        new Coordinate[]{
                                 new Coordinate(0.0, 0.0),
-                                new Coordinate(1.0, 1.0) }),
+                                new Coordinate(1.0, 1.0)}),
                 Maps.newHashMap());
         serializer.write(
                 linestring(
-                        new Coordinate[] {
+                        new Coordinate[]{
                                 new Coordinate(0.0, 0.0),
-                                new Coordinate(1.0, 1.0) }),
+                                new Coordinate(1.0, 1.0)}),
                 Maps.newHashMap());
         serializer.writeRelation(newArrayList(
                 new RelationMember(1525972802595572L, Way, "from"),
@@ -120,8 +115,8 @@ public class OsmosisSerializerTest {
     public void should_write_ways() throws Exception {
         serializer.write(
                 multilinestring(
-                        new Coordinate[] { new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(2.0, 0.0) },
-                        new Coordinate[] { new Coordinate(2.0, 0.0), new Coordinate(3.0, 0.0) }),
+                        new Coordinate[]{new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(2.0, 0.0)},
+                        new Coordinate[]{new Coordinate(2.0, 0.0), new Coordinate(3.0, 0.0)}),
                 Maps.newHashMap());
 
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Node).hasSize(4);
@@ -170,9 +165,9 @@ public class OsmosisSerializerTest {
     public void should_write_polygon_with_holes() throws Exception {
         serializer.write(
                 polygon(
-                        new Coordinate[] { new Coordinate(0.0, 0.0), new Coordinate(10.0, 0.0), new Coordinate(10.0, 10.0), new Coordinate(0.0, 10.0), new Coordinate(0.0, 0.0) },
-                        new Coordinate[][] { new Coordinate[] { new Coordinate(2.0, 2.0), new Coordinate(3.0, 2.0), new Coordinate(3.0, 3.0), new Coordinate(2.0, 3.0), new Coordinate(2.0, 2.0) },
-                                new Coordinate[] { new Coordinate(6.0, 6.0), new Coordinate(7.0, 6.0), new Coordinate(7.0, 7.0), new Coordinate(6.0, 7.0), new Coordinate(6.0, 6.0) } }),
+                        new Coordinate[]{new Coordinate(0.0, 0.0), new Coordinate(10.0, 0.0), new Coordinate(10.0, 10.0), new Coordinate(0.0, 10.0), new Coordinate(0.0, 0.0)},
+                        new Coordinate[][]{new Coordinate[]{new Coordinate(2.0, 2.0), new Coordinate(3.0, 2.0), new Coordinate(3.0, 3.0), new Coordinate(2.0, 3.0), new Coordinate(2.0, 2.0)},
+                                new Coordinate[]{new Coordinate(6.0, 6.0), new Coordinate(7.0, 6.0), new Coordinate(7.0, 7.0), new Coordinate(6.0, 7.0), new Coordinate(6.0, 6.0)}}),
                 ImmutableMap.of("natural", "water"));
 
         assertThat(sink.getEntities())
@@ -188,7 +183,7 @@ public class OsmosisSerializerTest {
     @Test
     public void should_write_polygon_without_holes_as_way() throws Exception {
         serializer.write(
-                polygon(new Coordinate[] { new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(1.0, 1.0), new Coordinate(0.0, 1.0), new Coordinate(0.0, 0.0) }, new Coordinate[][] {}),
+                polygon(new Coordinate[]{new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(1.0, 1.0), new Coordinate(0.0, 1.0), new Coordinate(0.0, 0.0)}, new Coordinate[][]{}),
                 ImmutableMap.of("natural", "water"));
 
         assertThat(sink.getEntities()).containsExactly(
@@ -207,14 +202,14 @@ public class OsmosisSerializerTest {
     @Test
     public void should_write_multipolygon() throws Exception {
         Polygon polygon1 = polygon(
-                new Coordinate[] { new Coordinate(0.0, 0.0), new Coordinate(10.0, 0.0), new Coordinate(10.0, 10.0), new Coordinate(0.0, 10.0), new Coordinate(0.0, 0.0) },
-                new Coordinate[][] { new Coordinate[] { new Coordinate(2.0, 2.0), new Coordinate(3.0, 2.0), new Coordinate(3.0, 3.0), new Coordinate(2.0, 3.0), new Coordinate(2.0, 2.0) } });
+                new Coordinate[]{new Coordinate(0.0, 0.0), new Coordinate(10.0, 0.0), new Coordinate(10.0, 10.0), new Coordinate(0.0, 10.0), new Coordinate(0.0, 0.0)},
+                new Coordinate[][]{new Coordinate[]{new Coordinate(2.0, 2.0), new Coordinate(3.0, 2.0), new Coordinate(3.0, 3.0), new Coordinate(2.0, 3.0), new Coordinate(2.0, 2.0)}});
 
         Polygon polygon2 = polygon(
-                new Coordinate[] { new Coordinate(20.0, 20.0), new Coordinate(30.0, 20.0), new Coordinate(30.0, 30.0), new Coordinate(20.0, 30.0), new Coordinate(20.0, 20.0) },
-                new Coordinate[][] { new Coordinate[] { new Coordinate(22.0, 22.0), new Coordinate(23.0, 22.0), new Coordinate(23.0, 23.0), new Coordinate(22.0, 23.0), new Coordinate(22.0, 22.0) } });
+                new Coordinate[]{new Coordinate(20.0, 20.0), new Coordinate(30.0, 20.0), new Coordinate(30.0, 30.0), new Coordinate(20.0, 30.0), new Coordinate(20.0, 20.0)},
+                new Coordinate[][]{new Coordinate[]{new Coordinate(22.0, 22.0), new Coordinate(23.0, 22.0), new Coordinate(23.0, 23.0), new Coordinate(22.0, 23.0), new Coordinate(22.0, 22.0)}});
 
-        serializer.write(gf.createMultiPolygon(new Polygon[] { polygon1, polygon2 }), ImmutableMap.of("natural", "water"));
+        serializer.write(gf.createMultiPolygon(new Polygon[]{polygon1, polygon2}), ImmutableMap.of("natural", "water"));
 
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Node).hasSize(16);
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Way).hasSize(4);
@@ -238,7 +233,7 @@ public class OsmosisSerializerTest {
     }
 
     private static MultiLineString multilinestring(Coordinate[] first, Coordinate[] second) {
-        return gf.createMultiLineString(new LineString[] { gf.createLineString(first), gf.createLineString(second) });
+        return gf.createMultiLineString(new LineString[]{gf.createLineString(first), gf.createLineString(second)});
     }
 
     private static Polygon polygon(Coordinate[] exterior, Coordinate[][] interior) {
@@ -262,13 +257,16 @@ public class OsmosisSerializerTest {
         private final List<Entity> entities = Lists.newArrayList();
 
         @Override
-        public void initialize(Map<String, Object> metaData) {}
+        public void initialize(Map<String, Object> metaData) {
+        }
 
         @Override
-        public void complete() {}
+        public void complete() {
+        }
 
         @Override
-        public void release() {}
+        public void release() {
+        }
 
         @Override
         public void process(EntityContainer entityContainer) {
