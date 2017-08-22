@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import static com.google.inject.Guice.createInjector;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
+import static java.util.stream.Stream.of;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BoundariesA0ShapefileTest {
@@ -28,6 +29,7 @@ public class BoundariesA0ShapefileTest {
         assertThat(tags.get("ref:tomtom")).isEqualTo("10200000000008");
         assertThat(tags.get("admin_level")).isEqualTo("2");
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter(relationMember -> relationMember.getRole().equals("admin_center")).count()).isEqualTo(1);
+        assertThat(of("name:fr", "name:de", "name:en", "name:ca", "name:es").allMatch(tags::hasKey)).isTrue();
 
     }
 
