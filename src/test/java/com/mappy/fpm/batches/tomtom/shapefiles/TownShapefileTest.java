@@ -5,10 +5,14 @@ import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
 import com.mappy.fpm.batches.utils.OsmosisSerializer;
+import net.morbz.osmonaut.osm.Node;
+import net.morbz.osmonaut.osm.RelationMember;
 import org.junit.Test;
 
 import javax.annotation.meta.When;
 import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
@@ -35,13 +39,14 @@ public class TownShapefileTest {
 
 
     @Test
-    public void should_have_tag_population() throws Exception {
+    public void should_have_tag_population_and_relations() throws Exception {
         Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "belbe3")).getInstance(Tomtom2Osm.class);
         launcher.run();
         Tomtom2OsmTestUtils.PbfContent pbfContent = read(new File("target/belbe3.osm.pbf"));
 
         assertThat(pbfContent.getNodes().stream().flatMap( n ->  newArrayList( n.getTags()).stream()).filter( t -> t.equals("population")).toArray()).hasSize(2);
-        assertThat(pbfContent.getRelations()).hasSize(5);
+        assertThat(pbfContent.getRelations()).hasSize(2);
+        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter(relationMember -> relationMember.getRole().equals("admin_center")).count()).isEqualTo(2);
     }
 
 

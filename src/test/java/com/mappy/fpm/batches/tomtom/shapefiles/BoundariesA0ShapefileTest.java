@@ -27,6 +27,8 @@ public class BoundariesA0ShapefileTest {
         Tags tags = wayOptional.get().getTags();
         assertThat(tags.get("ref:tomtom")).isEqualTo("10200000000008");
         assertThat(tags.get("admin_level")).isEqualTo("2");
+        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter(relationMember -> relationMember.getRole().equals("admin_center")).count()).isEqualTo(1);
+
     }
 
 }

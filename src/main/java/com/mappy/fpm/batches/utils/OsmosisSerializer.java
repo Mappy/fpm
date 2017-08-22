@@ -47,14 +47,22 @@ public class OsmosisSerializer implements GeometrySerializer {
 
     @Override
     public void write(Point point, Map<String, String> tags) {
+        writePoint(point, tags);
+    }
+
+    @Override
+    public Optional<Node> writePoint(Point point, Map<String, String> tags) {
         long id = geohash(0, point.getCoordinate());
 
         if (pointTracker.contains(id)) {
-            throw new IllegalStateException("Rejecting a point because already present: " + tags);
+            log.warn("Rejecting a point because already present: " + tags);
+            return Optional.empty();
         }
 
         pointTracker.add(id);
-        sink.process(new NodeContainer(new Node(ced(id, tags), point.getY(), point.getX())));
+        Node node = new Node(ced(id, tags), point.getY(), point.getX());
+        sink.process(new NodeContainer(node));
+        return Optional.of(node);
     }
 
     @Override
@@ -86,8 +94,7 @@ public class OsmosisSerializer implements GeometrySerializer {
     public void write(Polygon polygon, Map<String, String> tags) {
         if (polygon.getNumInteriorRing() == 0) {
             write(polygon.getExteriorRing(), tags);
-        }
-        else {
+        } else {
             List<RelationMember> rm = newArrayList(new RelationMember(write(polygon.getExteriorRing(), newHashMap()).getId(), Way, "outer"));
             for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
                 rm.add(new RelationMember(write(polygon.getInteriorRingN(i), newHashMap()).getId(), Way, "inner"));
@@ -101,8 +108,7 @@ public class OsmosisSerializer implements GeometrySerializer {
         for (RelationMember member : members) {
             if (member.getMemberType() == Node) {
                 checkState(pointTracker.contains(member.getMemberId()), "Adding relation on missing node");
-            }
-            else if (member.getMemberType() == Way) {
+            } else if (member.getMemberType() == Way) {
                 checkState(wayTracker.contains(member.getMemberId()), "Adding relation on missing way");
             }
         }
@@ -169,7 +175,7 @@ public class OsmosisSerializer implements GeometrySerializer {
     }
 
     private static Map<String, String> addMultipolygon(Map<String, String> tags) {
-        return ImmutableMap.<String, String> builder().putAll(tags).put("type", "multipolygon").build();
+        return ImmutableMap.<String, String>builder().putAll(tags).put("type", "multipolygon").build();
     }
 
     private static long geohash(int layer, Coordinate coordinate) {
