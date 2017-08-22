@@ -3,6 +3,7 @@ package com.mappy.fpm.batches.tomtom.shapefiles;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.BoundariesShapefile;
 import com.mappy.fpm.batches.tomtom.helpers.RelationProvider;
 import com.mappy.fpm.batches.utils.Feature;
@@ -27,9 +28,9 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
 
 
     @Inject
-    public BoundariesA8Shapefile(TomtomFolder folder, RelationProvider relationProvider) {
+    public BoundariesA8Shapefile(TomtomFolder folder, RelationProvider relationProvider, NameProvider nameProvider) {
 
-        super(folder.getFile("___a8.shp"), 8);
+        super(folder.getFile("___a8.shp"), 8, nameProvider);
         this.relationProvider = relationProvider;
     }
 
