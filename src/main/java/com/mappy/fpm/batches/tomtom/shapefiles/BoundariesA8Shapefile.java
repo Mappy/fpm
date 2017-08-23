@@ -30,7 +30,7 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
     @Inject
     public BoundariesA8Shapefile(TomtomFolder folder, RelationProvider relationProvider, NameProvider nameProvider) {
 
-        super(folder.getFile("___a8.shp"), 8, nameProvider);
+        super(folder.getFile("a8.shp"), 8, nameProvider);
         this.relationProvider = relationProvider;
     }
 
