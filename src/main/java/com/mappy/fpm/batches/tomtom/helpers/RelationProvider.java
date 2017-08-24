@@ -21,8 +21,8 @@ public class RelationProvider {
 
     private final Map<Long, RelationMemberTags> relationMap = new HashMap<>();
 
-    public void putRelation(Feature feature, List<RelationMember> relationMembers, String name) {
-        relationMap.put(feature.getLong("CITYCENTER"), new RelationMemberTags().withPopulation(ofNullable(valueOf(feature.getLong("POP")))).withName(name).withRelationMembers(relationMembers));
+    public void putRelation(Feature feature, List<RelationMember> relationMembers) {
+        relationMap.put(feature.getLong("CITYCENTER"), new RelationMemberTags().withPopulation(ofNullable(valueOf(feature.getLong("POP")))).withName(feature.getString("NAME")).withRelationMembers(relationMembers));
     }
 
     public Optional<RelationMemberTags> getMembers(Long id) {

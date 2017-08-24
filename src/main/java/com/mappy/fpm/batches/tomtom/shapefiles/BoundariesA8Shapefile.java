@@ -20,6 +20,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 @Order(1)
 public class BoundariesA8Shapefile extends BoundariesShapefile {
@@ -35,28 +36,16 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
     }
 
     @Override
-    public void serialize(GeometrySerializer serializer, Feature feature) {
-        List<RelationMember> relationMembers = Lists.newArrayList();
-        String name = feature.getString("NAME");
-        Long extId = feature.getLong("ID");
-        if (name != null) {
-            MultiPolygon multiPolygon = feature.getMultiPolygon();
-            for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
-                Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
-                for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
-                    Way way = serializer.write((LineString) geom, ImmutableMap.of(
-                            "boundary",
-                            "administrative",
-                            "admin_level",
-                            "8",
-                            "name",
-                            name,
-                            "ref:tomtom",
-                            extId.toString()));
-                    relationMembers.add(new RelationMember(way.getId(), EntityType.Way, "outer"));
-                }
-            }
-        }
-        relationProvider.putRelation(feature, relationMembers, name);
+    public void serialize(GeometrySerializer serializer, Feature feature, List<RelationMember> members){
+        super.serialize(serializer, feature, members);
+        relationProvider.putRelation(feature, members);
+
+    }
+    @Override
+    public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags)
+    {}
+
+    @Override
+    public void addPoint(GeometrySerializer serializer, List<RelationMember> members, String name, MultiPolygon multiPolygon) {
     }
 }

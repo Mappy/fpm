@@ -48,9 +48,9 @@ public class BoundariesShapefile extends TomtomShapefile {
     public void serialize(GeometrySerializer serializer, Feature feature, List<RelationMember> members) {
         String name = feature.getString("NAME");
         Long extId = feature.getLong("ID");
-        String order0 = feature.getString("ORDER0" + tomtomLevel);
+        String order = feature.getString("ORDER0" + tomtomLevel);
         Optional<String> population = ofNullable(valueOf(feature.getLong("POP")));
-        String insee = CountryCode.getByCode(order0) == null ? order0 : String.valueOf(CountryCode.getByCode(order0).getNumeric());
+
         Map<String, String> tags = nameProvider.getAlternateNames(extId);
         ImmutableMap<String, String> wayTags = of(
                 "boundary", "administrative",
@@ -59,17 +59,17 @@ public class BoundariesShapefile extends TomtomShapefile {
 
         ImmutableMap<String, String> relationTags = of(
                 "type", "boundary",
-                "ref:tomtom", extId.toString(),
-                "ref:INSEE", insee
+                "ref:tomtom", String.valueOf(extId),
+                "ref:INSEE", CountryCode.getByCode(order) == null ? order : String.valueOf(CountryCode.getByCode(order).getNumeric())
         );
         tags.putAll(relationTags);
         population.ifPresent(pop ->
-            tags.put("population", pop)
+                tags.put("population", pop)
         );
-        writeRelations(serializer, feature, members, name, tags, wayTags);
+        addRelations(serializer, feature, members, name, tags, wayTags);
     }
 
-    public void writePoint(GeometrySerializer serializer, List<RelationMember> members, String name, MultiPolygon multiPolygon) {
+    public void addPoint(GeometrySerializer serializer, List<RelationMember> members, String name, MultiPolygon multiPolygon) {
         Coordinate centPt = Centroid.getCentroid(multiPolygon);
         Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(centPt), of("name", name));
         node.ifPresent(node1 ->
@@ -77,11 +77,15 @@ public class BoundariesShapefile extends TomtomShapefile {
         );
     }
 
-    private void writeRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags, ImmutableMap<String, String> wayTags) {
+    public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags) {
+        serializer.writeRelation(members, tags);
+    }
+
+    private void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags, ImmutableMap<String, String> wayTags) {
         if (name != null) {
             tags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();
-            writePoint(serializer, members, name, multiPolygon);
+            addPoint(serializer, members, name, multiPolygon);
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
                 for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
@@ -91,7 +95,7 @@ public class BoundariesShapefile extends TomtomShapefile {
                 }
             }
 
-            serializer.writeRelation(members, tags);
+            writeRelations(serializer, members, tags);
         }
     }
 
