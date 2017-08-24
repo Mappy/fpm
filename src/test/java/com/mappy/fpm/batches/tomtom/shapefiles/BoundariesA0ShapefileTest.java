@@ -3,11 +3,14 @@ package com.mappy.fpm.batches.tomtom.shapefiles;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
+import net.morbz.osmonaut.osm.Relation;
+import net.morbz.osmonaut.osm.RelationMember;
 import net.morbz.osmonaut.osm.Tags;
 import net.morbz.osmonaut.osm.Way;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.inject.Guice.createInjector;
@@ -24,12 +27,16 @@ public class BoundariesA0ShapefileTest {
         Tomtom2OsmTestUtils.PbfContent pbfContent = read(new File("target/andandb.osm.pbf"));
 
         Optional<Way> wayOptional = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("boundary", "administrative")).findFirst();
+        Optional<Relation> relationOptional = pbfContent.getRelations().stream().filter(relationMember -> relationMember.getTags().hasKeyValue("boundary", "administrative")).findFirst();
         assertThat(wayOptional.isPresent()).isTrue();
-        Tags tags = wayOptional.get().getTags();
-        assertThat(tags.get("ref:tomtom")).isEqualTo("10200000000008");
-        assertThat(tags.get("admin_level")).isEqualTo("2");
+        assertThat(relationOptional.isPresent()).isTrue();
+        Tags wayTags = wayOptional.get().getTags();
+        Tags relationTags = relationOptional.get().getTags();
+        assertThat(wayTags.get("admin_level")).isEqualTo("2");
+        assertThat(relationTags.get("ref:tomtom")).isEqualTo("10200000000008");
+        assertThat(relationTags.get("ref:INSEE")).isEqualTo("20");
+        assertThat(of("name:fr", "name:de", "name:en", "name:ca", "name:es").allMatch(relationTags::hasKey)).isTrue();
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter(relationMember -> relationMember.getRole().equals("admin_center")).count()).isEqualTo(1);
-        assertThat(of("name:fr", "name:de", "name:en", "name:ca", "name:es").allMatch(tags::hasKey)).isTrue();
 
     }
 

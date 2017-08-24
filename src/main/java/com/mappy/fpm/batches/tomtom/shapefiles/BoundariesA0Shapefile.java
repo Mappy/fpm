@@ -12,6 +12,6 @@ public class BoundariesA0Shapefile extends BoundariesShapefile {
 
     @Inject
     public BoundariesA0Shapefile(TomtomFolder folder, NameProvider nameProvider) {
-        super(folder.getFile("___a0.shp"), 2, nameProvider);
+        super(folder.getFile("___a0.shp"), 2, 0, nameProvider);
     }
 }
