@@ -9,6 +9,6 @@ import javax.inject.Inject;
 public class BoundariesA9Shapefile extends BoundariesShapefile {
     @Inject
     public BoundariesA9Shapefile(TomtomFolder folder, NameProvider nameProvider) {
-        super(folder.getFile("___a9.shp"), 9, nameProvider);
+        super(folder.getFile("___a9.shp"), 9, 9, nameProvider);
     }
 }

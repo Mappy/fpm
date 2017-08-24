@@ -44,8 +44,7 @@ public class TownShapefileTest {
         launcher.run();
         Tomtom2OsmTestUtils.PbfContent pbfContent = read(new File("target/belbe3.osm.pbf"));
 
-        assertThat(pbfContent.getNodes().stream().flatMap( n ->  newArrayList( n.getTags()).stream()).filter( t -> t.equals("population")).toArray()).hasSize(2);
-        assertThat(pbfContent.getRelations()).hasSize(2);
+        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter( t -> t.getEntity().getTags().hasKey("population")).count()).isEqualTo(2);
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter(relationMember -> relationMember.getRole().equals("admin_center")).count()).isEqualTo(2);
     }
 
