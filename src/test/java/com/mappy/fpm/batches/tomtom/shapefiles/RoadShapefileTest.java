@@ -33,5 +33,10 @@ public class RoadShapefileTest {
         assertThat(tags.get("from:tomtom")).isEqualTo("12500003459999");
         assertThat(tags.get("to:tomtom")).isEqualTo("12500003122934");
         assertThat(tags.get("reversed:tomtom")).isEqualTo("yes");
+
+        assertThat(tags.get("toll")).isEqualTo("yes");
+        assertThat(tags.get("toll:name")).isEqualTo("Péage d'Aigrefeuille");
+        assertThat(tags.get("ref:asfa:1")).isEqualTo("4556");
+        assertThat(tags.get("ref:asfa:2")).isEqualTo("4557");
     }
 }

@@ -46,3 +46,5 @@ unzip -o -j 10m_physical.zip
 docker run --rm -v /tmp/tomtomfiles:/input -v /tmp/data:/output -p 9501:9501 -t mappy/fpm com.mappy.fpm.batches.GenerateFullPbf "Belgique,Luxembourg" "/input" "/output" Europe.osm.pbf 2
 docker run --rm -v /tmp/data:/workspace -v /tmp:/inputFolder -t mappy/fpm com.mappy.fpm.batches.merge.MergeNaturalEarthTomtom
 ```
+
+To generate tolls data, a tolls.json file must be present in the /input directory.

@@ -4,6 +4,7 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.maneuvers.RestrictionsAccumulator;
 import com.mappy.fpm.batches.tomtom.helpers.RoadTagger;
+import com.mappy.fpm.batches.tomtom.helpers.TollTagger;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.vividsolutions.jts.geom.LineString;
@@ -20,12 +21,14 @@ import static com.mappy.fpm.batches.tomtom.helpers.RoadTagger.isReversed;
 public class RoadShapefile extends TomtomShapefile {
 
     private final RoadTagger tagger;
+    private final TollTagger tolls;
     private final RestrictionsAccumulator restrictions;
 
     @Inject
-    public RoadShapefile(TomtomFolder folder, RoadTagger tagger, RestrictionsAccumulator restrictions) {
+    public RoadShapefile(TomtomFolder folder, RoadTagger tagger, TollTagger tolls, RestrictionsAccumulator restrictions) {
         super(folder.getFile("nw.shp"));
         this.tagger = tagger;
+        this.tolls = tolls;
         this.restrictions = restrictions;
     }
 
@@ -35,6 +38,7 @@ public class RoadShapefile extends TomtomShapefile {
             long tomtomId = feature.getLong("ID");
 
             Map<String, String> tags = tagger.tag(feature);
+            tags.putAll(tolls.tag(tomtomId));
 
             LineString raw = geom(feature);
             LineString geom = isReversed(feature) ? (LineString) raw.reverse() : raw;

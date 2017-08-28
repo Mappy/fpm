@@ -21,4 +21,8 @@ public class TomtomFolder {
         }
         return inputFolder + zone + "___________" + name;
     }
+
+    public String getTollsFile() {
+        return inputFolder + "tolls.json";
+    }
 }
