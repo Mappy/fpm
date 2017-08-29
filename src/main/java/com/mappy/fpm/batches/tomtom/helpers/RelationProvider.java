@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.lang.String.valueOf;
+import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
@@ -42,7 +42,7 @@ public class RelationProvider {
         private final List<RelationMember> relationMembers;
 
         public RelationMemberTags() {
-            this(null, null);
+            this(newHashMap(), null);
         }
     }
 }
