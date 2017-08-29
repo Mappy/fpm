@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.lang.String.valueOf;
+import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
@@ -21,8 +21,8 @@ public class RelationProvider {
 
     private final Map<Long, RelationMemberTags> relationMap = new HashMap<>();
 
-    public void putRelation(Feature feature, List<RelationMember> relationMembers) {
-        relationMap.put(feature.getLong("CITYCENTER"), new RelationMemberTags().withPopulation(ofNullable(valueOf(feature.getLong("POP")))).withName(feature.getString("NAME")).withRelationMembers(relationMembers));
+    public void putRelation(Feature feature, List<RelationMember> relationMembers, Map<String, String> tags) {
+        relationMap.put(feature.getLong("CITYCENTER"), new RelationMemberTags().withTags(tags).withRelationMembers(relationMembers));
     }
 
     public Optional<RelationMemberTags> getMembers(Long id) {
@@ -30,7 +30,7 @@ public class RelationProvider {
     }
 
     public Optional<String> getPop(Long id) {
-        return relationMap.get(id) == null ? empty() : relationMap.get(id).getPopulation();
+        return relationMap.get(id) == null ? empty() : ofNullable(relationMap.get(id).getTags().get("population"));
     }
 
 
@@ -38,12 +38,11 @@ public class RelationProvider {
     @Wither
     @RequiredArgsConstructor
     public class RelationMemberTags {
-        private final String name;
-        private final Optional<String> population;
+        private final Map<String, String> tags;
         private final List<RelationMember> relationMembers;
 
         public RelationMemberTags() {
-            this(null, empty(), null);
+            this(newHashMap(), null);
         }
     }
 }

@@ -4,24 +4,14 @@ import com.google.inject.Guice;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
-import net.morbz.osmonaut.osm.Node;
-import net.morbz.osmonaut.osm.RelationMember;
 import org.junit.Test;
 
-import javax.annotation.meta.When;
 import java.io.File;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class TownShapefileTest {
-
 
 
     @Test
@@ -44,10 +34,10 @@ public class TownShapefileTest {
         launcher.run();
         Tomtom2OsmTestUtils.PbfContent pbfContent = read(new File("target/belbe3.osm.pbf"));
 
-        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter( t -> t.getEntity().getTags().hasKey("population")).count()).isEqualTo(2);
+        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter(t -> t.getEntity().getTags().hasKey("population")).count()).isEqualTo(2);
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter(relationMember -> relationMember.getRole().equals("admin_center")).count()).isEqualTo(2);
+        assertThat(pbfContent.getRelations().stream().filter(relation -> relation.getTags().hasKey("population")).findFirst()).isNotEmpty();
     }
-
 
 
 }

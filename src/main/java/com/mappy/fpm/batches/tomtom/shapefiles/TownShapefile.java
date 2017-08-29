@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
-import com.google.common.collect.ImmutableMap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
@@ -61,18 +60,10 @@ public class TownShapefile extends TomtomShapefile {
         Optional<Node> node = geometrySerializer.writePoint(feature.getPoint(), tags);
 
         relationProvider.getMembers(feature.getLong("ID")).ifPresent(relationMembers -> {
-                    node.ifPresent(node1 ->
+            node.ifPresent(node1 ->
                             relationMembers.getRelationMembers().add(new RelationMember(node1.getId(), Node, "admin_center"))
                     );
-                    geometrySerializer.writeRelation(relationMembers.getRelationMembers(), ImmutableMap.of(
-                            "type",
-                            "boundary",
-                            "boundary",
-                            "administrative",
-                            "admin_level",
-                            "8",
-                            "name",
-                            relationMembers.getName()));
+                    geometrySerializer.writeRelation(relationMembers.getRelationMembers(), relationMembers.getTags());
                 }
         );
     }
