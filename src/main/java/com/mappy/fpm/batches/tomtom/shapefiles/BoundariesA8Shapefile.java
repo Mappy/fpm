@@ -36,16 +36,15 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
     }
 
     @Override
-    public void serialize(GeometrySerializer serializer, Feature feature, List<RelationMember> members){
-        super.serialize(serializer, feature, members);
-        relationProvider.putRelation(feature, members);
-
+    public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags) {
     }
-    @Override
-    public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags)
-    {}
 
     @Override
     public void addPoint(GeometrySerializer serializer, List<RelationMember> members, String name, MultiPolygon multiPolygon) {
+    }
+
+    @Override
+    public void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags, ImmutableMap<String, String> wayTags) {
+        relationProvider.putRelation(feature, members, tags);
     }
 }

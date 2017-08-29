@@ -81,7 +81,7 @@ public class BoundariesShapefile extends TomtomShapefile {
         serializer.writeRelation(members, tags);
     }
 
-    private void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags, ImmutableMap<String, String> wayTags) {
+    public void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags, ImmutableMap<String, String> wayTags) {
         if (name != null) {
             tags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();
