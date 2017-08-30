@@ -69,14 +69,6 @@ public class BoundariesShapefile extends TomtomShapefile {
         addRelations(serializer, feature, members, name, tags, wayTags);
     }
 
-    public void addPoint(GeometrySerializer serializer, List<RelationMember> members, String name, MultiPolygon multiPolygon) {
-        Coordinate centPt = Centroid.getCentroid(multiPolygon);
-        Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(centPt), of("name", name));
-        node.ifPresent(node1 ->
-                members.add(new RelationMember(node1.getId(), Node, "label"))
-        );
-    }
-
     public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags) {
         serializer.writeRelation(members, tags);
     }
@@ -85,11 +77,10 @@ public class BoundariesShapefile extends TomtomShapefile {
         if (name != null) {
             tags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();
-            addPoint(serializer, members, name, multiPolygon);
+            addPointWithRoleLabel(serializer, members, name, multiPolygon);
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
                 for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
-
                     Way way = serializer.write((LineString) geom, wayTags);
                     members.add(new RelationMember(way.getId(), Way, "outer"));
                 }
@@ -97,6 +88,14 @@ public class BoundariesShapefile extends TomtomShapefile {
 
             writeRelations(serializer, members, tags);
         }
+    }
+
+    private void addPointWithRoleLabel(GeometrySerializer serializer, List<RelationMember> members, String name, MultiPolygon multiPolygon) {
+        Coordinate centPt = Centroid.getCentroid(multiPolygon);
+        Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(centPt), of("name", name));
+        node.ifPresent(nodeLabel ->
+                members.add(new RelationMember(nodeLabel.getId(), Node, "label"))
+        );
     }
 
 }

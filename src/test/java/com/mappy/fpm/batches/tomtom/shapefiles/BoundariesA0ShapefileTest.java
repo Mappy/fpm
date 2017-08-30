@@ -45,8 +45,7 @@ public class BoundariesA0ShapefileTest {
     }
 
     @Test
-    public void should_have_admin_centers_with_all_tags() throws Exception {
-
+    public void should_have_relation_with_role_label_and_tag_name() throws Exception {
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
                 .filteredOn(relationMember -> relationMember.getRole().equals("label")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")).isNotEmpty();
