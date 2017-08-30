@@ -16,7 +16,7 @@ public class BoundariesA8ShapefileTest {
     public static Tomtom2OsmTestUtils.PbfContent pbfContent;
 
     @BeforeClass
-    public static void setup() throws Exception{
+    public static void setup() throws Exception {
         Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "belbe3")).getInstance(Tomtom2Osm.class);
         launcher.run();
         pbfContent = read(new File("target/belbe3.osm.pbf"));
@@ -28,7 +28,7 @@ public class BoundariesA8ShapefileTest {
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
                 .filteredOn(relationMember -> relationMember.getRole().equals("outer")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("boundary")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("admin_level")).isNotEmpty();
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("admin_level", "8")).isNotEmpty();
     }
 
     @Test

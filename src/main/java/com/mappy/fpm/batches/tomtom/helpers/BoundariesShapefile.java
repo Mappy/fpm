@@ -73,7 +73,7 @@ public class BoundariesShapefile extends TomtomShapefile {
         Coordinate centPt = Centroid.getCentroid(multiPolygon);
         Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(centPt), of("name", name));
         node.ifPresent(node1 ->
-                members.add(new RelationMember(node1.getId(), Node, "admin_center"))
+                members.add(new RelationMember(node1.getId(), Node, "label"))
         );
     }
 
