@@ -55,15 +55,18 @@ public class TownShapefile extends TomtomShapefile {
                 tags.put("place", "village");
                 break;
         }
-        tags.putAll(nameProvider.getAlternateNames(feature.getLong("ID")));
+        Map<String, String> alternateNames = nameProvider.getAlternateNames(feature.getLong("ID"));
+        tags.putAll(alternateNames);
         relationProvider.getPop(feature.getLong("ID")).ifPresent(pop -> tags.put("population", pop));
         Optional<Node> node = geometrySerializer.writePoint(feature.getPoint(), tags);
 
         relationProvider.getMembers(feature.getLong("ID")).ifPresent(relationMembers -> {
-            node.ifPresent(node1 ->
-                            relationMembers.getRelationMembers().add(new RelationMember(node1.getId(), Node, "admin_center"))
+                    node.ifPresent(adminCenter ->
+                            relationMembers.getRelationMembers().add(new RelationMember(adminCenter.getId(), Node, "admin_center"))
                     );
-                    geometrySerializer.writeRelation(relationMembers.getRelationMembers(), relationMembers.getTags());
+                    Map<String, String> relationMemberTags = relationMembers.getTags();
+                    relationMemberTags.putAll(alternateNames);
+                    geometrySerializer.writeRelation(relationMembers.getRelationMembers(), relationMemberTags);
                 }
         );
     }
