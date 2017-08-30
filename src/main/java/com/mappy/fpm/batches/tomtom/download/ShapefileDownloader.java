@@ -97,7 +97,8 @@ public class ShapefileDownloader {
                     "_a7.",
                     "_a8.",
                     "_a9.",
-                    "_an." // alternate names
+                    "_an.", // alternate names
+                    "_bu." // built-up area
                      );
         }
         else if ("sp".equals(type)) {
