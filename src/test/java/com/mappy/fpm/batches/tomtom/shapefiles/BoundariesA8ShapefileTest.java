@@ -16,7 +16,7 @@ public class BoundariesA8ShapefileTest {
     public static Tomtom2OsmTestUtils.PbfContent pbfContent;
 
     @BeforeClass
-    public static void setup() throws Exception{
+    public static void setup() throws Exception {
         Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "belbe3")).getInstance(Tomtom2Osm.class);
         launcher.run();
         pbfContent = read(new File("target/belbe3.osm.pbf"));
@@ -28,7 +28,7 @@ public class BoundariesA8ShapefileTest {
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
                 .filteredOn(relationMember -> relationMember.getRole().equals("outer")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("boundary")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("admin_level")).isNotEmpty();
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("admin_level", "8")).isNotEmpty();
     }
 
     @Test
@@ -43,7 +43,7 @@ public class BoundariesA8ShapefileTest {
     }
 
     @Test
-    public void should_have_admin_centers_with_all_tags() throws Exception {
+    public void should_have_relation_with_admin_centers_and_all_tags() throws Exception {
 
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
                 .filteredOn(relationMember -> relationMember.getRole().equals("admin_center")) //
@@ -52,6 +52,14 @@ public class BoundariesA8ShapefileTest {
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name:nl")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("population")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name:fr")).isNotEmpty();
+    }
+
+    @Test
+    public void should_have_relation_with_role_label_and_tag_name() throws Exception {
+
+        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
+                .filteredOn(relationMember -> relationMember.getRole().equals("label")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")).isNotEmpty();
     }
 
 }

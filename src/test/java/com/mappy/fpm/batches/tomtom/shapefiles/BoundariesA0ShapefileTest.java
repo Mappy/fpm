@@ -1,43 +1,54 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
+import com.google.inject.Guice;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
-import net.morbz.osmonaut.osm.Relation;
-import net.morbz.osmonaut.osm.RelationMember;
-import net.morbz.osmonaut.osm.Tags;
-import net.morbz.osmonaut.osm.Way;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.List;
-import java.util.Optional;
 
-import static com.google.inject.Guice.createInjector;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
-import static java.util.stream.Stream.of;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BoundariesA0ShapefileTest {
+    public static Tomtom2OsmTestUtils.PbfContent pbfContent;
+
+    @BeforeClass
+    public static void setup() throws Exception {
+        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "andandb")).getInstance(Tomtom2Osm.class);
+        launcher.run();
+        pbfContent = read(new File("target/andandb.osm.pbf"));
+    }
+
 
     @Test
-    public void should_generate_boundaries_with_admin_level_and_tomtom_ref() throws Exception {
-        Tomtom2Osm launcher = createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "andandb")).getInstance(Tomtom2Osm.class);
-        launcher.run();
-        Tomtom2OsmTestUtils.PbfContent pbfContent = read(new File("target/andandb.osm.pbf"));
+    public void should_have_relations_with_ways() throws Exception {
+        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
+                .filteredOn(relationMember -> relationMember.getRole().equals("outer")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("boundary")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("admin_level", "2")).isNotEmpty();
+    }
 
-        Optional<Way> wayOptional = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("boundary", "administrative")).findFirst();
-        Optional<Relation> relationOptional = pbfContent.getRelations().stream().filter(relationMember -> relationMember.getTags().hasKeyValue("boundary", "administrative")).findFirst();
-        assertThat(wayOptional.isPresent()).isTrue();
-        assertThat(relationOptional.isPresent()).isTrue();
-        Tags wayTags = wayOptional.get().getTags();
-        Tags relationTags = relationOptional.get().getTags();
-        assertThat(wayTags.get("admin_level")).isEqualTo("2");
-        assertThat(relationTags.get("ref:tomtom")).isEqualTo("10200000000008");
-        assertThat(relationTags.get("ref:INSEE")).isEqualTo("20");
-        assertThat(of("name:fr", "name:de", "name:en", "name:ca", "name:es").allMatch(relationTags::hasKey)).isTrue();
-        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream()).filter(relationMember -> relationMember.getRole().equals("admin_center")).count()).isEqualTo(1);
+    @Test
+    public void should_have_relations_with_all_tags() throws Exception {
+        assertThat(pbfContent.getRelations()) //
+                .filteredOn(relation -> relation.getTags().hasKey("name")) //
+                .filteredOn(relation -> relation.getTags().hasKey("name:de")) //
+                .filteredOn(relation -> relation.getTags().hasKey("name:fr")) //
+                .filteredOn(relation -> relation.getTags().hasKey("name:en")) //
+                .filteredOn(relation -> relation.getTags().hasKey("name:es")) //
+                .filteredOn(relation -> relation.getTags().hasKey("population")) //
+                .filteredOn(relation -> relation.getTags().hasKey("ref:INSEE")) //
+                .filteredOn(relation -> relation.getTags().hasKey("ref:tomtom")).isNotEmpty();
+    }
 
+    @Test
+    public void should_have_relation_with_role_label_and_tag_name() throws Exception {
+        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
+                .filteredOn(relationMember -> relationMember.getRole().equals("label")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")).isNotEmpty();
     }
 
 }
