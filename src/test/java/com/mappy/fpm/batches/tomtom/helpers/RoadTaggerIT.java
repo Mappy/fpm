@@ -35,10 +35,10 @@ public class RoadTaggerIT {
 
     @Test
     public void should_generate_roads_file_with_parking_aisle() throws Exception {
-        Way way = pbfContent.getWays().stream().filter(w -> w.getTags().get("ref:tomtom").equals("10200000004654")).findFirst().get();
-
-        assertThat(way.getTags().get("highway")).isEqualTo("service");
-        assertThat(way.getTags().get("service")).isEqualTo("parking_aisle");
+        assertThat(pbfContent.getWays().stream())
+                .filteredOn(w -> w.getTags().hasKeyValue("ref:tomtom", "10200000004654"))
+                .filteredOn(w -> w.getTags().hasKeyValue("highway", "service"))
+                .filteredOn(w -> w.getTags().hasKeyValue("service", "parking_aisle")).isNotEmpty();
     }
 
     @Test
@@ -100,9 +100,9 @@ public class RoadTaggerIT {
 
     @Test
     public void should_include_parking_typed_entrance_exit_car_park() {
-        Map<String, List<Way>> waysById = pbfContent.getWays().stream().collect(groupingBy(w -> w.getTags().get("ref:tomtom")));
-
-        assertThat(waysById.get("10200000002148")).isNotNull();
+        assertThat(pbfContent.getWays().stream()) //
+                .filteredOn(way -> way.getTags().hasKeyValue("ref:tomtom", "10200000002148")) //
+                .isNotEmpty();
     }
 
     private static PbfContent getGeneratedPbf() {

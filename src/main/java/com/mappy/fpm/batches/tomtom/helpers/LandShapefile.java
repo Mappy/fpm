@@ -35,6 +35,9 @@ public class LandShapefile extends TomtomShapefile {
             tags.put("name", name);
         }
         switch (feature.getInteger("FEATTYP")) {
+            case 3110: // Built-up area
+                tags.put("landuse", "residential");
+                break;
             case 7120: // Forest (Woodland)
                 tags.put("landuse", "forest");
                 break;
