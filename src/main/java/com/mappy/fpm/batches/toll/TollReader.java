@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -21,6 +22,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
 
 @Singleton
+@Slf4j
 public class TollReader {
 
     private final Map<Long, Toll> tollsByTomtomId;
@@ -62,6 +64,8 @@ public class TollReader {
                         tolls.put(apply, new Toll(String.valueOf(json.getInt("id")), json.getString("name"), json.getString("tollcode1"), json.optString("tollcode2")));
                     }
                 }
+            } else {
+                log.info("No tolls file was found at {}", file.getAbsolutePath());
             }
 
             return tolls;
