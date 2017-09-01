@@ -8,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.concurrent.locks.Condition;
 
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,6 +61,22 @@ public class BoundariesA8ShapefileTest {
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
                 .filteredOn(relationMember -> relationMember.getRole().equals("label")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")).isNotEmpty();
+    }
+
+    @Test
+    public void should_have_brussel_as_capital() throws Exception {
+
+        assertThat(pbfContent.getNodes().stream())
+                .filteredOn(node -> node.getTags().hasKeyValue("name", "Brussel")) //
+                .filteredOn(node -> node.getTags().hasKeyValue("capital", "yes")) //
+                .filteredOn(node -> node.getTags().hasKeyValue("place", "city")).hasSize(1);
+    }
+
+    @Test
+    public void should_have_some_brussel_neighbourhood() throws Exception {
+
+        assertThat(pbfContent.getNodes().stream())
+                .filteredOn(node -> node.getTags().hasKeyValue("place", "neighbourhood")).isNotEmpty();
     }
 
 }

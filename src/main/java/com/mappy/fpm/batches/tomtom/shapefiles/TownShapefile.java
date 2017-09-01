@@ -37,37 +37,53 @@ public class TownShapefile extends TomtomShapefile {
         String name = feature.getString("NAME");
         if (name != null) {
             tags.put("name", name);
-        }
-        switch (feature.getInteger("ADMINCLASS")) {
-            case 1:
-                tags.put("place", "city");
-                break;
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-                tags.put("place", "town");
-                break;
-            case 8:
-            case 9:
-                tags.put("place", "village");
-                break;
-        }
-        Map<String, String> alternateNames = nameProvider.getAlternateNames(feature.getLong("ID"));
-        tags.putAll(alternateNames);
-        relationProvider.getPop(feature.getLong("ID")).ifPresent(pop -> tags.put("population", pop));
-        Optional<Node> node = geometrySerializer.writePoint(feature.getPoint(), tags);
 
-        relationProvider.getMembers(feature.getLong("ID")).ifPresent(relationMembers -> {
-                    node.ifPresent(adminCenter ->
-                            relationMembers.getRelationMembers().add(new RelationMember(adminCenter.getId(), Node, "admin_center"))
-                    );
-                    Map<String, String> relationMemberTags = relationMembers.getTags();
-                    relationMemberTags.putAll(alternateNames);
-                    geometrySerializer.writeRelation(relationMembers.getRelationMembers(), relationMemberTags);
-                }
-        );
+            switch (feature.getInteger("ADMINCLASS")) {
+                case 0:
+                    tags.put("capital", "yes");
+                    break;
+                case 1:
+                    tags.put("capital", "1");
+                    break;
+                case 7:
+                    tags.put("capital", "6");
+                    break;
+                case 8:
+                    tags.put("capital", "8");
+                    break;
+                case 9:
+                    tags.put("capital", "9");
+                    break;
+            }
+
+            switch (feature.getInteger("CITYTYP")) {
+                case 0:
+                    tags.put("place", "village");
+                    break;
+                case 1:
+                    tags.put("place", feature.getInteger("DISPCLASS") < 8 ? "city" : "town");
+                    break;
+                case 32:
+                    tags.put("place", "hamlet");
+                    break;
+                case 64:
+                    tags.put("place", "neighbourhood");
+                    break;
+            }
+            Map<String, String> alternateNames = nameProvider.getAlternateNames(feature.getLong("ID"));
+            tags.putAll(alternateNames);
+            relationProvider.getPop(feature.getLong("ID")).ifPresent(pop -> tags.put("population", pop));
+            Optional<Node> node = geometrySerializer.writePoint(feature.getPoint(), tags);
+
+            relationProvider.getMembers(feature.getLong("ID")).ifPresent(relationMembers -> {
+                        node.ifPresent(adminCenter ->
+                                relationMembers.getRelationMembers().add(new RelationMember(adminCenter.getId(), Node, "admin_center"))
+                        );
+                        Map<String, String> relationMemberTags = relationMembers.getTags();
+                        relationMemberTags.putAll(alternateNames);
+                        geometrySerializer.writeRelation(relationMembers.getRelationMembers(), relationMemberTags);
+                    }
+            );
+        }
     }
 }
