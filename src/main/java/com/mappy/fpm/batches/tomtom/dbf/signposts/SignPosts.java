@@ -1,9 +1,12 @@
 package com.mappy.fpm.batches.tomtom.dbf.signposts;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.PictogramType;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
@@ -13,7 +16,10 @@ import java.io.File;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Branch;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Towards;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.InfoType.*;
@@ -23,6 +29,7 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Slf4j
 public class SignPosts {
+
     private static final Comparator<List<SignPost>> bySize = Comparator.comparing(List::size);
     private static final Predicate<SignPost> onlyDestinationRefTowards = signPost -> (signPost.getInfotyp() == Route_Number_on_Shield || signPost.getInfotyp() == Route_Number)
             && signPost.getContyp() == Towards;
@@ -30,20 +37,29 @@ public class SignPosts {
     private static final Predicate<SignPost> onlyDestination = onlyDestinationRefTowards.or(onlyDestinationLabel);
     private static final Predicate<SignPost> onlySymbol = signPost -> signPost.getInfotyp() == Pictogram;
 
-    private final ListMultimap<Long, SignPost> signs;
-    private final ListMultimap<Long, Long> sp;
+    private final ListMultimap<Long, SignPost> si;
     private final Map<Long, Long> sg;
+    private final Multimap<Long, SignPostPath> sp;
+    private final ListMultimap<Long, Long> lastWayOfPath;
+    private final Set<Long> waysWithSign;
+    private final Map<Long, SignWay> ways = newHashMap();
 
     @Inject
     public SignPosts(TomtomFolder folder) {
-        signs = siFile(folder);
+        si = siFile(folder);
         sp = spFile(folder);
+        lastWayOfPath = extractLastWay(sp);
+        waysWithSign = regroupPerWays(sp);
         sg = sgFile(folder);
     }
 
     public Map<String, String> getTags(long tomtomId, boolean oneWay, Long fromJunctionId, Long toJunctionId) {
-        Map<String, String> tags = Maps.newHashMap();
-        List<Long> signIds = sp.get(tomtomId);
+        Map<String, String> tags = newHashMap();
+        if(waysWithSign.contains(tomtomId)) {
+            ways.put(tomtomId, new SignWay(tomtomId, fromJunctionId, toJunctionId));
+        }
+
+        List<Long> signIds = lastWayOfPath.get(tomtomId);
         if (!signIds.isEmpty()) {
             Long signId = signIds.get(0);
             Long junctionId = sg.get(signId);
@@ -62,21 +78,39 @@ public class SignPosts {
                 destinationTag = "destination:backward";
             }
             else {
-                log.warn("Junction ID {} does not correspond to FROM {} or TO {} for sign post {} on road {}", junctionId, fromJunctionId, toJunctionId, signId, tomtomId);
-                destinationTag = "destination:undefined";
+                Collection<SignPostPath> signPostPaths = sp.get(signId);
+                SignWay previewWay = ways.get(signPostPaths.stream().filter(s -> s.getSeqnr() == signPostPaths.size() - 1).findFirst().get().getTomtomId());
+
+                if (previewWay.getFromJunctionId().equals(fromJunctionId) || previewWay.getToJunctionId().equals(fromJunctionId)) {
+                    destinationTag = "destination:forward";
+                }
+                else if (previewWay.getFromJunctionId().equals(toJunctionId) || previewWay.getToJunctionId().equals(toJunctionId)) {
+                    destinationTag = "destination:backward";
+                }
+                else {
+                    log.warn("Junction ID {} does not correspond to FROM {} or TO {} for sign post {} on road {}", junctionId, fromJunctionId, toJunctionId, signId, tomtomId);
+                    destinationTag = "destination:undefined";
+                }
             }
 
-            if (isNotEmpty(signPostHeaderFor(tomtomId))) {
-                tags.put(destinationTag + ":ref", Joiner.on(";").join(signPostHeaderFor(tomtomId)));
+            List<String> signPostHeaderFor = signPostHeaderFor(tomtomId);
+            if (isNotEmpty(signPostHeaderFor)) {
+                tags.put(destinationTag + ":ref", on(";").join(signPostHeaderFor));
             }
-            if (isNotEmpty(signPostContentFor(tomtomId))) {
-                tags.put(destinationTag, Joiner.on(";").join(signPostContentFor(tomtomId)));
+
+            List<String> signPostContentFor = signPostContentFor(tomtomId);
+            if (isNotEmpty(signPostContentFor)) {
+                tags.put(destinationTag, on(";").join(signPostContentFor));
             }
-            if (isNotEmpty(symbolRefFor(tomtomId))) {
-                tags.put(destinationTag + ":symbol", Joiner.on(";").join(symbolRefFor(tomtomId)));
+
+            List<String> symbolRefFor = symbolRefFor(tomtomId);
+            if (isNotEmpty(symbolRefFor)) {
+                tags.put(destinationTag + ":symbol", on(";").join(symbolRefFor));
             }
-            if (isNotEmpty(exitRefFor(tomtomId))) {
-                tags.put("junction:ref", Joiner.on(";").join(exitRefFor(tomtomId)));
+
+            List<String> exitRefFor = exitRefFor(tomtomId);
+            if (isNotEmpty(exitRefFor)) {
+                tags.put("junction:ref", on(";").join(exitRefFor));
             }
         }
         return tags;
@@ -105,7 +139,11 @@ public class SignPosts {
                 symbols.add(signs.stream().filter(onlySymbol).findFirst().map(sp -> PictogramType.name(sp.getTxtcont())).orElse("none"));
             }
         }
-        return symbols;
+
+        if(symbols.stream().anyMatch(s -> !"none".equals(s))) {
+            return symbols;
+        }
+        return newArrayList();
     }
 
     public List<String> exitRefFor(long tomtomId) {
@@ -114,8 +152,8 @@ public class SignPosts {
     }
 
     private List<SignPost> refFor(long tomtomId, Predicate<SignPost> filter) {
-        return sp.get(tomtomId).stream() //
-                .map(signs::get).sorted(bySize.reversed()).findFirst() //
+        return lastWayOfPath.get(tomtomId).stream() //
+                .map(si::get).sorted(bySize.reversed()).findFirst() //
                 .map(signPostList -> signPostList.stream() //
                         .filter(filter) //
                         .sorted() //
@@ -140,35 +178,51 @@ public class SignPosts {
                 }
             }
         }
-        log.info("Loaded {} signs", signs.size());
+        log.info("Loaded {} si", signs.size());
         return signs;
     }
 
-    private static ListMultimap<Long, Long> spFile(TomtomFolder folder) {
+    private static Multimap<Long, SignPostPath> spFile(TomtomFolder folder) {
         File file = new File(folder.getFile("sp.dbf"));
-        ListMultimap<Long, Long> result = ArrayListMultimap.create();
+        Multimap<Long, SignPostPath> result = TreeMultimap.create();
         if (!file.exists()) {
             return result;
         }
-        Multimap<Long, SignPostPath> sorted = TreeMultimap.create();
         log.info("Reading SP file {}", file);
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
                 SignPostPath path = SignPostPath.fromRow(row);
-                sorted.put(path.getId(), path);
+                result.put(path.getId(), path);
             }
         }
-        for (Long key : sorted.keySet()) {
-            result.put(sorted.get(key).iterator().next().getTomtomId(), key);
+        log.info("Loaded {} sign paths", result.size());
+        return result;
+    }
+
+    private static ListMultimap<Long, Long> extractLastWay(Multimap<Long, SignPostPath> sp) {
+        ListMultimap<Long, Long> result = ArrayListMultimap.create();
+
+        sp.keySet().forEach(key -> result.put(sp.get(key).iterator().next().getTomtomId(), key));
+
+        return result;
+    }
+
+    private static Set<Long> regroupPerWays(Multimap<Long, SignPostPath> sp) {
+        Set<Long> result = newHashSet();
+
+        for (Long key : sp.keySet()) {
+            for(SignPostPath signPostPath : sp.get(key)) {
+                result.add(signPostPath.getTomtomId());
+            }
         }
-        log.info("Loaded {} sign paths", sorted.size());
+
         return result;
     }
 
     private static Map<Long, Long> sgFile(TomtomFolder folder) {
         File file = new File(folder.getFile("sg.dbf"));
-        Map<Long, Long> speeds = Maps.newHashMap();
+        Map<Long, Long> speeds = newHashMap();
         if (!file.exists()) {
             return speeds;
         }
@@ -182,5 +236,12 @@ public class SignPosts {
         }
         log.info("Loaded {} Sign posts junctions", speeds.size());
         return speeds;
+    }
+
+    @Data
+    private class SignWay {
+        private final Long tomtomId;
+        private final Long fromJunctionId;
+        private final Long toJunctionId;
     }
 }

@@ -4,6 +4,8 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 
 import org.junit.*;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -47,6 +49,24 @@ public class SignPostsTest {
         assertThat(signPosts.getTags(12500001658893L, false, 0L, 12500002912860L)).contains(entry("destination:forward", "A10;Bordeaux;Nantes;Quai d'Issy"));
         assertThat(signPosts.getTags(12500001658893L, false, 12500002912860L, 12500002912861L)).contains(entry("destination:backward", "A10;Bordeaux;Nantes;Quai d'Issy"));
     }
+
+   @Test
+   public void should_generate_tag_for_signpost_on_intermediate_junction() throws Exception {
+       when(folder.getFile("sg.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_sg.dbf").getPath());
+       when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_si.dbf").getPath());
+       when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_sp.dbf").getPath());
+
+       SignPosts signPosts = new SignPosts(folder);
+
+       Map<String, String> tags = signPosts.getTags(14700000013542L, false, 14700000005231L, 14700000005138L);
+       assertThat(tags).isEmpty();
+
+       tags = signPosts.getTags(14700000023315L, false, 14700000005231L, 14700000025680L);
+       assertThat(tags).isEmpty();
+
+       tags = signPosts.getTags(14700000021236L, false, 14700000025680L, 14700000025681L);
+       assertThat(tags).containsExactly(entry("destination:forward", "Sliema;Gzira"));
+   }
 
     @Test
     public void should_prefer_large_sign() throws Exception {
