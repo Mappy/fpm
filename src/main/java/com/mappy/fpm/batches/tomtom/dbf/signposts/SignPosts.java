@@ -81,14 +81,17 @@ public class SignPosts {
                 Collection<SignPostPath> signPostPaths = sp.get(signId);
                 SignWay previewWay = ways.get(signPostPaths.stream().filter(s -> s.getSeqnr() == signPostPaths.size() - 1).findFirst().get().getTomtomId());
 
-                if (previewWay.getFromJunctionId().equals(fromJunctionId) || previewWay.getToJunctionId().equals(fromJunctionId)) {
-                    destinationTag = "destination:forward";
-                }
-                else if (previewWay.getFromJunctionId().equals(toJunctionId) || previewWay.getToJunctionId().equals(toJunctionId)) {
-                    destinationTag = "destination:backward";
-                }
-                else {
-                    log.warn("Junction ID {} does not correspond to FROM {} or TO {} for sign post {} on road {}", junctionId, fromJunctionId, toJunctionId, signId, tomtomId);
+                if(previewWay != null) {
+                    if (previewWay.getFromJunctionId().equals(fromJunctionId) || previewWay.getToJunctionId().equals(fromJunctionId)) {
+                        destinationTag = "destination:forward";
+                    } else if (previewWay.getFromJunctionId().equals(toJunctionId) || previewWay.getToJunctionId().equals(toJunctionId)) {
+                        destinationTag = "destination:backward";
+                    } else {
+                        log.warn("Junction ID {} does not correspond to FROM {} or TO {} for sign post {} on road {}", junctionId, fromJunctionId, toJunctionId, signId, tomtomId);
+                        destinationTag = "destination:undefined";
+                    }
+                } else {
+                    log.warn("All ways have not been parse for {}", signId);
                     destinationTag = "destination:undefined";
                 }
             }
