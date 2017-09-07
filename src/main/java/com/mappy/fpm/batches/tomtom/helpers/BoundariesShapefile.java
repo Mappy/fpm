@@ -49,7 +49,7 @@ public class BoundariesShapefile extends TomtomShapefile {
         String name = feature.getString("NAME");
         Long extId = feature.getLong("ID");
         String order = feature.getString("ORDER0" + tomtomLevel);
-        Optional<String> population = ofNullable(valueOf(feature.getLong("POP")));
+        Optional<Long> population = ofNullable(feature.getLong("POP"));
 
         Map<String, String> tags = nameProvider.getAlternateNames(extId);
         ImmutableMap<String, String> wayTags = of(
@@ -60,12 +60,10 @@ public class BoundariesShapefile extends TomtomShapefile {
         ImmutableMap<String, String> relationTags = of(
                 "type", "boundary",
                 "ref:tomtom", String.valueOf(extId),
-                "ref:INSEE", CountryCode.getByCode(order) == null ? order : String.valueOf(CountryCode.getByCode(order).getNumeric())
+                "ref:INSEE", CountryCode.getByCode(order) == null ? order : valueOf(CountryCode.getByCode(order).getNumeric())
         );
         tags.putAll(relationTags);
-        population.ifPresent(pop ->
-                tags.put("population", pop)
-        );
+        population.ifPresent(pop -> tags.put("population", valueOf(pop)));
         addRelations(serializer, feature, members, name, tags, wayTags);
     }
 
