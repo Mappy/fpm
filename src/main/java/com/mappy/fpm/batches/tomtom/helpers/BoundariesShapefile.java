@@ -37,7 +37,7 @@ public class BoundariesShapefile extends TomtomShapefile {
         this.adminLevel = String.valueOf(adminLevel);
         this.tomtomLevel = String.valueOf(tomtomLevel);
         this.nameProvider = nameProvider;
-        this.nameProvider.loadFromFile("an.dbf", "NAME", false);
+        this.nameProvider.loadFromFile("___an.dbf", "NAME", false);
     }
 
     @Override
