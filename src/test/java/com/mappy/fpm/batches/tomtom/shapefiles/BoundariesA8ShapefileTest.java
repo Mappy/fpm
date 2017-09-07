@@ -8,7 +8,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.concurrent.locks.Condition;
 
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +28,7 @@ public class BoundariesA8ShapefileTest {
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
                 .filteredOn(relationMember -> relationMember.getRole().equals("outer")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("boundary")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("admin_level", "8")).isNotEmpty();
     }
 

@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
-import com.google.common.collect.ImmutableMap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.BoundariesShapefile;

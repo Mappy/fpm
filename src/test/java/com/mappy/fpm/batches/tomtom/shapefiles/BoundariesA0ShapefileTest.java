@@ -28,6 +28,7 @@ public class BoundariesA0ShapefileTest {
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
                 .filteredOn(relationMember -> relationMember.getRole().equals("outer")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("boundary")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("admin_level", "2")).isNotEmpty();
     }
 
