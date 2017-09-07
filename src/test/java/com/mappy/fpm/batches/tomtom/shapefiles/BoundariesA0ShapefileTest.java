@@ -44,9 +44,15 @@ public class BoundariesA0ShapefileTest {
     }
 
     @Test
-    public void should_have_relation_with_role_label_and_tag_name() throws Exception {
+    public void should_have_relation_with_role_label_and_tags() throws Exception {
         assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
                 .filteredOn(relationMember -> relationMember.getRole().equals("label")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name:de")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name:fr")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name:en")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name:es")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("ref:INSEE")) //
+                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("ref:tomtom")) //
                 .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")).isNotEmpty();
     }
 

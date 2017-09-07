@@ -30,8 +30,8 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
     }
 
     @Override
-    public void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags, ImmutableMap<String, String> wayTags) {
-        super.addRelations(serializer, feature, members, name, tags, wayTags);
+    public void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags) {
+        super.addRelations(serializer, feature, members, name, tags);
         relationProvider.putRelation(feature, members, tags);
     }
 }
