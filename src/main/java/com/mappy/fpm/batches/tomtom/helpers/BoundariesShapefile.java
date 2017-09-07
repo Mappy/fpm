@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.valueOf;
 import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
@@ -49,35 +50,32 @@ public class BoundariesShapefile extends TomtomShapefile {
         String name = feature.getString("NAME");
         Long extId = feature.getLong("ID");
         String order = feature.getString("ORDER0" + tomtomLevel);
-        Optional<String> population = ofNullable(valueOf(feature.getLong("POP")));
+        Optional<Long> population = ofNullable(feature.getLong("POP"));
 
         Map<String, String> tags = nameProvider.getAlternateNames(extId);
-        ImmutableMap<String, String> wayTags = of(
-                "boundary", "administrative",
-                "admin_level", adminLevel);
-        tags.putAll(wayTags);
-
-        ImmutableMap<String, String> relationTags = of(
-                "type", "boundary",
+        tags.putAll(of(
                 "ref:tomtom", String.valueOf(extId),
-                "ref:INSEE", CountryCode.getByCode(order) == null ? order : String.valueOf(CountryCode.getByCode(order).getNumeric())
-        );
-        tags.putAll(relationTags);
-        population.ifPresent(pop ->
-                tags.put("population", pop)
-        );
-        addRelations(serializer, feature, members, name, tags, wayTags);
+                "ref:INSEE", CountryCode.getByCode(order) == null ? order : valueOf(CountryCode.getByCode(order).getNumeric())
+        ));
+        population.ifPresent(pop -> tags.put("population", valueOf(pop)));
+        addRelations(serializer, feature, members, name, tags);
     }
 
     public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags) {
+        tags.put("type", "boundary");
         serializer.writeRelation(members, tags);
     }
 
-    public void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags, ImmutableMap<String, String> wayTags) {
+    public void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags) {
         if (name != null) {
-            tags.put("name", name);
+            Map<String, String> wayTags = newHashMap(of(
+                    "name", name,
+                    "boundary", "administrative",
+                    "admin_level", adminLevel));
+            Map<String, String> pointTags = newHashMap(tags);
+            pointTags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();
-            addPointWithRoleLabel(serializer, members, name, multiPolygon);
+            addPointWithRoleLabel(serializer, members, pointTags, multiPolygon);
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
                 for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
@@ -85,17 +83,15 @@ public class BoundariesShapefile extends TomtomShapefile {
                     members.add(new RelationMember(way.getId(), Way, "outer"));
                 }
             }
-
+            tags.putAll(wayTags);
             writeRelations(serializer, members, tags);
         }
     }
 
-    private void addPointWithRoleLabel(GeometrySerializer serializer, List<RelationMember> members, String name, MultiPolygon multiPolygon) {
+    private void addPointWithRoleLabel(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags, MultiPolygon multiPolygon) {
         Coordinate centPt = Centroid.getCentroid(multiPolygon);
-        Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(centPt), of("name", name));
-        node.ifPresent(nodeLabel ->
-                members.add(new RelationMember(nodeLabel.getId(), Node, "label"))
-        );
+        Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(centPt), tags);
+        node.ifPresent(nodeLabel -> members.add(new RelationMember(nodeLabel.getId(), Node, "label")));
     }
 
 }
