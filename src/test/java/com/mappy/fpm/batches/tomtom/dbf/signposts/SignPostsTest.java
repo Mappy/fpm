@@ -15,6 +15,7 @@ public class SignPostsTest {
     @Before
     public void setup() {
         when(folder.getFile("sg.dbf")).thenReturn(getClass().getResource("/tomtom/sg.dbf").getPath());
+        when(folder.getFile("nw.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_nw.dbf").getPath());
     }
 
     @Test

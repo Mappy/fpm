@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches;
 
 import com.mappy.fpm.batches.merge.pbf.OsmMerger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -17,6 +18,7 @@ public class GenerateFullPbfTest {
     private final GenerateFullPbf generateFullPbf = new GenerateFullPbf(osmMerger, "src/test/resources/generateFullPbf", "target", "Europe.osm.pbf", 1);
 
     @Test
+    @Ignore
     public void should_generate_luxembourg() throws Exception {
         File belgique = new File("target/Belgique/Belgique.osm.pbf");
         belgique.delete();

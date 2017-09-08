@@ -42,7 +42,7 @@ public class SignPosts {
     private final Multimap<Long, SignPostPath> sp;
     private final ListMultimap<Long, Long> lastWayOfPath;
     private final Set<Long> waysWithSign;
-    private final Map<Long, SignWay> ways = newHashMap();
+    private final Map<Long, SignWay> ways;
 
     @Inject
     public SignPosts(TomtomFolder folder) {
@@ -50,6 +50,7 @@ public class SignPosts {
         sp = spFile(folder);
         lastWayOfPath = extractLastWay(sp);
         waysWithSign = regroupPerWays(sp);
+        ways = nwFile(folder);
         sg = sgFile(folder);
     }
 
@@ -241,8 +242,26 @@ public class SignPosts {
         return speeds;
     }
 
+    private static Map<Long, SignWay> nwFile(TomtomFolder folder) {
+        File file = new File(folder.getFile("nw.dbf"));
+        Map<Long, SignWay> speeds = newHashMap();
+        if (!file.exists()) {
+            return speeds;
+        }
+
+        log.info("Reading SG File {}", file);
+        try (DbfReader reader = new DbfReader(file)) {
+            DbfRow row;
+            while ((row = reader.nextRow()) != null) {
+                speeds.put(row.getLong("ID"), new SignWay(row.getLong("ID"), row.getLong("F_JNCTID"), row.getLong("T_JNCTID")));
+            }
+        }
+        log.info("Loaded {} Sign posts junctions", speeds.size());
+        return speeds;
+    }
+
     @Data
-    private class SignWay {
+    private static class SignWay {
         private final Long tomtomId;
         private final Long fromJunctionId;
         private final Long toJunctionId;
