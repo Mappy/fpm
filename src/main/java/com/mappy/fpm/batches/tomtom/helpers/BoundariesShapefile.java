@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
@@ -78,14 +77,23 @@ public class BoundariesShapefile extends TomtomShapefile {
             addPointWithRoleLabel(serializer, members, pointTags, multiPolygon);
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
+                for (int j=0; j < polygon.getNumInteriorRing(); j++){
+                    for (Geometry geom : LongLineSplitter.split(polygon.getInteriorRingN(j), 100)) {
+                        addRelationMember(serializer, members, wayTags, (LineString) geom, "inner");
+                    }
+                }
                 for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
-                    Way way = serializer.write((LineString) geom, wayTags);
-                    members.add(new RelationMember(way.getId(), Way, "outer"));
+                    addRelationMember(serializer, members, wayTags, (LineString) geom, "outer");
                 }
             }
             tags.putAll(wayTags);
             writeRelations(serializer, members, tags);
         }
+    }
+
+    private void addRelationMember(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString geom, String memberRole) {
+        Way way = serializer.write(geom, wayTags);
+        members.add(new RelationMember(way.getId(), Way, memberRole));
     }
 
     private void addPointWithRoleLabel(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags, MultiPolygon multiPolygon) {
