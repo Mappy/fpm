@@ -98,7 +98,8 @@ public class ShapefileDownloader {
                     "_a8.",
                     "_a9.",
                     "_an.", // alternate names
-                    "_bu." // built-up area
+                    "_bu.", // built-up area
+                    "_td." // time domains
                      );
         }
         else if ("sp".equals(type)) {
