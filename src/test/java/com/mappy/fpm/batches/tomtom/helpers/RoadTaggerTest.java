@@ -12,6 +12,8 @@ import com.mappy.fpm.utils.MemoryFeature;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Map;
+
 import static com.mappy.fpm.batches.utils.CollectionUtils.map;
 import static com.mappy.fpm.utils.MemoryFeature.onlyTags;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,6 +61,20 @@ public class RoadTaggerTest {
         assertThat(tagger.tag(onlyTags(map("FT", "1", "FEATTYP", "4110", "ID", "123", "MINUTES", "10.902", "F_ELEV", "0", "T_ELEV", "0", "FOW", "14", "NAME", "Calais - Douvres", "ONEWAY", "N"))))
                 .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54").containsEntry("vehicle", "no");
     }
+
+    @Test
+    public void should_tag_vehicle_no() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).containsEntry("vehicle", "no");
+    }
+
+    @Test
+    public void should_not_tag_vehicle_no_when_restriction_speed() {
+        Map<String, String> restrictionsMap = Maps.newHashMap();
+        restrictionsMap.put("maxspeed", "60");
+        when(speedRestrictionTagger.tag(any(MemoryFeature.class))).thenReturn(restrictionsMap);
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).doesNotContainEntry("vehicle", "no");
+    }
+
 
     @Test
     public void should_tag_pedestrian_roads() {

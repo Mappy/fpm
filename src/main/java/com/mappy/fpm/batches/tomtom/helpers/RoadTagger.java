@@ -60,12 +60,14 @@ public class RoadTagger {
         addTagIf("ref", feature.getString("SHIELDNUM"), feature.getString("SHIELDNUM") != null, tags);
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("oneway", "yes", isOneway(feature), tags);
-        addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && feature.getInteger("FT").equals(1), tags);
+        Map<String, String> restrictionTags = speedRestriction.tag(feature);
+
+        addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && restrictionTags.isEmpty(), tags);
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
         if (!tags.containsValue("ferry")) {
             tags.putAll(speedProfiles.extracted(feature));
-            tags.putAll(speedRestriction.tag(feature));
+            tags.putAll(restrictionTags);
             tags.putAll(highwayType(feature));
             tags.putAll(lanes.lanesFor(feature));
             tags.putAll(nameProvider.getAlternateNames(id));
