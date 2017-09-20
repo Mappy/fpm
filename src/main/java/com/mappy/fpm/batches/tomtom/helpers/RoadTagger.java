@@ -7,10 +7,13 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TdDbf;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 import com.mappy.fpm.batches.utils.Feature;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -33,15 +36,19 @@ public class RoadTagger {
     private final SignPosts signPosts;
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
+    private final TdDbf timeDomaine;
+
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, TomtomStats tomtomStats, NameProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction) {
+                      SpeedRestrictionTagger speedRestriction, TdDbf timeDomaine
+    ) {
         this.speedProfiles = speedProfiles;
         this.stats = tomtomStats;
         this.nameProvider = nameProvider;
         this.signPosts = signPosts;
         this.lanes = lanes;
+        this.timeDomaine = timeDomaine;
         this.speedRestriction = speedRestriction;
         this.nameProvider.loadFromFile("gc.dbf", "FULLNAME", true);
     }
@@ -60,14 +67,13 @@ public class RoadTagger {
         addTagIf("ref", feature.getString("SHIELDNUM"), feature.getString("SHIELDNUM") != null, tags);
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("oneway", "yes", isOneway(feature), tags);
-        Map<String, String> restrictionTags = speedRestriction.tag(feature);
-
-        addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && restrictionTags.isEmpty(), tags);
+        List<TimeDomains> timeDomains = timeDomaine.getTimeDomains(id);
+        addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
         if (!tags.containsValue("ferry")) {
             tags.putAll(speedProfiles.extracted(feature));
-            tags.putAll(restrictionTags);
+            tags.putAll(speedRestriction.tag(feature));
             tags.putAll(highwayType(feature));
             tags.putAll(lanes.lanesFor(feature));
             tags.putAll(nameProvider.getAlternateNames(id));
