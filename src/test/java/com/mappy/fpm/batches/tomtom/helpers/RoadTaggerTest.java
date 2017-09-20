@@ -78,11 +78,6 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_tag_vehicle_no() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).containsEntry("vehicle", "no");
-    }
-
-    @Test
     public void should_tag_foot_and_bicycle_no() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "0", "FREEWAY", "0", "RAMP", "1"))))
                 .containsEntry("foot", "no").containsEntry("bicycle", "no");
