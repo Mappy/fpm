@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<metalink xmlns="http://www.metalinker.org/" pubdate="04 Apr 2016 09:39:14 GMT"
-	type="static" version="3.0">
+<metalink xmlns="http://www.metalinker.org/" pubdate="04 Apr 2016 09:39:14 GMT" type="static" version="3.0">
 	<publisher>
 		<name>TomTom</name>
 		<url>https://partnerlink.tomtom.com</url>
@@ -20,14 +19,12 @@
 			<verification>
 				<hash type="md5">2aadde763e88685b9d588bef186520d3</hash>
 			</verification>
-			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
-			</logo>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif</logo>
 			<description>file #1506: Europe 2016_03 2DCMNB Geographic Data Files
 				Ascii Sequential FRA: eur2016_03/gdfas/2dcmnb/fra/f10.7z.001. ONLY
 				DOWNLOADABLE FROM 193.203.34.228</description>
 			<resources>
-				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-2dcmnb-fra-f10.7z.001
-				</url>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-2dcmnb-fra-f10.7z.001</url>
 			</resources>
 		</file>
 		<file name="eur2016_03-shpd-2dcmnb-esp-f11.7z.001">
@@ -36,14 +33,12 @@
 			<verification>
 				<hash type="md5">2c94788afbcb6821a9f6737623ba4252</hash>
 			</verification>
-			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
-			</logo>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif</logo>
 			<description>file #1507: Europe 2016_03 2DCMNB Geographic Data Files
 				Ascii Sequential ESP: eur2016_03/gdfas/2dcmnb/esp/f11.7z.001. ONLY
 				DOWNLOADABLE FROM 193.203.34.228</description>
 			<resources>
-				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-2dcmnb-esp-f11.7z.001
-				</url>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-2dcmnb-esp-f11.7z.001</url>
 			</resources>
 		</file>
 		<file name="eur2016_03-shpd-2dcmnb-deu-f12.7z.001">
@@ -52,14 +47,12 @@
 			<verification>
 				<hash type="md5">42e90d2fda601630d36d27dcd129a6a3</hash>
 			</verification>
-			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
-			</logo>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif</logo>
 			<description>file #1508: Europe 2016_03 2DCMNB Geographic Data Files
 				Ascii Sequential DEU: eur2016_03/gdfas/2dcmnb/deu/f12.7z.001. ONLY
 				DOWNLOADABLE FROM 193.203.34.228</description>
 			<resources>
-				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-2dcmnb-deu-f12.7z.001
-				</url>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-2dcmnb-deu-f12.7z.001</url>
 			</resources>
 		</file>
 		<file name="eur2016_03-shpd-mnpoi-fra-f10.7z.001">
@@ -68,15 +61,13 @@
 			<verification>
 				<hash type="md5">cccf0ac2083680d3e5efee753b802891</hash>
 			</verification>
-			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
-			</logo>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif</logo>
 			<description>file #1160: Europe 2016_03 MultiNet POI Standard
 				Geographic Data Files Ascii Relational FRA:
 				eur2016_03/gdfar/mnpoi/fra/f10.7z.001. ONLY DOWNLOADABLE FROM
 				193.203.34.228</description>
 			<resources>
-				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-mnpoi-fra-f10.7z.001
-				</url>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-mnpoi-fra-f10.7z.001</url>
 			</resources>
 		</file>
 		<file name="eur2016_03-shpd-mnpoi-esp-f10.7z.001">
@@ -85,15 +76,13 @@
 			<verification>
 				<hash type="md5">cccf0ac2083680d3e5efee753b802891</hash>
 			</verification>
-			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
-			</logo>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif</logo>
 			<description>file #1160: Europe 2016_03 MultiNet POI Standard
 				Geographic Data Files Ascii Relational ESP:
 				eur2016_03/gdfar/mnpoi/esp/f10.7z.001. ONLY DOWNLOADABLE FROM
 				193.203.34.228</description>
 			<resources>
-				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-mnpoi-esp-f10.7z.001
-				</url>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-mnpoi-esp-f10.7z.001</url>
 			</resources>
 		</file>
 		<file name="eur2016_03-shpd-mnpoi-deu-f10.7z.001">
@@ -102,15 +91,13 @@
 			<verification>
 				<hash type="md5">cccf0ac2083680d3e5efee753b802891</hash>
 			</verification>
-			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
-			</logo>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif</logo>
 			<description>file #1160: Europe 2016_03 MultiNet POI Standard
 				Geographic Data Files Ascii Relational DEU:
 				eur2016_03/gdfar/mnpoi/deu/f10.7z.001. ONLY DOWNLOADABLE FROM
 				193.203.34.228</description>
 			<resources>
-				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-mnpoi-deu-f10.7z.001
-				</url>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-mnpoi-deu-f10.7z.001</url>
 			</resources>
 		</file>
 		<file name="eur2016_03-shpd-mnpoi-fra-f11.7z.001">
@@ -119,15 +106,13 @@
 			<verification>
 				<hash type="md5">69fc70d862f2b3f3b89db7e2ab3e6339</hash>
 			</verification>
-			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif
-			</logo>
+			<logo>http://www.tomtom.com/lib/img/promobanners/icon_register.gif</logo>
 			<description>file #1161: Europe 2016_03 MultiNet POI Standard
 				Geographic Data Files Ascii Relational FRA:
 				eur2016_03/gdfar/mnpoi/fra/f11.7z.001. ONLY DOWNLOADABLE FROM
 				193.203.34.228</description>
 			<resources>
-				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-mnpoi-fra-f11.7z.001
-				</url>
+				<url type="http">http://edelivery2.tomtom.com/eur2016_03-shpd-mnpoi-fra-f11.7z.001</url>
 			</resources>
 		</file>
 	</files>
