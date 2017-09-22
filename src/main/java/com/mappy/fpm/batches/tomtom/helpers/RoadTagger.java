@@ -7,10 +7,13 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TdDbf;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 import com.mappy.fpm.batches.utils.Feature;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -33,15 +36,19 @@ public class RoadTagger {
     private final SignPosts signPosts;
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
+    private final TdDbf timeDomaine;
+
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, TomtomStats tomtomStats, NameProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction) {
+                      SpeedRestrictionTagger speedRestriction, TdDbf timeDomaine
+    ) {
         this.speedProfiles = speedProfiles;
         this.stats = tomtomStats;
         this.nameProvider = nameProvider;
         this.signPosts = signPosts;
         this.lanes = lanes;
+        this.timeDomaine = timeDomaine;
         this.speedRestriction = speedRestriction;
         this.nameProvider.loadFromFile("gc.dbf", "FULLNAME", true);
     }
@@ -60,7 +67,8 @@ public class RoadTagger {
         addTagIf("ref", feature.getString("SHIELDNUM"), feature.getString("SHIELDNUM") != null, tags);
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("oneway", "yes", isOneway(feature), tags);
-        addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")), tags);
+        List<TimeDomains> timeDomains = timeDomaine.getTimeDomains(id);
+        addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
         if (!tags.containsValue("ferry")) {
@@ -105,13 +113,11 @@ public class RoadTagger {
 
         if (fElev.equals(tElev)) {
             tags.put("layer", String.valueOf(fElev));
-        }
-        else {
+        } else {
             if (isReversed(feature)) {
                 tags.put("layer:from", String.valueOf(tElev));
                 tags.put("layer:to", String.valueOf(fElev));
-            }
-            else {
+            } else {
                 tags.put("layer:from", String.valueOf(fElev));
                 tags.put("layer:to", String.valueOf(tElev));
             }
@@ -132,24 +138,20 @@ public class RoadTagger {
             if (PEDESTRIAN.is(fow)) {
                 tags.put(HIGHWAY, "pedestrian");
                 stats.increment("highway_pedestrian");
-            }
-            else if (STAIRS.is(fow)) {
+            } else if (STAIRS.is(fow)) {
                 tags.put(HIGHWAY, "steps");
                 stats.increment("highway_steps");
-            }
-            else if (WALKWAY.is(fow)) {
+            } else if (WALKWAY.is(fow)) {
                 tags.put(HIGHWAY, "footway");
                 stats.increment("highway_footway");
-            }
-            else if (PARKING_PLACE.is(fow) || ENTRANCE_EXIT_CAR_PARK.is(fow)) {
+            } else if (PARKING_PLACE.is(fow) || ENTRANCE_EXIT_CAR_PARK.is(fow)) {
                 tags.put(HIGHWAY, "service");
                 tags.put(SERVICE, "parking_aisle");
                 stats.increment("parking");
-            }
-            else if (frc != null) {
+            } else if (frc != null) {
                 boolean isFreeway = PART_OF_FREEWAY.is(feature.getInteger("FREEWAY"));
                 tags.put(HIGHWAY, functionalRoadClass(frc, SLIP_ROAD.is(fow), isFreeway));
-                if(frc == 0 || PART_OF_MOTORWAY.is(fow) || isFreeway) {
+                if (frc == 0 || PART_OF_MOTORWAY.is(fow) || isFreeway) {
                     tags.put(FOOT, "no");
                     tags.put(BICYCLE, "no");
                 }

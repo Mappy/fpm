@@ -1,11 +1,10 @@
 package com.mappy.fpm.batches.tomtom.download;
 
+import com.google.common.collect.Sets;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import com.google.common.collect.Lists;
-
-import java.util.List;
+import java.util.Set;
 
 public class TomtomCountries {
     @Data
@@ -20,8 +19,8 @@ public class TomtomCountries {
         }
     }
 
-    public static List<TomtomCountry> countries() {
-        List<TomtomCountry> countries = Lists.newArrayList();
+    public static Set<TomtomCountry> countries() {
+        Set<TomtomCountry> countries = Sets.newHashSet();
         countries.add(new TomtomCountry("ALB", "Albanie"));
         countries.add(new TomtomCountry("AND", "Andorre"));
         countries.add(new TomtomCountry("AUT", "Autriche"));
@@ -71,8 +70,8 @@ public class TomtomCountries {
         return countries;
     }
 
-    public static List<TomtomCountry> outerworld() {
-        List<TomtomCountry> countries = Lists.newArrayList();
+    public static Set<TomtomCountry> outerworld() {
+        Set<TomtomCountry> countries = Sets.newHashSet();
         countries.add(new TomtomCountry("OAT", "Outerworld-Atlantique", true));
         countries.add(new TomtomCountry("OIN", "Outerworld-Indien", true));
         countries.add(new TomtomCountry("OBE", "Outerworld-Belgique", true));

@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.tomtom.download;
 
-import com.google.common.collect.Sets;
 import lombok.Data;
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
@@ -18,6 +17,7 @@ import java.util.regex.Pattern;
 import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static java.util.stream.Collectors.toList;
 import static org.jsoup.parser.Parser.xmlParser;
 
@@ -75,7 +75,7 @@ public class MetalinkParser {
 
     @Data
     public static class MetalinkUrl {
-        private static final Set<String> NEEDED = Sets.newHashSet(newArrayList("2dcmnb", "mn", "sp"));
+        private static final Set<String> NEEDED = newHashSet(newArrayList("2dcmnb", "mn", "sp"));
 
         private final String name;
         private final String country;

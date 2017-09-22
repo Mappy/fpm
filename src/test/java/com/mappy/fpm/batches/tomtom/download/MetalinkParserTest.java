@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.*;
 public class MetalinkParserTest {
     @Test
     public void should_parse_metalink() throws Exception {
-        Metalink metalink = MetalinkParser.parse(getClass().getResourceAsStream("/Europe_2016_03_20160404_093914_GMT.metalink.xml"));
+        Metalink metalink = MetalinkParser.parse(getClass().getResourceAsStream("/tomtom/download/Europe.metalink.xml"));
 
         assertThat(metalink.size()).isEqualTo(3);
         assertThat(metalink.forCountry("fra"))

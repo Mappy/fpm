@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.download;
 
+import com.google.common.collect.Sets;
 import com.mappy.fpm.batches.tomtom.download.MetalinkParser.Metalink;
 import com.mappy.fpm.batches.tomtom.download.MetalinkParser.MetalinkUrl;
 import com.mappy.fpm.batches.tomtom.download.TomtomCountries.TomtomCountry;
@@ -15,7 +16,7 @@ public class TomtomDownloaderTest {
     private final MetalinkDownloader downloader = mock(MetalinkDownloader.class);
     private final ShapefileDownloader shapefileDownloader = mock(ShapefileDownloader.class);
     private final TomtomDownloader tomtomDownloader = new TomtomDownloader(downloader, shapefileDownloader,
-            newArrayList(new TomtomCountry("FRA", "France"), new TomtomCountry("GRC", "Grèce")));
+            Sets.newHashSet(new TomtomCountry("FRA", "France"), new TomtomCountry("GRC", "Grèce")));
 
     @Test(expected = IllegalStateException.class)
     public void should_throw_an_exception_without_data() throws Exception {
@@ -35,7 +36,7 @@ public class TomtomDownloaderTest {
             fail("No exception");
         }
         catch (IllegalStateException e) {
-            assertThat(e.getMessage()).isEqualTo("No data for Grèce");
+            assertThat(e.getMessage()).contains("No data for Grèce");
         }
     }
 

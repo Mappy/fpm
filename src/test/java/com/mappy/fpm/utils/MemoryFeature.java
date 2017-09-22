@@ -21,7 +21,7 @@ public class MemoryFeature implements Feature {
         }) }), tags);
     }
 
-    public static MemoryFeature onlyTags(Map<String, String> tags) {
+    public static MemoryFeature     onlyTags(Map<String, String> tags) {
         return new MemoryFeature(null, tags);
     }
 

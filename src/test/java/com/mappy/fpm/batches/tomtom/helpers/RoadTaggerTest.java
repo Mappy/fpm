@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mappy.fpm.batches.tomtom.TomtomStats;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
@@ -8,9 +9,13 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TdDbf;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 import com.mappy.fpm.utils.MemoryFeature;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static com.mappy.fpm.batches.utils.CollectionUtils.map;
 import static com.mappy.fpm.utils.MemoryFeature.onlyTags;
@@ -25,7 +30,8 @@ public class RoadTaggerTest {
     private final NameProvider names = mock(NameProvider.class);
     private final SignPosts signPosts = mock(SignPosts.class);
     private final LaneTagger lanes = mock(LaneTagger.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, mock(TomtomStats.class), names, signPosts, lanes, speedRestrictionTagger);
+    private final TdDbf timeDomains = mock(TdDbf.class);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, mock(TomtomStats.class), names, signPosts, lanes, speedRestrictionTagger, timeDomains);
 
     @Before
     public void setup() {
@@ -49,9 +55,9 @@ public class RoadTaggerTest {
 
     @Test
     public void should_tag_ferries() throws Exception {
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "1", "F_ELEV", "0", "T_ELEV", "0", "NAME", "Calais - Douvres", "MINUTES", "10.902")))).containsEntry("route", "ferry")
+        assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "NAME", "Calais - Douvres", "MINUTES", "10.902")))).containsEntry("route", "ferry")
                 .containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "1", "F_ELEV", "0", "T_ELEV", "0", "MINUTES", "10")))).containsEntry("route", "ferry").doesNotContainKey("name");
+        assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "MINUTES", "10", "", "")))).containsEntry("route", "ferry").doesNotContainKey("name");
     }
 
     @Test
@@ -59,6 +65,20 @@ public class RoadTaggerTest {
         assertThat(tagger.tag(onlyTags(map("FT", "1", "FEATTYP", "4110", "ID", "123", "MINUTES", "10.902", "F_ELEV", "0", "T_ELEV", "0", "FOW", "14", "NAME", "Calais - Douvres", "ONEWAY", "N"))))
                 .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54").containsEntry("vehicle", "no");
     }
+
+    @Test
+    public void should_tag_vehicle_no() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).containsEntry("vehicle", "no");
+    }
+
+    @Test
+    public void should_not_tag_vehicle_no_when_restriction_speed() {
+        List<TimeDomains> timeDomainList = Lists.newArrayList();
+        timeDomainList.add(new TimeDomains(1L));
+        when(timeDomains.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).doesNotContainEntry("vehicle", "no");
+    }
+
 
     @Test
     public void should_tag_pedestrian_roads() {
@@ -75,11 +95,6 @@ public class RoadTaggerTest {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "PRIVATERD", "2"))))
                 .containsEntry("access", "private");
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "PRIVATERD", "0")))).doesNotContainKey("access");
-    }
-
-    @Test
-    public void should_tag_vehicle_no() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).containsEntry("vehicle", "no");
     }
 
     @Test

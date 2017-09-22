@@ -14,17 +14,19 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import static com.google.common.base.Throwables.propagate;
+import static com.google.common.collect.Lists.newArrayList;
 
 @Slf4j
 public class ShapefileExtractor {
-    public static void decompress(File outputDirectory, File file, List<String> patterns) {
+
+    public static void decompress(File outputDirectory, File file, boolean outerworld, String type) {
         try {
             SevenZFile archive = new SevenZFile(file);
             SevenZArchiveEntry entry = null;
             while ((entry = archive.getNextEntry()) != null) {
                 String filename = Paths.get(entry.getName()).getFileName().toString();
 
-                if (patterns.stream().anyMatch(filename::contains)) {
+                if (tablesNeeded(outerworld, type).stream().anyMatch(filename::contains)) {
                     log.info("Extracting {}", filename);
                     byte[] content = new byte[(int) entry.getSize()];
                     archive.read(content, 0, content.length);
@@ -39,5 +41,53 @@ public class ShapefileExtractor {
         catch (IOException e) {
             throw propagate(e);
         }
+    }
+
+    private static List<String> tablesNeeded(boolean outerworld, String type) {
+        if (outerworld) {
+            return newArrayList("nw.");
+        }
+        if ("mn".equals(type)) {
+            return newArrayList(
+                    "_nw.", // roads
+                    "_rs.", // road restrictions
+                    "_mn.", // road maneuver
+                    "_mp.", // road maneuver
+                    "_lc.", // land covers
+                    "_lu.", // land uses
+                    "_wa.", // water areas
+                    "_wl.", // water lines
+                    "_sm.", // cities
+                    "_smnm.", // alternate city names
+                    "_bl.", // coastlines
+                    "_rr.", // railroads
+                    "_gc.", // Geocoding Information (alternate roads names)
+                    "_sr.", // speeds restrictions (for maxspeed)
+                    "_si.", // sign post information
+                    "_sp.", // sign post paths
+                    "_sg.", // sign post
+                    "_ld.", // lane directions
+                    "_a0.",
+                    "_a1.",
+                    "_a2.",
+                    "_a3.",
+                    "_a4.",
+                    "_a5.",
+                    "_a6.",
+                    "_a7.",
+                    "_a8.",
+                    "_a9.",
+                    "_an.", // alternate names
+                    "_bu.", // built-up area
+                    "_td." // time domains
+            );
+        }
+        else if ("sp".equals(type)) {
+            return newArrayList("_hsnp.", "_hspr.");
+        }
+        else if ("2dcmnb".equals(type)) {
+            return newArrayList("_2dbd.", "_2dtb.");
+        }
+        throw new IllegalStateException();
     }
 }
