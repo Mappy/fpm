@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
-import com.google.common.collect.Lists;
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.utils.Feature;
@@ -18,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.valueOf;
 import static java.util.Optional.ofNullable;
@@ -31,7 +31,6 @@ public class BoundariesShapefile extends TomtomShapefile {
     private final String tomtomLevel;
     private final NameProvider nameProvider;
 
-
     protected BoundariesShapefile(String filename, int adminLevel, int tomtomLevel, NameProvider nameProvider) {
         super(filename);
         this.adminLevel = String.valueOf(adminLevel);
@@ -42,10 +41,6 @@ public class BoundariesShapefile extends TomtomShapefile {
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
-        serialize(serializer, feature, Lists.newArrayList());
-    }
-
-    public void serialize(GeometrySerializer serializer, Feature feature, List<RelationMember> members) {
         String name = feature.getString("NAME");
         Long extId = feature.getLong("ID");
         String order = feature.getString("ORDER0" + tomtomLevel);
@@ -57,7 +52,7 @@ public class BoundariesShapefile extends TomtomShapefile {
                 "ref:INSEE", CountryCode.getByCode(order) == null ? order : valueOf(CountryCode.getByCode(order).getNumeric())
         ));
         population.ifPresent(pop -> tags.put("population", valueOf(pop)));
-        addRelations(serializer, feature, members, name, tags);
+        addRelations(serializer, feature, newArrayList(), name, tags);
     }
 
     public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags) {
@@ -101,5 +96,4 @@ public class BoundariesShapefile extends TomtomShapefile {
         Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(centPt), tags);
         node.ifPresent(nodeLabel -> members.add(new RelationMember(nodeLabel.getId(), Node, "label")));
     }
-
 }

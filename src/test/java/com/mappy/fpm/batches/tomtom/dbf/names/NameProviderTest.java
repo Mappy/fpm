@@ -1,10 +1,8 @@
 package com.mappy.fpm.batches.tomtom.dbf.names;
 
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
-
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -12,28 +10,16 @@ import static org.junit.Assert.assertEquals;
 public class NameProviderTest {
 
     @Test
-    public void shouldAddAlternativeName(){
-        NameProvider np = new NameProvider(new TomtomFolder("src/test/resources/osmgenerator/", "belbe2"));
-        np.loadFromFile("smnm.dbf", "NAME", false);
-        Map<String, String> tags = new HashMap<>();
-        tags.putAll(np.getAlternateNames(10560000430948L));
-        assertEquals(tags.size(), 5);
-        assertEquals(tags.get("name:fr"), "Bruxelles");
-        assertEquals(tags.get("name:nl"), "Brussel");
-        assertEquals(tags.get("name:de"), "Brüssel");
-        assertEquals(tags.get("name:en"), "Brussels");
-        assertEquals(tags.get("name:es"), "Bruselas");
-    }
-
-    @Test
-    public void shouldAddAlternativeFullName(){
-        NameProvider np = new NameProvider(new TomtomFolder("src/test/resources/osmgenerator/", "belbe2"));
-        np.loadFromFile("gc.dbf", "FULLNAME", false);
-        Map<String, String> tags = new HashMap<>();
-        tags.putAll(np.getAlternateNames(-2147483648L));
-        assertEquals(3, tags.size());
-        assertEquals("Waverse Steenweg", tags.get("name:nl"));
-        assertEquals("A34", tags.get("alt_name"));
-
+    public void should_add_alternative_names() {
+        NameProvider np = new NameProvider(new TomtomFolder("src/test/resources/tomtom/", "andorra"));
+        np.loadFromFile("an.dbf", "NAME", false);
+        Map<String, String> tags = np.getAlternateNames(10200000000008L);
+        assertEquals(tags.size(), 6);
+        assertEquals(tags.get("name:ca"), "Andorra_cat");
+        assertEquals(tags.get("name:fr"), "Andorre");
+        assertEquals(tags.get("name:de"), "Andorra_ger");
+        assertEquals(tags.get("name:en"), "Andorra_eng");
+        assertEquals(tags.get("name:es"), "Andorra_spa");
+        assertEquals(tags.get("alt_name"), "Andorra_aaa");
     }
 }
