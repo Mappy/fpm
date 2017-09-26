@@ -210,7 +210,7 @@
         <dependency>
             <groupId>com.neovisionaries</groupId>
             <artifactId>nv-i18n</artifactId>
-            <version>1.11</version>
+            <version>1.22</version>
         </dependency>
     </dependencies>
 
