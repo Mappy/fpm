@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
@@ -26,7 +27,10 @@ public class BoundariesA0ShapefileTest {
 
     @BeforeClass
     public static void setup() throws Exception {
-        createDirectory(get("target", "tests"));
+        Path dir = get("target", "tests");
+        if(!dir.toFile().exists()) {
+            createDirectory(dir);
+        }
 
         NameProvider nameProvider = mock(NameProvider.class);
         Map<String, String> names = newHashMap();
