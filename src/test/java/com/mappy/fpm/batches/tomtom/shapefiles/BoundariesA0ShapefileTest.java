@@ -5,11 +5,15 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.OsmosisSerializer;
+import net.morbz.osmonaut.osm.Relation;
+import net.morbz.osmonaut.osm.RelationMember;
+import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
@@ -17,6 +21,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.nio.file.Files.createDirectory;
 import static java.nio.file.Paths.get;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -50,31 +55,53 @@ public class BoundariesA0ShapefileTest {
     }
 
     @Test
-    public void should_have_relations_with_ways() throws Exception {
-        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
-                .filteredOn(relationMember -> relationMember.getRole().equals("outer")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("boundary")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("admin_level", "2")).isNotEmpty();
+    public void should_have_relations_with_all_tags() throws Exception {
+        List<Relation> relations = pbfContent.getRelations();
+        assertThat(relations).hasSize(1);
+
+        Tags tags = relations.get(0).getTags();
+        assertThat(tags.size()).isEqualTo(7);
+        assertThat(tags.get("ref:tomtom")).isEqualTo("10200000000008");
+        assertThat(tags.get("boundary")).isEqualTo("administrative");
+        assertThat(tags.get("admin_level")).isEqualTo("2");
+        assertThat(tags.get("name")).isEqualTo("Andorra");
+        assertThat(tags.get("name:fr")).isEqualTo("Andorre");
+        assertThat(tags.get("ref:INSEE")).isEqualTo("20");
+        assertThat(tags.get("type")).isEqualTo("boundary");
     }
 
     @Test
-    public void should_have_relations_with_all_tags() throws Exception {
-        assertThat(pbfContent.getRelations()) //
-                .filteredOn(relation -> relation.getTags().hasKeyValue("name", "Andorra")) //
-                .filteredOn(relation -> relation.getTags().hasKeyValue("name:fr", "Andorre")) //
-                .filteredOn(relation -> relation.getTags().hasKeyValue("ref:INSEE", "20")) //
-                .filteredOn(relation -> relation.getTags().hasKeyValue("ref:tomtom", "10200000000008")).isNotEmpty();
+    public void should_have_relations_with_ways() throws Exception {
+        List<RelationMember> labels = pbfContent.getRelations().stream()//
+                .flatMap(relation -> relation.getMembers().stream())//
+                .filter(relationMember -> relationMember.getRole().equals("outer"))//
+                .collect(toList());
+
+        assertThat(labels).hasSize(9);
+
+        assertThat(labels.stream()
+                .map(RelationMember::getEntity) //
+                .filter(entity -> entity.getTags().hasKeyValue("boundary", "administrative")) //
+                .filter(entity -> entity.getTags().hasKeyValue("name", "Andorra")) //
+                .filter(entity -> entity.getTags().hasKeyValue("admin_level", "2")))
+                .hasSize(9);
     }
 
     @Test
     public void should_have_relation_with_role_label_and_tags() throws Exception {
-        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
-                .filteredOn(relationMember -> relationMember.getRole().equals("label")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("name", "Andorra")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("name:fr", "Andorre")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("ref:INSEE", "20")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("ref:tomtom", "10200000000008")).isNotEmpty();
+        List<RelationMember> labels = pbfContent.getRelations().stream()//
+                .flatMap(relation -> relation.getMembers().stream())//
+                .filter(relationMember -> relationMember.getRole().equals("label"))//
+                .collect(toList());
+
+        assertThat(labels).hasSize(1);
+
+        Tags tags = labels.get(0).getEntity().getTags();
+        assertThat(tags.size()).isEqualTo(4);
+        assertThat(tags.get("name")).isEqualTo("Andorra");
+        assertThat(tags.get("name:fr")).isEqualTo("Andorre");
+        assertThat(tags.get("ref:INSEE")).isEqualTo("20");
+        assertThat(tags.get("ref:tomtom")).isEqualTo("10200000000008");
     }
 
     @Test
