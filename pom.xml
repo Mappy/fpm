@@ -104,7 +104,7 @@
         <dependency>
             <groupId>com.github.davidmoten</groupId>
             <artifactId>geo</artifactId>
-            <version>0.7.4</version>
+            <version>0.7.6</version>
         </dependency>
         <dependency>
             <groupId>org.jamel.dbf</groupId>
