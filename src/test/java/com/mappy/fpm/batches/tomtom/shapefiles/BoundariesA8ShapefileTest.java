@@ -1,25 +1,59 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
-import com.google.inject.Guice;
-import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
-import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
+import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
+import com.mappy.fpm.batches.tomtom.helpers.RelationProvider;
+import com.mappy.fpm.batches.utils.GeometrySerializer;
+import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.util.Map;
 
+import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
+import static java.nio.file.Files.createDirectory;
+import static java.nio.file.Paths.get;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BoundariesA8ShapefileTest {
     public static Tomtom2OsmTestUtils.PbfContent pbfContent;
 
     @BeforeClass
     public static void setup() throws Exception {
-        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "belbe3")).getInstance(Tomtom2Osm.class);
-        launcher.run();
-        pbfContent = read(new File("target/belbe3.osm.pbf"));
+        Path dir = get("target", "tests");
+        if(!dir.toFile().exists()) {
+            createDirectory(dir);
+        }
+
+        NameProvider nameProvider = mock(NameProvider.class);
+        Map<String, String> names = newHashMap();
+        names.putAll(of("name", "Brussel", "name:fr", "Bruxelles"));
+        when(nameProvider.getAlternateNames(10560000000843L)).thenReturn(names);
+
+        TomtomFolder tomtomFolder = mock(TomtomFolder.class);
+        when(tomtomFolder.getFile("___a8.shp")).thenReturn("src/test/resources/tomtom/boundaries/a8/belbe3___________a8.shp");
+
+        OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
+        when(osmLevelGenerator.getOsmLevel("belbe3", "8")).thenReturn("8");
+
+        RelationProvider relationProvider = mock(RelationProvider.class);
+
+        BoundariesA8Shapefile shapefile = new BoundariesA8Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, new RelationProvider());
+
+        GeometrySerializer serializer = new OsmosisSerializer("target/tests/belbe3.osm.pbf", "Test_TU");
+
+        shapefile.serialize(serializer);
+        serializer.close();
+
+        pbfContent = read(new File("target/tests/belbe3.osm.pbf"));
     }
 
 

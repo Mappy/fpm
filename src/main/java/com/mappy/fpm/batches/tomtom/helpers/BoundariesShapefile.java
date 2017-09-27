@@ -27,13 +27,16 @@ import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 public class BoundariesShapefile extends TomtomShapefile {
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
-    private final String adminLevel;
+    private final String osmLevel;
     private final String tomtomLevel;
     private final NameProvider nameProvider;
 
-    protected BoundariesShapefile(String filename, int adminLevel, int tomtomLevel, NameProvider nameProvider) {
+    protected BoundariesShapefile(String filename, int tomtomLevel, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(filename);
-        this.adminLevel = String.valueOf(adminLevel);
+        String[] split = filename.split("/");
+        String zone = split[split.length-1].split("_")[0];
+
+        this.osmLevel = osmLevelGenerator.getOsmLevel(zone, String.valueOf(tomtomLevel));
         this.tomtomLevel = String.valueOf(tomtomLevel);
         this.nameProvider = nameProvider;
         this.nameProvider.loadFromFile("___an.dbf", "NAME", false);
@@ -65,7 +68,7 @@ public class BoundariesShapefile extends TomtomShapefile {
             Map<String, String> wayTags = newHashMap(of(
                     "name", name,
                     "boundary", "administrative",
-                    "admin_level", adminLevel));
+                    "admin_level", osmLevel));
             Map<String, String> pointTags = newHashMap(tags);
             pointTags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();

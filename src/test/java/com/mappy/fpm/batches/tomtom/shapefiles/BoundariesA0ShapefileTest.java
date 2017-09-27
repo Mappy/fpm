@@ -3,6 +3,7 @@ package com.mappy.fpm.batches.tomtom.shapefiles;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Relation;
@@ -44,7 +45,11 @@ public class BoundariesA0ShapefileTest {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___a0.shp")).thenReturn("src/test/resources/tomtom/boundaries/a0/andorra______________a0.shp");
-        BoundariesA0Shapefile shapefile = new BoundariesA0Shapefile(tomtomFolder, nameProvider);
+
+        OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
+        when(osmLevelGenerator.getOsmLevel("andorra", "0")).thenReturn("2");
+
+        BoundariesA0Shapefile shapefile = new BoundariesA0Shapefile(tomtomFolder, nameProvider, osmLevelGenerator);
 
         GeometrySerializer serializer = new OsmosisSerializer("target/tests/andorra.osm.pbf", "Test_TU");
 
