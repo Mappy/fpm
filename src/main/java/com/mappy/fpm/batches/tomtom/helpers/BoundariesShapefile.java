@@ -44,25 +44,25 @@ public class BoundariesShapefile extends TomtomShapefile {
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
-        String name = feature.getString("NAME");
         Long extId = feature.getLong("ID");
         String order = feature.getString("ORDER0" + tomtomLevel);
 
-        Map<String, String> tags = nameProvider.getAlternateNames(extId);
+        Map<String, String> tags = newHashMap();
+        tags.putAll(nameProvider.getAlternateNames(extId));
         tags.putAll(of(
                 "ref:tomtom", String.valueOf(extId),
                 "ref:INSEE", CountryCode.getByCode(order) == null ? order : valueOf(CountryCode.getByCode(order).getNumeric())
         ));
 
-        Optional<Long> population = ofNullable(feature.getLong("POP"));
-        population.ifPresent(pop -> tags.put("population", valueOf(pop)));
+        ofNullable(feature.getLong("POP")).ifPresent(pop -> tags.put("population", valueOf(pop)));
 
         List<RelationMember> members = newArrayList();
+        String name = feature.getString("NAME");
         if (name != null) {
-            Map<String, String> wayTags = newHashMap(of(
+            Map<String, String> wayTags = of(
                     "name", name,
                     "boundary", "administrative",
-                    "admin_level", osmLevel));
+                    "admin_level", osmLevel);
             Map<String, String> pointTags = newHashMap(tags);
             pointTags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();

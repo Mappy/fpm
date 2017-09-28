@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
-import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
+import com.mappy.fpm.batches.AbstractTest;
+import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
@@ -11,106 +12,127 @@ import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
+import net.morbz.osmonaut.osm.Entity;
+import net.morbz.osmonaut.osm.Relation;
+import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.util.Map;
+import java.util.List;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
-import static java.nio.file.Files.createDirectory;
-import static java.nio.file.Paths.get;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class BoundariesA8ShapefileTest {
+public class BoundariesA8ShapefileTest extends AbstractTest {
 
-    private static Tomtom2OsmTestUtils.PbfContent pbfContent;
+    private static PbfContent pbfContent;
 
     private static NameProvider nameProvider = mock(NameProvider.class);
 
     @BeforeClass
     public static void setup() throws Exception {
-        Path dir = get("target", "tests");
-        if(!dir.toFile().exists()) {
-            createDirectory(dir);
-        }
 
-        Map<String, String> names = newHashMap();
-        names.putAll(of("name", "Brussel", "name:nl", "Bruxelles", "name:fr", "Bruxelles"));
-        when(nameProvider.getAlternateNames(10560000000250L)).thenReturn(names);
+        when(nameProvider.getAlternateNames(10560000000250L)) //
+                .thenReturn(of("name", "Anderlecht", "name:nl", "AnderlechtNL", "name:fr", "AnderlechtFR"));
+        when(nameProvider.getAlternateNames(10560000000267L)) //
+                .thenReturn(of("name", "Sint-Gillis", "name:nl", "Sint-GillisNL", "name:fr", "Sint-GillisFR"));
+        when(nameProvider.getAlternateNames(10560000000263L)) //
+                .thenReturn(of("name", "Vorst", "name:nl", "VorstNL", "name:fr", "VorstFR"));
 
-        Map<String, String> names2 = newHashMap();
-        names2.putAll(of("name", "Brussel", "name:nl", "Bruxelles", "name:fr", "Bruxelles"));
-        when(nameProvider.getAlternateNames(10560000000267L)).thenReturn(names2);
-
-        Map<String, String> names3 = newHashMap();
-        names3.putAll(of("name", "Brussel", "name:nl", "Bruxelles", "name:fr", "Bruxelles"));
-        when(nameProvider.getAlternateNames(10560000000263L)).thenReturn(names3);
-
-        Map<String, String> names4 = newHashMap();
-        names4.putAll(of("name", "Brussel", "name:nl", "Bruxelles", "name:fr", "Bruxelles"));
-        when(nameProvider.getAlternateNames(10560000718742L)).thenReturn(names4);
+        when(nameProvider.getAlternateNames(10560000718742L)) //
+                .thenReturn(of("name", "Anderlecht", "name:nl", "AnderlechtCNL", "name:fr", "AnderlechtCFR"));
+        when(nameProvider.getAlternateNames(10560000388234L)) //
+                .thenReturn(of("name", "Sint-Gillis", "name:nl", "Sint-GillisCNL", "name:fr", "Sint-GillisCFR"));
+        when(nameProvider.getAlternateNames(10560000455427L)) //
+                .thenReturn(of("name", "Vorst", "name:nl", "VorstCNL", "name:fr", "VorstCFR"));
 
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
-        when(tomtomFolder.getFile("___a8.shp")).thenReturn("src/test/resources/tomtom/boundaries/a8/belbe3___________a8.shp");
+        when(tomtomFolder.getFile("___a8.shp")).thenReturn("src/test/resources/tomtom/boundaries/a8/Anderlecht___________a8.shp");
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
-        when(osmLevelGenerator.getOsmLevel("belbe3", "8")).thenReturn("8");
+        when(osmLevelGenerator.getOsmLevel("Anderlecht", "8")).thenReturn("8");
 
         TownTagger townTagger = mock(TownTagger.class);
-        double[] doubles3 = {4.307077, 50.8366041};
+        double[] doubles = {4.3451859, 50.8251293};
         GeometryFactory factory = mock(GeometryFactory.class);
-        Point point = new Point(new PackedCoordinateSequence.Double(doubles3, 2), factory);
-        when(townTagger.get(10560000718742L)).thenReturn(new Centroid(10560000718742L, "toto", 8, 1, 7, point));
+        Point point = new Point(new PackedCoordinateSequence.Double(doubles, 2), factory);
+        when(townTagger.get(10560000718742L)).thenReturn(new Centroid(10560000718742L, "Anderlecht", 8, 1, 7, point));
+        double[] doubles2 = {4.3134424, 50.8055758};
+        Point point2 = new Point(new PackedCoordinateSequence.Double(doubles2, 2), factory);
+        when(townTagger.get(10560000388234L)).thenReturn(new Centroid(10560000388234L, "Sint-Gillis", 8, 1, 8, point2));
+        double[] doubles3 = {4.307077, 50.8366041};
+        Point point3 = new Point(new PackedCoordinateSequence.Double(doubles3, 2), factory);
+        when(townTagger.get(10560000455427L)).thenReturn(new Centroid(10560000455427L, "Vorst", 8, 1, 8, point3));
 
         BoundariesA8Shapefile shapefile = new BoundariesA8Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/belbe3.osm.pbf", "Test_TU");
+        GeometrySerializer serializer = new OsmosisSerializer("target/tests/Anderlecht.osm.pbf", "Test_TU");
 
         shapefile.serialize(serializer);
         serializer.close();
 
-        pbfContent = read(new File("target/tests/belbe3.osm.pbf"));
-    }
-
-    @Test
-    public void should_have_relations_with_ways() throws Exception {
-        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
-                .filteredOn(relationMember -> relationMember.getRole().equals("outer")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("boundary")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKeyValue("admin_level", "8")).isNotEmpty();
+        pbfContent = read(new File("target/tests/Anderlecht.osm.pbf"));
     }
 
     @Test
     public void should_have_relations_with_all_tags() throws Exception {
-        assertThat(pbfContent.getRelations()) //
-                .filteredOn(relation -> relation.getTags().hasKey("name")) //
-                .filteredOn(relation -> relation.getTags().hasKey("name:nl")) //
-                .filteredOn(relation -> relation.getTags().hasKey("name:fr")) //
-                .filteredOn(relation -> relation.getTags().hasKey("population")) //
-                .filteredOn(relation -> relation.getTags().hasKey("ref:INSEE")) //
-                .filteredOn(relation -> relation.getTags().hasKey("ref:tomtom")).isNotEmpty();
+        List<Relation> relations = pbfContent.getRelations();
+        assertThat(relations).hasSize(3);
+
+        List<Tags> tags = relations.stream()
+                .map(Entity::getTags)
+                .collect(toList());
+
+        assertThat(tags).extracting(t -> t.get("boundary")).containsOnly("administrative");
+        assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("8");
+        assertThat(tags).extracting(t -> t.get("type")).containsOnly("boundary");
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtFR", "Sint-GillisFR", "VorstFR");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtNL", "Sint-GillisNL", "VorstNL");
+        assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
+        assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("21001", "21013", "21007");
+        assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000250", "10560000000267", "10560000000263");
     }
 
     @Test
-    public void should_have_relation_with_admin_centers_and_all_tags() throws Exception {
-        verify(nameProvider).getAlternateNames(10560000718742L);
+    public void should_have_relations_with_tags_and_role_outer() throws Exception {
+        List<Relation> relations = pbfContent.getRelations();
+        assertThat(relations).hasSize(3);
 
-        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
-                .filteredOn(relationMember -> relationMember.getRole().equals("admin_center")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("place")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name:nl")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("population")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name:fr")).isNotEmpty();
+        List<Tags> tags = relations.stream()
+                .flatMap(f -> f.getMembers().stream())
+                .filter(relationMember -> "outer".equals(relationMember.getRole()))
+                .map(m -> m.getEntity().getTags())
+                .collect(toList());
+
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
+        assertThat(tags).extracting(t -> t.get("boundary")).containsOnly("administrative");
+        assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("8");
+    }
+
+    @Test
+    public void should_have_relation_with_tags_and_admin_centers() throws Exception {
+        List<Relation> relations = pbfContent.getRelations();
+        assertThat(relations).hasSize(3);
+
+        List<Tags> tags = relations.stream()
+                .flatMap(f -> f.getMembers().stream())
+                .filter(relationMember -> "admin_center".equals(relationMember.getRole()))
+                .map(m -> m.getEntity().getTags())
+                .collect(toList());
+
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtCFR", "Sint-GillisCFR", "VorstCFR");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtCNL", "Sint-GillisCNL", "VorstCNL");
+        assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
+        assertThat(tags).extracting(t -> t.get("capital")).containsOnly("8", "8", "8");
+        assertThat(tags).extracting(t -> t.get("place")).containsOnly("city", "town", "town");
     }
 
     @Test
@@ -125,7 +147,7 @@ public class BoundariesA8ShapefileTest {
     public void should_have_brussel_as_capital() throws Exception {
 
         assertThat(pbfContent.getNodes().stream())
-                .filteredOn(node -> node.getTags().hasKeyValue("name", "Brussel")) //
+                .filteredOn(node -> node.getTags().hasKeyValue("name", "Anderlecht")) //
                 .filteredOn(node -> node.getTags().hasKeyValue("capital", "8")) //
                 .filteredOn(node -> node.getTags().hasKeyValue("place", "city")).hasSize(1);
     }

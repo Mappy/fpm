@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
@@ -13,30 +14,23 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
-import static java.nio.file.Files.createDirectory;
-import static java.nio.file.Paths.get;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BoundariesA0ShapefileTest {
+public class BoundariesA0ShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
 
     @BeforeClass
     public static void setup() throws Exception {
-        Path dir = get("target", "tests");
-        if(!dir.toFile().exists()) {
-            createDirectory(dir);
-        }
 
         NameProvider nameProvider = mock(NameProvider.class);
         Map<String, String> names = newHashMap();

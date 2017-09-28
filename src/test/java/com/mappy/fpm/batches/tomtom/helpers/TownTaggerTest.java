@@ -1,28 +1,21 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.nio.file.Path;
-
-import static java.nio.file.Files.createDirectory;
-import static java.nio.file.Paths.get;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class TownTaggerTest {
+public class TownTaggerTest extends AbstractTest {
 
     private TownTagger townTagger;
 
     @Before
     public void setup() throws Exception {
-        Path dir = get("target", "tests");
-        if(!dir.toFile().exists()) {
-            createDirectory(dir);
-        }
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("sm.shp")).thenReturn("src/test/resources/tomtom/town/Anderlecht___________sm.shp");
