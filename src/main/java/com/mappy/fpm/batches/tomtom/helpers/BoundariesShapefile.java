@@ -8,6 +8,7 @@ import com.mappy.fpm.batches.utils.LongLineSplitter;
 import com.neovisionaries.i18n.CountryCode;
 import com.vividsolutions.jts.algorithm.Centroid;
 import com.vividsolutions.jts.geom.*;
+import org.jetbrains.annotations.NotNull;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
@@ -49,10 +50,19 @@ public class BoundariesShapefile extends TomtomShapefile {
         Map<String, String> tags = nameProvider.getAlternateNames(extId);
         tags.putAll(of(
                 "ref:tomtom", String.valueOf(extId),
-                "ref:INSEE", CountryCode.getByCode(order) == null ? order : valueOf(CountryCode.getByCode(order).getNumeric())
+                "ref:INSEE", getInseeWithAlpha3(order)
         ));
         population.ifPresent(pop -> tags.put("population", valueOf(pop)));
         addRelations(serializer, feature, newArrayList(), name, tags);
+    }
+
+    @NotNull
+    private String getInseeWithAlpha3(String alpha3) {
+        String alpha32 = alpha3;
+        if (CountryCode.getByCode(alpha3) == null) {
+            alpha32 = alpha3.substring(0, alpha3.length() - 1);
+        }
+        return CountryCode.getByCode(alpha32) == null ? alpha3 : valueOf(CountryCode.getByCode(alpha32).getNumeric());
     }
 
     public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags) {
