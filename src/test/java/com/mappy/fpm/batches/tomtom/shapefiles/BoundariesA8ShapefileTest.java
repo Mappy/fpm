@@ -4,7 +4,7 @@ import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
-import com.mappy.fpm.batches.tomtom.helpers.RelationProvider;
+import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import org.junit.BeforeClass;
@@ -35,8 +35,16 @@ public class BoundariesA8ShapefileTest {
 
         NameProvider nameProvider = mock(NameProvider.class);
         Map<String, String> names = newHashMap();
-        names.putAll(of("name", "Brussel", "name:fr", "Bruxelles"));
-        when(nameProvider.getAlternateNames(10560000000843L)).thenReturn(names);
+        names.putAll(of("name", "Brussel", "name:nl", "Bruxelles", "name:fr", "Bruxelles"));
+        when(nameProvider.getAlternateNames(10560000000250L)).thenReturn(names);
+
+        Map<String, String> names2 = newHashMap();
+        names.putAll(of("name", "Brussel", "name:nl", "Bruxelles", "name:fr", "Bruxelles"));
+        when(nameProvider.getAlternateNames(10560000000267L)).thenReturn(names2);
+
+        Map<String, String> names3 = newHashMap();
+        names.putAll(of("name", "Brussel", "name:nl", "Bruxelles", "name:fr", "Bruxelles"));
+        when(nameProvider.getAlternateNames(10560000000263L)).thenReturn(names3);
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___a8.shp")).thenReturn("src/test/resources/tomtom/boundaries/a8/belbe3___________a8.shp");
@@ -44,9 +52,9 @@ public class BoundariesA8ShapefileTest {
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("belbe3", "8")).thenReturn("8");
 
-        RelationProvider relationProvider = mock(RelationProvider.class);
+        TownTagger townTagger = mock(TownTagger.class);
 
-        BoundariesA8Shapefile shapefile = new BoundariesA8Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, new RelationProvider());
+        BoundariesA8Shapefile shapefile = new BoundariesA8Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
         GeometrySerializer serializer = new OsmosisSerializer("target/tests/belbe3.osm.pbf", "Test_TU");
 
@@ -55,7 +63,6 @@ public class BoundariesA8ShapefileTest {
 
         pbfContent = read(new File("target/tests/belbe3.osm.pbf"));
     }
-
 
     @Test
     public void should_have_relations_with_ways() throws Exception {

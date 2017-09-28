@@ -29,7 +29,7 @@ public class BoundariesShapefile extends TomtomShapefile {
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private final String osmLevel;
     private final String tomtomLevel;
-    private final NameProvider nameProvider;
+    protected final NameProvider nameProvider;
 
     protected BoundariesShapefile(String filename, int tomtomLevel, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(filename);
@@ -47,23 +47,17 @@ public class BoundariesShapefile extends TomtomShapefile {
         String name = feature.getString("NAME");
         Long extId = feature.getLong("ID");
         String order = feature.getString("ORDER0" + tomtomLevel);
-        Optional<Long> population = ofNullable(feature.getLong("POP"));
 
         Map<String, String> tags = nameProvider.getAlternateNames(extId);
         tags.putAll(of(
                 "ref:tomtom", String.valueOf(extId),
                 "ref:INSEE", CountryCode.getByCode(order) == null ? order : valueOf(CountryCode.getByCode(order).getNumeric())
         ));
+
+        Optional<Long> population = ofNullable(feature.getLong("POP"));
         population.ifPresent(pop -> tags.put("population", valueOf(pop)));
-        addRelations(serializer, feature, newArrayList(), name, tags);
-    }
 
-    public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags) {
-        tags.put("type", "boundary");
-        serializer.writeRelation(members, tags);
-    }
-
-    public void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags) {
+        List<RelationMember> members = newArrayList();
         if (name != null) {
             Map<String, String> wayTags = newHashMap(of(
                     "name", name,
@@ -85,8 +79,14 @@ public class BoundariesShapefile extends TomtomShapefile {
                 }
             }
             tags.putAll(wayTags);
-            writeRelations(serializer, members, tags);
+            tags.put("type", "boundary");
+
+            finishRelation(serializer, tags, members, feature);
         }
+    }
+
+    protected void finishRelation(GeometrySerializer serializer, Map<String, String> tags, List<RelationMember> members, Feature feature) {
+        serializer.writeRelation(members, tags);
     }
 
     private void addRelationMember(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString geom, String memberRole) {
