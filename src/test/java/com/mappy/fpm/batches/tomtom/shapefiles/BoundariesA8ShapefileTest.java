@@ -13,7 +13,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 import net.morbz.osmonaut.osm.Entity;
-import net.morbz.osmonaut.osm.Relation;
 import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -78,14 +77,13 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
         serializer.close();
 
         pbfContent = read(new File("target/tests/Anderlecht.osm.pbf"));
+        assertThat(pbfContent.getRelations()).hasSize(3);
     }
 
     @Test
     public void should_have_relations_with_all_tags() throws Exception {
-        List<Relation> relations = pbfContent.getRelations();
-        assertThat(relations).hasSize(3);
 
-        List<Tags> tags = relations.stream()
+        List<Tags> tags = pbfContent.getRelations().stream()
                 .map(Entity::getTags)
                 .collect(toList());
 
@@ -102,10 +100,8 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
 
     @Test
     public void should_have_relations_with_tags_and_role_outer() throws Exception {
-        List<Relation> relations = pbfContent.getRelations();
-        assertThat(relations).hasSize(3);
 
-        List<Tags> tags = relations.stream()
+        List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())
                 .filter(relationMember -> "outer".equals(relationMember.getRole()))
                 .map(m -> m.getEntity().getTags())
@@ -118,10 +114,8 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
 
     @Test
     public void should_have_relation_with_tags_and_admin_centers() throws Exception {
-        List<Relation> relations = pbfContent.getRelations();
-        assertThat(relations).hasSize(3);
 
-        List<Tags> tags = relations.stream()
+        List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())
                 .filter(relationMember -> "admin_center".equals(relationMember.getRole()))
                 .map(m -> m.getEntity().getTags())
@@ -138,17 +132,30 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
     @Test
     public void should_have_relation_with_role_label_and_tag_name() throws Exception {
 
-        assertThat(pbfContent.getRelations().stream().flatMap(relation -> relation.getMembers().stream())) //
-                .filteredOn(relationMember -> relationMember.getRole().equals("label")) //
-                .filteredOn(relationMember -> relationMember.getEntity().getTags().hasKey("name")).isNotEmpty();
+        List<Tags> tags = pbfContent.getRelations().stream()
+                .flatMap(f -> f.getMembers().stream())
+                .filter(relationMember -> "label".equals(relationMember.getRole()))
+                .map(m -> m.getEntity().getTags())
+                .collect(toList());
+
+        assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000250", "10560000000267", "10560000000263");
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtFR", "Sint-GillisFR", "VorstFR");
+        assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("21001", "21013", "21007");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtNL", "Sint-GillisNL", "VorstNL");
+        assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
     }
 
     @Test
-    public void should_have_brussel_as_capital() throws Exception {
+    public void should_have_Anderlecht_as_capital() throws Exception {
+        List<Tags> tags = pbfContent.getNodes().stream()
+                .filter(node -> node.getTags().size() != 0)
+                .map(Entity::getTags)
+                .collect(toList());
 
-        assertThat(pbfContent.getNodes().stream())
-                .filteredOn(node -> node.getTags().hasKeyValue("name", "Anderlecht")) //
-                .filteredOn(node -> node.getTags().hasKeyValue("capital", "8")) //
-                .filteredOn(node -> node.getTags().hasKeyValue("place", "city")).hasSize(1);
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtCFR", "AnderlechtFR", "Sint-GillisCFR", "Sint-GillisFR", "VorstCFR", "VorstFR");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtCNL", "AnderlechtNL", "Sint-GillisCNL", "Sint-GillisNL", "VorstCNL", "VorstNL");
+        assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
     }
 }
