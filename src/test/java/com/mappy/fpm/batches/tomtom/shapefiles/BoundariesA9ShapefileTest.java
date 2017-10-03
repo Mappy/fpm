@@ -35,45 +35,52 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
     @BeforeClass
     public static void setup() throws Exception {
 
-        when(nameProvider.getAlternateNames(10560000000247L)) //
-                .thenReturn(of("name", "Anderlecht", "name:nl", "AnderlechtNL", "name:fr", "AnderlechtFR"));
-        when(nameProvider.getAlternateNames(10560000000262L)) //
-                .thenReturn(of("name", "Sint-Gillis", "name:nl", "Sint-GillisNL", "name:fr", "Sint-GillisFR"));
-        when(nameProvider.getAlternateNames(10560000000258L)) //
-                .thenReturn(of("name", "Vorst", "name:nl", "VorstNL", "name:fr", "VorstFR"));
+        when(nameProvider.getAlternateNames(10560000000077L)) //
+                .thenReturn(of("name", "Ranst", "name:nl", "RanstNL", "name:fr", "RanstFR"));
+        when(nameProvider.getAlternateNames(10560000000078L)) //
+                .thenReturn(of("name", "Broechem", "name:nl", "BroechemNL", "name:fr", "BroechemFR"));
+        when(nameProvider.getAlternateNames(10560000000079L)) //
+                .thenReturn(of("name", "Emblem", "name:nl", "EmblemNL", "name:fr", "EmblemFR"));
+        when(nameProvider.getAlternateNames(10560000000090L)) //
+                .thenReturn(of("name", "Oelegem", "name:nl", "OelegemNL", "name:fr", "OelegemFR"));
 
-        when(nameProvider.getAlternateCityNames(10560000718742L)) //
-                .thenReturn(of("name", "Anderlecht", "name:nl", "AnderlechtCNL", "name:fr", "AnderlechtCFR"));
-        when(nameProvider.getAlternateCityNames(10560000388234L)) //
-                .thenReturn(of("name", "Sint-Gillis", "name:nl", "Sint-GillisCNL", "name:fr", "Sint-GillisCFR"));
-        when(nameProvider.getAlternateCityNames(10560000455427L)) //
-                .thenReturn(of("name", "Vorst", "name:nl", "VorstCNL", "name:fr", "VorstCFR"));
+        when(nameProvider.getAlternateCityNames(10560000419571L)) //
+                .thenReturn(of("name", "Ranst", "name:nl", "RanstCNL", "name:fr", "RanstCFR"));
+        when(nameProvider.getAlternateCityNames(10560000309610L)) //
+                .thenReturn(of("name", "Broechem", "name:nl", "BroechemCNL", "name:fr", "BroechemCFR"));
+        when(nameProvider.getAlternateCityNames(10560000712819L)) //
+                .thenReturn(of("name", "Emblem", "name:nl", "EmblemCNL", "name:fr", "EmblemCFR"));
+        when(nameProvider.getAlternateCityNames(10560000571768L)) //
+                .thenReturn(of("name", "Oelegem", "name:nl", "OelegemCNL", "name:fr", "OelegemCFR"));
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
-        when(tomtomFolder.getFile("___a9.shp")).thenReturn("src/test/resources/tomtom/boundaries/a9/Anderlecht___________a9.shp");
+        when(tomtomFolder.getFile("___a9.shp")).thenReturn("src/test/resources/tomtom/boundaries/a9/Ranst___________a9.shp");
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
-        when(osmLevelGenerator.getOsmLevel("Anderlecht", "9")).thenReturn("9");
+        when(osmLevelGenerator.getOsmLevel("Ranst", "9")).thenReturn("9");
 
         TownTagger townTagger = mock(TownTagger.class);
-        double[] doubles = {4.3451859, 50.8251293};
         GeometryFactory factory = mock(GeometryFactory.class);
-        Point point = new Point(new PackedCoordinateSequence.Double(doubles, 2), factory);
-        when(townTagger.get(10560000718742L)).thenReturn(new TownTagger.Centroid(10560000718742L, "Anderlecht", 8, 1, 7, point));
-        double[] doubles2 = {4.3134424, 50.8055758};
-        Point point2 = new Point(new PackedCoordinateSequence.Double(doubles2, 2), factory);
-        when(townTagger.get(10560000388234L)).thenReturn(new TownTagger.Centroid(10560000388234L, "Sint-Gillis", 8, 1, 8, point2));
-        double[] doubles3 = {4.307077, 50.8366041};
-        Point point3 = new Point(new PackedCoordinateSequence.Double(doubles3, 2), factory);
-        when(townTagger.get(10560000455427L)).thenReturn(new TownTagger.Centroid(10560000455427L, "Vorst", 8, 1, 8, point3));
+
+        Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.560886, 51.190382}, 2), factory);
+        when(townTagger.get(10560000419571L)).thenReturn(new TownTagger.Centroid(10560000419571L, "Ranst", 8, 1, 7, point));
+
+        Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.601984, 51.181340}, 2), factory);
+        when(townTagger.get(10560000309610L)).thenReturn(new TownTagger.Centroid(10560000309610L, "Broechem", 8, 1, 8, point2));
+
+        Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.606374, 51.162370}, 2), factory);
+        when(townTagger.get(10560000712819L)).thenReturn(new TownTagger.Centroid(10560000712819L, "Emblem", 8, 1, 8, point3));
+
+        Point point4 = new Point(new PackedCoordinateSequence.Double(new double[]{4.596975, 51.210989}, 2), factory);
+        when(townTagger.get(10560000571768L)).thenReturn(new TownTagger.Centroid(10560000571768L, "Oelegem", 8, 1, 8, point4));
 
         BoundariesA9Shapefile shapefile = new BoundariesA9Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/AnderlechtA9.osm.pbf", "Test_TU");
+        GeometrySerializer serializer = new OsmosisSerializer("target/tests/Ranst.osm.pbf", "Test_TU");
         shapefile.serialize(serializer);
         serializer.close();
 
-        pbfContent = read(new File("target/tests/AnderlechtA9.osm.pbf"));
-        assertThat(pbfContent.getRelations()).hasSize(3);
+        pbfContent = read(new File("target/tests/Ranst.osm.pbf"));
+        assertThat(pbfContent.getRelations()).hasSize(4);
     }
 
     @Test
@@ -82,16 +89,15 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
                 .map(Entity::getTags)
                 .collect(toList());
 
-        assertThat(tags).hasSize(3);
+        assertThat(tags).hasSize(4);
         assertThat(tags).extracting(t -> t.get("boundary")).containsOnly("administrative");
         assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("9");
         assertThat(tags).extracting(t -> t.get("type")).containsOnly("boundary");
-        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
-        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtFR", "Sint-GillisFR", "VorstFR");
-        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtNL", "Sint-GillisNL", "VorstNL");
-        assertThat(tags).extracting(t -> t.get("population")).containsOnly("0", "0", "0");
-        assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("21001A", "21013A", "21007A");
-        assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000247", "10560000000262", "10560000000258");
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Ranst", "Broechem", "Emblem", "Oelegem");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("RanstFR", "BroechemFR", "EmblemFR", "OelegemFR");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("RanstNL", "BroechemNL", "EmblemNL", "OelegemNL");
+        assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("11035A", "11035C", "11035D", "11035B");
+        assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000077", "10560000000078", "10560000000079", "10560000000090");
     }
 
     @Test
@@ -103,8 +109,8 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
-        assertThat(tags).hasSize(17);
-        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
+        assertThat(tags).hasSize(18);
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Ranst", "Broechem", "Emblem", "Oelegem");
         assertThat(tags).extracting(t -> t.get("boundary")).containsOnly("administrative");
         assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("9");
     }
@@ -118,14 +124,13 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
-        assertThat(tags).hasSize(3);
+        assertThat(tags).hasSize(4);
         assertThat(tags.get(0)).hasSize(6);
-        assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000247", "10560000000262", "10560000000258");
-        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
-        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtFR", "Sint-GillisFR", "VorstFR");
-        assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("21001A", "21013A", "21007A");
-        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtNL", "Sint-GillisNL", "VorstNL");
-        assertThat(tags).extracting(t -> t.get("population")).containsOnly("0", "0", "0");
+        assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000077", "10560000000078", "10560000000079", "10560000000090");
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Ranst", "Broechem", "Emblem", "Oelegem");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("RanstFR", "BroechemFR", "EmblemFR", "OelegemFR");
+        assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("11035A", "11035C", "11035D", "11035B");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("RanstNL", "BroechemNL", "EmblemNL", "OelegemNL");
     }
 
     @Test
@@ -137,11 +142,11 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
-        assertThat(tags).hasSize(3);
-        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
-        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtCFR", "Sint-GillisCFR", "VorstCFR");
-        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtCNL", "Sint-GillisCNL", "VorstCNL");
-        assertThat(tags).extracting(t -> t.get("population")).containsOnly("0", "0", "0");
+        assertThat(tags).hasSize(4);
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Ranst", "Broechem", "Emblem", "Oelegem");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("RanstCFR", "BroechemCFR", "EmblemCFR", "OelegemCFR");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("RanstCNL", "BroechemCNL", "EmblemCNL", "OelegemCNL");
+        assertThat(tags).extracting(t -> t.get("capital")).containsOnly("8", "8", "8");
+        assertThat(tags).extracting(t -> t.get("place")).containsOnly("city", "town", "town");
     }
-
 }

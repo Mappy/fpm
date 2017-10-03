@@ -57,15 +57,15 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
         when(osmLevelGenerator.getOsmLevel("Anderlecht", "8")).thenReturn("8");
 
         TownTagger townTagger = mock(TownTagger.class);
-        double[] doubles = {4.3451859, 50.8251293};
         GeometryFactory factory = mock(GeometryFactory.class);
-        Point point = new Point(new PackedCoordinateSequence.Double(doubles, 2), factory);
+
+        Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.307077, 50.8366041}, 2), factory);
         when(townTagger.get(10560000718742L)).thenReturn(new Centroid(10560000718742L, "Anderlecht", 8, 1, 7, point));
-        double[] doubles2 = {4.3134424, 50.8055758};
-        Point point2 = new Point(new PackedCoordinateSequence.Double(doubles2, 2), factory);
+
+        Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.3451859, 50.8251293}, 2), factory);
         when(townTagger.get(10560000388234L)).thenReturn(new Centroid(10560000388234L, "Sint-Gillis", 8, 1, 8, point2));
-        double[] doubles3 = {4.307077, 50.8366041};
-        Point point3 = new Point(new PackedCoordinateSequence.Double(doubles3, 2), factory);
+
+        Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.3134424, 50.8055758}, 2), factory);
         when(townTagger.get(10560000455427L)).thenReturn(new Centroid(10560000455427L, "Vorst", 8, 1, 8, point3));
 
         BoundariesA8Shapefile shapefile = new BoundariesA8Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
@@ -128,6 +128,23 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
         assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("21001", "21013", "21007");
         assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtNL", "Sint-GillisNL", "VorstNL");
         assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
+    }
+
+    @Test
+    public void should_have_relation_with_tags_and_admin_centers() throws Exception {
+
+        List<Tags> tags = pbfContent.getRelations().stream()
+                .flatMap(f -> f.getMembers().stream())
+                .filter(relationMember -> "admin_center".equals(relationMember.getRole()))
+                .map(m -> m.getEntity().getTags())
+                .collect(toList());
+
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtCFR", "Sint-GillisCFR", "VorstCFR");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtCNL", "Sint-GillisCNL", "VorstCNL");
+        assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
+        assertThat(tags).extracting(t -> t.get("capital")).containsOnly("8", "8", "8");
+        assertThat(tags).extracting(t -> t.get("place")).containsOnly("city", "town", "town");
     }
 
     @Test

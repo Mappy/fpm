@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static java.util.Optional.ofNullable;
 
 public class BoundariesA9Shapefile extends BoundariesShapefile {
 
@@ -27,6 +26,7 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
     public BoundariesA9Shapefile(TomtomFolder folder, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator, TownTagger townTagger) {
         super(folder.getFile("___a9.shp"), 9, nameProvider, osmLevelGenerator);
         this.townTagger = townTagger;
+        nameProvider.loadFromCityFile("smnm.dbf", "NAME", false);
     }
 
     @Override
@@ -40,7 +40,38 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
             tags.put("name", cityCenter.getName());
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
-            ofNullable(feature.getLong("POP")).ifPresent(pop -> tags.put("population", String.valueOf(pop)));
+            switch (cityCenter.getAdminclass()) {
+                case 0:
+                    tags.put("capital", "yes");
+                    break;
+                case 1:
+                    tags.put("capital", "1");
+                    break;
+                case 7:
+                    tags.put("capital", "6");
+                    break;
+                case 8:
+                    tags.put("capital", "8");
+                    break;
+                case 9:
+                    tags.put("capital", "9");
+                    break;
+            }
+
+            switch (cityCenter.getCitytyp()) {
+                case 0:
+                    tags.put("place", "village");
+                    break;
+                case 1:
+                    tags.put("place", cityCenter.getDispclass() < 8 ? "city" : "town");
+                    break;
+                case 32:
+                    tags.put("place", "hamlet");
+                    break;
+                case 64:
+                    tags.put("place", "neighbourhood");
+                    break;
+            }
 
             if(serializer.containPoint(cityCenter.getPoint())) {
                 cityCenter.getPoint().getCoordinate().x = cityCenter.getPoint().getCoordinate().x +0.000001;
