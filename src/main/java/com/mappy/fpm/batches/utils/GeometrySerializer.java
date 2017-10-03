@@ -19,6 +19,10 @@ public interface GeometrySerializer extends Closeable {
         throw new UnsupportedOperationException();
     }
 
+    default boolean containPoint(Point point) {
+        return false;
+    }
+
     void write(Polygon polygon, Map<String, String> tags);
 
     void write(MultiPolygon multiPolygon, Map<String, String> tags);

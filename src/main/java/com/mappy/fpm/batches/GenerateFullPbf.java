@@ -22,6 +22,10 @@ import static java.lang.Integer.parseInt;
 @Slf4j
 public class GenerateFullPbf {
     private static final String OSM_PBF_SUFFIX = ".osm.pbf";
+    private static final String TOWN_SUFFIX = "_2dbd.shp";
+    private static final String PART_SUFFIX = "___________nw.shp";
+    private static final String COUNTRY_SUFFIX = "______________a0.shp";
+
     private final OsmMerger osmMerger;
     private final String inputDirectoryPath;
     private final String outputDirectoryPath;
@@ -64,8 +68,12 @@ public class GenerateFullPbf {
 
                 for (String zoneFileName : new File(inputDirectoryPath + "/" + country).list()) {
 
-                    if (zoneFileName.endsWith("_2dbd.shp") || zoneFileName.endsWith("___________nw.shp") || zoneFileName.endsWith("___________fe.shp") || zoneFileName.endsWith("______________a0.shp")) {
-                        String zone = zoneFileName.replace("_2dbd.shp", "").replace("___________nw.shp", "").replace("___________fe.shp", "").replace("______________a0.shp", "");
+                    if (zoneFileName.endsWith(TOWN_SUFFIX)
+                            || zoneFileName.endsWith(PART_SUFFIX)
+                            || zoneFileName.endsWith("___________fe.shp")
+                            || zoneFileName.endsWith(COUNTRY_SUFFIX)) {
+
+                        String zone = zoneFileName.replace(TOWN_SUFFIX, "").replace(PART_SUFFIX, "").replace("___________fe.shp", "").replace(COUNTRY_SUFFIX, "");
 
                         String pbfFolderName = outputDirectoryPath + "/" + country + "/pbfFiles";
                         File pbfFolder = new File(pbfFolderName);

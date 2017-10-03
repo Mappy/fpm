@@ -26,8 +26,9 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
 
     @Inject
     public BoundariesA8Shapefile(TomtomFolder folder, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator, TownTagger townTagger) {
-        super(folder.getFile("___a8.shp"), 8, nameProvider, osmLevelGenerator);
+        super(folder.getFile("a8.shp"), 8, nameProvider, osmLevelGenerator);
         this.townTagger = townTagger;
+        nameProvider.loadFromCityFile("smnm.dbf", "NAME", false);
     }
 
     @Override
@@ -73,17 +74,17 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
                     break;
             }
 
-            nameProvider.loadFromFile("smnm.dbf", "NAME", false);
-            Map<String, String> alternateNames = nameProvider.getAlternateNames(cityCenter.getId());
-            tags.putAll(alternateNames);
+            tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
             Optional<Long> population = ofNullable(feature.getLong("POP"));
             population.ifPresent(pop -> tags.put("population", String.valueOf(pop)));
 
+            if(serializer.containPoint(cityCenter.getPoint())) {
+                cityCenter.getPoint().getCoordinate().x = cityCenter.getPoint().getCoordinate().x +0.000001;
+                cityCenter.getPoint().getCoordinate().y = cityCenter.getPoint().getCoordinate().y +0.000001;
+            }
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
-
             node.ifPresent(adminCenter -> members.add(new RelationMember(adminCenter.getId(), Node, "admin_center")));
-
         }
 
         serializer.writeRelation(members, adminTags);
