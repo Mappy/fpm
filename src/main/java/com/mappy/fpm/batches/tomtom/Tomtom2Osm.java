@@ -6,16 +6,13 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import com.google.inject.Injector;
 import com.mappy.fpm.batches.splitter.Splitter;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.Order;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
 
-import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -53,12 +50,6 @@ public class Tomtom2Osm {
 
     public List<ClassInfo> shapefiles() throws IOException {
         return ClassPath.from(getClass().getClassLoader()).getTopLevelClasses(getClass().getPackage().getName() + ".shapefiles").stream()
-                .filter(clazz -> TomtomShapefile.class.isAssignableFrom(clazz.load())).sorted(conparator()).collect(toList());
+                .filter(clazz -> TomtomShapefile.class.isAssignableFrom(clazz.load())).collect(toList());
     }
-
-    private static Comparator<ClassInfo> conparator() {
-        Comparator<ClassInfo> writeFirst = comparing(clazz -> !clazz.load().isAnnotationPresent(Order.class) ? Integer.MAX_VALUE : clazz.load().getAnnotation(Order.class).value() );
-        return writeFirst.thenComparing(comparing(ClassInfo::getSimpleName));
-    }
-
 }

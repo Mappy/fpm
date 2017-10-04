@@ -28,13 +28,16 @@ import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 public class BoundariesShapefile extends TomtomShapefile {
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
-    private final String adminLevel;
+    private final String osmLevel;
     private final String tomtomLevel;
-    private final NameProvider nameProvider;
+    protected final NameProvider nameProvider;
 
-    protected BoundariesShapefile(String filename, int adminLevel, int tomtomLevel, NameProvider nameProvider) {
+    protected BoundariesShapefile(String filename, int tomtomLevel, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(filename);
-        this.adminLevel = String.valueOf(adminLevel);
+        String[] split = filename.split("/");
+        String zone = split[split.length-1].split("_")[0];
+
+        this.osmLevel = osmLevelGenerator.getOsmLevel(zone, String.valueOf(tomtomLevel));
         this.tomtomLevel = String.valueOf(tomtomLevel);
         this.nameProvider = nameProvider;
         this.nameProvider.loadFromFile("___an.dbf", "NAME", false);
@@ -42,40 +45,23 @@ public class BoundariesShapefile extends TomtomShapefile {
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
-        String name = feature.getString("NAME");
         Long extId = feature.getLong("ID");
         String order = feature.getString("ORDER0" + tomtomLevel);
-        Optional<Long> population = ofNullable(feature.getLong("POP"));
 
-        Map<String, String> tags = nameProvider.getAlternateNames(extId);
+        Map<String, String> tags = newHashMap();
+        tags.putAll(nameProvider.getAlternateNames(extId));
         tags.putAll(of(
                 "ref:tomtom", String.valueOf(extId),
                 "ref:INSEE", getInseeWithAlpha3(order)
         ));
-        population.ifPresent(pop -> tags.put("population", valueOf(pop)));
-        addRelations(serializer, feature, newArrayList(), name, tags);
-    }
 
-    @NotNull
-    private String getInseeWithAlpha3(String alpha3) {
-        String alpha32 = alpha3;
-        if (CountryCode.getByCode(alpha3) == null) {
-            alpha32 = alpha3.substring(0, alpha3.length() - 1);
-        }
-        return CountryCode.getByCode(alpha32) == null ? alpha3 : valueOf(CountryCode.getByCode(alpha32).getNumeric());
-    }
-
-    public void writeRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags) {
-        tags.put("type", "boundary");
-        serializer.writeRelation(members, tags);
-    }
-
-    public void addRelations(GeometrySerializer serializer, Feature feature, List<RelationMember> members, String name, Map<String, String> tags) {
+        List<RelationMember> members = newArrayList();
+        String name = feature.getString("NAME");
         if (name != null) {
-            Map<String, String> wayTags = newHashMap(of(
+            Map<String, String> wayTags = of(
                     "name", name,
                     "boundary", "administrative",
-                    "admin_level", adminLevel));
+                    "admin_level", osmLevel);
             Map<String, String> pointTags = newHashMap(tags);
             pointTags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();
@@ -92,8 +78,23 @@ public class BoundariesShapefile extends TomtomShapefile {
                 }
             }
             tags.putAll(wayTags);
-            writeRelations(serializer, members, tags);
+            tags.put("type", "boundary");
+
+            finishRelation(serializer, tags, members, feature);
         }
+    }
+
+    @NotNull
+    private String getInseeWithAlpha3(String alpha3) {
+        String alpha32 = alpha3;
+        if (CountryCode.getByCode(alpha3) == null) {
+            alpha32 = alpha3.substring(0, alpha3.length() - 1);
+        }
+        return CountryCode.getByCode(alpha32) == null ? alpha3 : valueOf(CountryCode.getByCode(alpha32).getNumeric());
+    }
+
+    protected void finishRelation(GeometrySerializer serializer, Map<String, String> tags, List<RelationMember> members, Feature feature) {
+        serializer.writeRelation(members, tags);
     }
 
     private void addRelationMember(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString geom, String memberRole) {

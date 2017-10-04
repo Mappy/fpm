@@ -19,6 +19,7 @@ import static com.google.common.collect.Maps.newHashMap;
 public class NameProvider {
 
     private final Map<Long, List<AlternativeName>> alternateNames = newHashMap();
+    private final Map<Long, List<AlternativeName>> alternateCityNames = newHashMap();
     private final TomtomFolder folder;
 
     @Inject
@@ -27,6 +28,16 @@ public class NameProvider {
     }
 
     public void loadFromFile(String filename, String alternativeParamName, boolean hasSideName) {
+
+        readFile(filename, alternativeParamName, hasSideName, this.alternateNames);
+    }
+
+    public void loadFromCityFile(String filename, String alternativeParamName, boolean hasSideName) {
+
+        readFile(filename, alternativeParamName, hasSideName, this.alternateCityNames);
+    }
+
+    private void readFile(String filename, String alternativeParamName, boolean hasSideName, Map<Long, List<AlternativeName>> alternateCityNames) {
         File file = new File(folder.getFile(filename));
         if (file.exists()) {
             log.info("Reading file {}", file);
@@ -34,16 +45,28 @@ public class NameProvider {
                 DbfRow row;
                 while ((row = reader.nextRow()) != null) {
                     AlternativeName altName = AlternativeName.fromDbf(row, alternativeParamName, hasSideName);
-                    List<AlternativeName> altNames = alternateNames.containsKey(altName.getId()) ? alternateNames.get(altName.getId()) : newArrayList();
+                    List<AlternativeName> altNames = alternateCityNames.containsKey(altName.getId()) ? alternateCityNames.get(altName.getId()) : newArrayList();
 
                     altNames.add(altName);
-                    alternateNames.put(altName.getId(), altNames);
+                    alternateCityNames.put(altName.getId(), altNames);
                 }
             }
         }
     }
 
     public Map<String, String> getAlternateNames(Long tomtomId) {
+        Map<Long, List<AlternativeName>> alternateNames = this.alternateNames;
+
+        return getNames(tomtomId, alternateNames);
+    }
+
+    public Map<String, String> getAlternateCityNames(Long tomtomId) {
+        Map<Long, List<AlternativeName>> alternateCityNames = this.alternateCityNames;
+
+        return getNames(tomtomId, alternateCityNames);
+    }
+
+    private Map<String, String> getNames(Long tomtomId, Map<Long, List<AlternativeName>> alternateNames) {
         Map<String, String> tags = newHashMap();
         List<AlternativeName> an = alternateNames.get(tomtomId);
         if (an != null) {

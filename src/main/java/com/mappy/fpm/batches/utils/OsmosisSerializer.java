@@ -51,11 +51,16 @@ public class OsmosisSerializer implements GeometrySerializer {
     }
 
     @Override
+    public boolean containPoint(Point point) {
+        return pointTracker.contains(geohash(0, point.getCoordinate()));
+    }
+
+    @Override
     public Optional<Node> writePoint(Point point, Map<String, String> tags) {
         long id = geohash(0, point.getCoordinate());
 
         if (pointTracker.contains(id)) {
-            log.warn("Rejecting a point because already present: " + tags);
+            log.warn("Rejecting point {} with tags {} because id already present.", id, tags);
             return Optional.empty();
         }
 
