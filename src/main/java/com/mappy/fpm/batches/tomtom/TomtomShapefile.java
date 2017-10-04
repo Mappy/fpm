@@ -36,12 +36,12 @@ public abstract class TomtomShapefile {
             }
         }
         else {
-            log.info("File not found: {}", file.getAbsolutePath());
+            log.info("File not found : {}", file.getAbsolutePath());
         }
     }
 
     private static void log(int counter, long time) {
-        log.info("Added {} objects{}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
+        log.info("Added {} object(s){}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
     }
 
     public abstract void serialize(GeometrySerializer serializer, Feature feature);

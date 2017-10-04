@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.dbf.names;
 
+import com.google.common.base.Stopwatch;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Slf4j
 @Singleton
@@ -28,41 +30,44 @@ public class NameProvider {
     }
 
     public void loadFromFile(String filename, String alternativeParamName, boolean hasSideName) {
-
         readFile(filename, alternativeParamName, hasSideName, this.alternateNames);
     }
 
     public void loadFromCityFile(String filename, String alternativeParamName, boolean hasSideName) {
-
         readFile(filename, alternativeParamName, hasSideName, this.alternateCityNames);
     }
 
     private void readFile(String filename, String alternativeParamName, boolean hasSideName, Map<Long, List<AlternativeName>> alternateCityNames) {
         File file = new File(folder.getFile(filename));
         if (file.exists()) {
-            log.info("Reading file {}", file);
+            log.info("Opening {}", file);
             try (DbfReader reader = new DbfReader(file)) {
                 DbfRow row;
+                Stopwatch stopwatch = Stopwatch.createStarted();
+                int counter = 0;
                 while ((row = reader.nextRow()) != null) {
                     AlternativeName altName = AlternativeName.fromDbf(row, alternativeParamName, hasSideName);
                     List<AlternativeName> altNames = alternateCityNames.containsKey(altName.getId()) ? alternateCityNames.get(altName.getId()) : newArrayList();
 
                     altNames.add(altName);
                     alternateCityNames.put(altName.getId(), altNames);
+                    counter++;
                 }
+                long time = stopwatch.elapsed(MILLISECONDS);
+                stopwatch.stop();
+                log.info("Added {} object(s){}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
             }
+        }
+        else {
+            log.info("File not found : {}", file.getAbsolutePath());
         }
     }
 
     public Map<String, String> getAlternateNames(Long tomtomId) {
-        Map<Long, List<AlternativeName>> alternateNames = this.alternateNames;
-
         return getNames(tomtomId, alternateNames);
     }
 
     public Map<String, String> getAlternateCityNames(Long tomtomId) {
-        Map<Long, List<AlternativeName>> alternateCityNames = this.alternateCityNames;
-
         return getNames(tomtomId, alternateCityNames);
     }
 

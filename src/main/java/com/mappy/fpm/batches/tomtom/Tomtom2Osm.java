@@ -32,7 +32,7 @@ public class Tomtom2Osm {
 
     public String run() throws IOException {
         Stopwatch stopwatch = Stopwatch.createStarted();
-        log.info("Running Tomtom2Osm to generate {}", outputFile);
+        log.info("Start generating {}", outputFile);
         for (ClassInfo clazz : shapefiles()) {
             log.info("Converting {}", clazz.getSimpleName());
             TomtomShapefile instance = (TomtomShapefile) injector.getInstance(clazz.load());

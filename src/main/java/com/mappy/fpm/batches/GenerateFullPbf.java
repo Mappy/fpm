@@ -59,10 +59,14 @@ public class GenerateFullPbf {
     }
 
     public void run(List<String> countries) throws IOException {
+        log.info("Running with countries : {}", countries);
+
         try {
             List<String> countryPbfFiles = newArrayList();
 
             for (String country : countries) {
+                log.info("Generating country : {}", country);
+
                 List<String> zonePbfFiles = newArrayList();
                 List<Future<?>> zonesFutures = newArrayList();
 
@@ -95,6 +99,8 @@ public class GenerateFullPbf {
                 String countryFile = outputDirectoryPath + "/" + country + "/" + country + OSM_PBF_SUFFIX;
                 countryPbfFiles.add(countryFile);
                 mergePbfFiles(zonePbfFiles, countryFile, zonesFutures);
+
+                log.info("Done generating country : {}", country);
             }
             mergePbfFiles(countryPbfFiles, outputDirectoryPath + "/" + outputFileName, newArrayList());
 
