@@ -54,7 +54,7 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
                 .thenReturn(of("name", "Oelegem", "name:nl", "OelegemCNL", "name:fr", "OelegemCFR"));
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
-        when(tomtomFolder.getFile("___a9.shp")).thenReturn("src/test/resources/tomtom/boundaries/a9/Ranst___________a9.shp");
+        when(tomtomFolder.getFile("a9.shp")).thenReturn("src/test/resources/tomtom/boundaries/a9/Ranst___________a9.shp");
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("Ranst", "9")).thenReturn("9");
