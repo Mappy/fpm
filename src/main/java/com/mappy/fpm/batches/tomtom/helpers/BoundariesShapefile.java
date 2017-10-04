@@ -13,6 +13,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +22,6 @@ import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.valueOf;
-import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 
@@ -40,7 +40,9 @@ public class BoundariesShapefile extends TomtomShapefile {
         this.osmLevel = osmLevelGenerator.getOsmLevel(zone, String.valueOf(tomtomLevel));
         this.tomtomLevel = String.valueOf(tomtomLevel);
         this.nameProvider = nameProvider;
-        this.nameProvider.loadFromFile("___an.dbf", "NAME", false);
+        if(new File(filename).exists()) {
+            this.nameProvider.loadFromFile("___an.dbf", "NAME", false);
+        }
     }
 
     @Override

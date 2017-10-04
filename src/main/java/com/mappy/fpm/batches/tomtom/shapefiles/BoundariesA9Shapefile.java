@@ -12,6 +12,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +27,9 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
     public BoundariesA9Shapefile(TomtomFolder folder, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator, TownTagger townTagger) {
         super(folder.getFile("a9.shp"), 9, nameProvider, osmLevelGenerator);
         this.townTagger = townTagger;
-        nameProvider.loadFromCityFile("smnm.dbf", "NAME", false);
+        if(new File(folder.getFile("a9.shp")).exists()) {
+            nameProvider.loadFromCityFile("smnm.dbf", "NAME", false);
+        }
     }
 
     @Override

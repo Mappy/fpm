@@ -11,6 +11,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -23,7 +24,9 @@ public class WaterAreaShapefile extends TomtomShapefile {
     public WaterAreaShapefile(NameProvider nameProvider, TomtomFolder folder) {
         super(folder.getFile("wa.shp"));
         this.nameProvider = nameProvider;
-        this.nameProvider.loadFromFile("wxnm.dbf", "NAME", false);
+        if(new File(folder.getFile("wa.shp")).exists()) {
+            this.nameProvider.loadFromFile("wxnm.dbf", "NAME", false);
+        }
     }
 
     public void serialize(GeometrySerializer serializer, Feature feature) {

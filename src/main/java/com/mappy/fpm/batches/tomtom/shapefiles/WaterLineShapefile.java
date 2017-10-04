@@ -7,6 +7,7 @@ import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
@@ -19,7 +20,9 @@ public class WaterLineShapefile extends TomtomShapefile {
     public WaterLineShapefile(TomtomFolder folder, NameProvider nameProvider) {
         super(folder.getFile("wl.shp"));
         this.nameProvider = nameProvider;
-        this.nameProvider.loadFromFile("wxnm.dbf", "NAME", false);
+        if(new File(folder.getFile("wl.shp")).exists()) {
+            this.nameProvider.loadFromFile("wxnm.dbf", "NAME", false);
+        }
     }
 
     @Override
