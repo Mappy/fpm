@@ -35,7 +35,7 @@ public class BoundariesShapefile extends TomtomShapefile {
     protected BoundariesShapefile(String filename, int tomtomLevel, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(filename);
         String[] split = filename.split("/");
-        String zone = split[split.length-1].split("_")[0];
+        String zone = split[split.length-1].split("_[_2]")[0];
 
         this.osmLevel = osmLevelGenerator.getOsmLevel(zone, String.valueOf(tomtomLevel));
         this.tomtomLevel = String.valueOf(tomtomLevel);
