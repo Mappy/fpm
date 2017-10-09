@@ -30,11 +30,11 @@ public class NameProvider {
     }
 
     public void loadFromFile(String filename, String alternativeParamName, boolean hasSideName) {
-        readFile(filename, alternativeParamName, hasSideName, this.alternateNames);
+        readFile(filename, alternativeParamName, hasSideName, alternateNames);
     }
 
-    public void loadFromCityFile(String filename, String alternativeParamName, boolean hasSideName) {
-        readFile(filename, alternativeParamName, hasSideName, this.alternateCityNames);
+    public void loadFromCityFile(String filename) {
+        readFile(filename, "NAME", false, alternateCityNames);
     }
 
     private void readFile(String filename, String alternativeParamName, boolean hasSideName, Map<Long, List<AlternativeName>> alternateCityNames) {

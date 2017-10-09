@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
@@ -23,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BoundariesA2ShapefileTest {
+public class BoundariesA2ShapefileTest extends AbstractTest {
 
     public static PbfContent pbfContent;
 
@@ -43,12 +44,12 @@ public class BoundariesA2ShapefileTest {
 
         BoundariesA2Shapefile shapefile = new BoundariesA2Shapefile(tomtomFolder, nameProvider, osmLevelGenerator);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/belbe2.osm.pbf", "Test_TU");
+        GeometrySerializer serializer = new OsmosisSerializer("target/tests/belbe2A2.osm.pbf", "Test_TU");
 
         shapefile.serialize(serializer);
         serializer.close();
 
-        pbfContent = read(new File("target/tests/belbe2.osm.pbf"));
+        pbfContent = read(new File("target/tests/belbe2A2.osm.pbf"));
     }
 
     @Test

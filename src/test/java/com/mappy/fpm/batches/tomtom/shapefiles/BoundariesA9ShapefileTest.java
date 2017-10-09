@@ -30,10 +30,10 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
 
-    private static NameProvider nameProvider = mock(NameProvider.class);
-
     @BeforeClass
     public static void setup() throws Exception {
+
+        NameProvider nameProvider = mock(NameProvider.class);
 
         when(nameProvider.getAlternateNames(10560000000077L)) //
                 .thenReturn(of("name", "Ranst", "name:nl", "RanstNL", "name:fr", "RanstFR"));

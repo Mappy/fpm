@@ -32,7 +32,7 @@ public class TownTaggerTest extends AbstractTest {
 
         centroid = townTagger.get(10560000455427L);
         Double[] doubles2 = {4.3134424, 50.8055758};
-        assertCentroid(centroid, 10560000455427L, "Vorst", 8, 1, 8, doubles2);
+        assertCentroid(centroid, 10560000455427L, "Vorst", 9, 1, 8, doubles2);
 
         centroid = townTagger.get(10560000718742L);
         Double[] doubles3 = {4.307077, 50.8366041};
