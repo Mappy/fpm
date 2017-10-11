@@ -117,7 +117,10 @@ public class OsmosisSerializer implements GeometrySerializer {
                 checkState(wayTracker.contains(member.getMemberId()), "Adding relation on missing way");
             }
         }
-        long id = relationId(members.get(0).getMemberId());
+
+        int layer = Layers.layer(tags.get("layer"));
+
+        long id = relationId(members.get(0).getMemberId(), layer);
         sink.process(new RelationContainer(new Relation(ced(id, tags), members)));
         return id;
     }
@@ -165,8 +168,8 @@ public class OsmosisSerializer implements GeometrySerializer {
         return id;
     }
 
-    private long relationId(long memberId) {
-        long id = memberId;
+    private long relationId(long memberId, int layer) {
+        long id = memberId + layer;
         while (relationTracker.contains(id)) {
             log.debug("Collision on relation with {}", id);
             id++;
