@@ -56,29 +56,32 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
     public void should_have_members_with_tags() throws Exception {
 
         Relation wallonie = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000851")).findFirst().get();
-        assertThat(wallonie.getTags().size()).isEqualTo(6);
+        assertThat(wallonie.getTags().size()).isEqualTo(7);
         assertThat(wallonie.getTags().get("name")).isEqualTo("Région Wallonne");
         assertThat(wallonie.getTags().get("boundary")).isEqualTo("administrative");
         assertThat(wallonie.getTags().get("ref:INSEE")).isEqualTo("03000");
         assertThat(wallonie.getTags().get("type")).isEqualTo("boundary");
         assertThat(wallonie.getTags().get("admin_level")).isEqualTo("4");
+        assertThat(wallonie.getTags().get("layer")).isEqualTo("4");
 
         Relation brussel = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000843")).findFirst().get();
-        assertThat(brussel.getTags().size()).isEqualTo(7);
+        assertThat(brussel.getTags().size()).isEqualTo(8);
         assertThat(brussel.getTags().get("name")).isEqualTo("Brussel Hoofdstedelijk Gewest");
         assertThat(brussel.getTags().get("name:fr")).isEqualTo("Bruxelles");
         assertThat(brussel.getTags().get("boundary")).isEqualTo("administrative");
         assertThat(brussel.getTags().get("ref:INSEE")).isEqualTo("04000");
         assertThat(brussel.getTags().get("type")).isEqualTo("boundary");
         assertThat(brussel.getTags().get("admin_level")).isEqualTo("4");
+        assertThat(brussel.getTags().get("layer")).isEqualTo("4");
 
         Relation vlaamsGewest = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000849")).findFirst().get();
-        assertThat(vlaamsGewest.getTags().size()).isEqualTo(6);
+        assertThat(vlaamsGewest.getTags().size()).isEqualTo(7);
         assertThat(vlaamsGewest.getTags().get("name")).isEqualTo("Vlaams Gewest");
         assertThat(vlaamsGewest.getTags().get("boundary")).isEqualTo("administrative");
         assertThat(vlaamsGewest.getTags().get("ref:INSEE")).isEqualTo("02000");
         assertThat(vlaamsGewest.getTags().get("type")).isEqualTo("boundary");
         assertThat(vlaamsGewest.getTags().get("admin_level")).isEqualTo("4");
+        assertThat(vlaamsGewest.getTags().get("layer")).isEqualTo("4");
     }
 
     @Test

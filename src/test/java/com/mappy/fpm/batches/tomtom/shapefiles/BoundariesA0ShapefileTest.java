@@ -59,10 +59,11 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
         assertThat(relations).hasSize(1);
 
         Tags tags = relations.get(0).getTags();
-        assertThat(tags.size()).isEqualTo(7);
+        assertThat(tags.size()).isEqualTo(8);
         assertThat(tags.get("ref:tomtom")).isEqualTo("10200000000008");
         assertThat(tags.get("boundary")).isEqualTo("administrative");
         assertThat(tags.get("admin_level")).isEqualTo("2");
+        assertThat(tags.get("layer")).isEqualTo("2");
         assertThat(tags.get("name")).isEqualTo("Andorra");
         assertThat(tags.get("name:fr")).isEqualTo("Andorre");
         assertThat(tags.get("ref:INSEE")).isEqualTo("20");

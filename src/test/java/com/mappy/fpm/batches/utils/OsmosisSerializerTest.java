@@ -28,8 +28,8 @@ public class OsmosisSerializerTest {
 
     @Test
     public void should_write_points() throws Exception {
-        serializer.write(point(42.0, 3.0), ImmutableMap.of("place", "city", "name", "Paris"));
-        serializer.write(point(42.1, 3.0), ImmutableMap.of("place", "town"));
+        serializer.write(point(42.0), ImmutableMap.of("place", "city", "name", "Paris"));
+        serializer.write(point(42.1), ImmutableMap.of("place", "town"));
 
         assertThat(sink.getEntities()).containsExactly(
                 new Node(new CommonEntityData(1156149936395291L, 1, timestamp, new OsmUser(1, "user"), 1L, newArrayList(new Tag("place", "city"), new Tag("name", "Paris"))), 42.0, 3.0),
@@ -38,9 +38,9 @@ public class OsmosisSerializerTest {
 
     @Test
     public void should_refuse_to_forget_a_point() {
-        serializer.writePoint(point(42.0, 3.0), ImmutableMap.of("place", "city"));
+        serializer.writePoint(point(42.0), ImmutableMap.of("place", "city"));
 
-        Optional<Node> node2 = serializer.writePoint(point(42.0, 3.0), ImmutableMap.of("amenity", "hotel"));
+        Optional<Node> node2 = serializer.writePoint(point(42.0), ImmutableMap.of("amenity", "hotel"));
         assertThat(node2).isEmpty();
     }
 
@@ -67,6 +67,7 @@ public class OsmosisSerializerTest {
 
     @Test
     public void should_increment_way_id_if_aready_exists() throws Exception {
+
         serializer.write(
                 linestring(
                         new Coordinate[]{
@@ -87,18 +88,7 @@ public class OsmosisSerializerTest {
 
     @Test
     public void should_generate_relation_id() throws Exception {
-        serializer.write(
-                linestring(
-                        new Coordinate[]{
-                                new Coordinate(0.0, 0.0),
-                                new Coordinate(1.0, 1.0)}),
-                Maps.newHashMap());
-        serializer.write(
-                linestring(
-                        new Coordinate[]{
-                                new Coordinate(0.0, 0.0),
-                                new Coordinate(1.0, 1.0)}),
-                Maps.newHashMap());
+        writeWays();
         serializer.writeRelation(newArrayList(
                 new RelationMember(1525972802595572L, Way, "from"),
                 new RelationMember(1525972802595573L, Way, "to")), newHashMap());
@@ -109,6 +99,32 @@ public class OsmosisSerializerTest {
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).containsExactly(
                 1525972802595572L,
                 1525972802595573L);
+    }
+
+    @Test
+    public void should_generate_relation_id_with_same_way() throws Exception {
+        writeWays();
+        serializer.writeRelation(newArrayList(
+                new RelationMember(1525972802595572L, Way, "from")), newHashMap());
+        serializer.writeRelation(newArrayList(
+                new RelationMember(1525972802595573L, Way, "to")), newHashMap());
+
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).containsExactly(
+                1525972802595572L,
+                1525972802595573L);
+    }
+
+    @Test
+    public void should_not_generate_same_relation_id_with_layer() throws Exception {
+        writeWays();
+        serializer.writeRelation(newArrayList(
+                new RelationMember(1525972802595572L, Way, "from")), ImmutableMap.of("layer", "0"));
+        serializer.writeRelation(newArrayList(
+                new RelationMember(1525972802595572L, Way, "to")), ImmutableMap.of("layer", "2"));
+
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).containsExactly(
+                1525972802595572L,
+                1525972802595575L);
     }
 
     @Test
@@ -224,6 +240,21 @@ public class OsmosisSerializerTest {
                                 new RelationMember(1173569056124267L, Way, "inner"))));
     }
 
+    private void writeWays() {
+        serializer.write(
+                linestring(
+                        new Coordinate[]{
+                                new Coordinate(0.0, 0.0),
+                                new Coordinate(1.0, 1.0)}),
+                Maps.newHashMap());
+        serializer.write(
+                linestring(
+                        new Coordinate[]{
+                                new Coordinate(0.0, 0.0),
+                                new Coordinate(1.0, 1.0)}),
+                Maps.newHashMap());
+    }
+
     private static Node node(long id, double lat, double lon) {
         return new Node(new CommonEntityData(id, 1, timestamp, new OsmUser(1, "user"), 1L), lat, lon);
     }
@@ -248,8 +279,8 @@ public class OsmosisSerializerTest {
         return gf.createPolygon(coordinates);
     }
 
-    private static Point point(double lat, double lon) {
-        return gf.createPoint(new Coordinate(lon, lat));
+    private static Point point(double lat) {
+        return gf.createPoint(new Coordinate(3.0, lat));
     }
 
     public static class MemorySink implements Sink {

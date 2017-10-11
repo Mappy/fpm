@@ -51,6 +51,7 @@ public class EntityMergeResult {
     private EntityMergeResult mergeTags() {
         Entity entity1 = ec1.getEntity();
         Entity entity2 = ec2.getEntity();
+
         entity1.getTags().addAll(entity2.getTags());
         return new EntityMergeResult(null, null, ec1, true);
     }

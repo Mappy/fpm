@@ -81,6 +81,7 @@ public class BoundariesShapefile extends TomtomShapefile {
             }
             tags.putAll(wayTags);
             tags.put("type", "boundary");
+            tags.put("layer", osmLevel);
 
             finishRelation(serializer, tags, members, feature);
         }

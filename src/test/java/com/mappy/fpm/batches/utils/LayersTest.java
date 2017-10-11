@@ -37,6 +37,7 @@ public class LayersTest {
 
     @Test
     public void should_find_layers() throws Exception {
+        assertThat(Layers.layer("-9")).isEqualTo(18);
         assertThat(Layers.layer("-4")).isEqualTo(8);
         assertThat(Layers.layer("-3")).isEqualTo(6);
         assertThat(Layers.layer("-2")).isEqualTo(4);
@@ -46,5 +47,6 @@ public class LayersTest {
         assertThat(Layers.layer("2")).isEqualTo(3);
         assertThat(Layers.layer("3")).isEqualTo(5);
         assertThat(Layers.layer("4")).isEqualTo(7);
+        assertThat(Layers.layer("9")).isEqualTo(17);
     }
 }
