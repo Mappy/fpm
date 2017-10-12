@@ -69,7 +69,7 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
         when(townTagger.get(10560000309610L)).thenReturn(new TownTagger.Centroid(10560000309610L, "Broechem", "456", 8, 1, 8, point2));
 
         Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.606374, 51.162370}, 2), factory);
-        when(townTagger.get(10560000712819L)).thenReturn(new TownTagger.Centroid(10560000712819L, "Emblem", "789", 8, 1, 8, point3));
+        when(townTagger.get(10560000712819L)).thenReturn(new TownTagger.Centroid(10560000712819L, "Emblem", null, 8, 1, 8, point3));
 
         Point point4 = new Point(new PackedCoordinateSequence.Double(new double[]{4.596975, 51.210989}, 2), factory);
         when(townTagger.get(10560000571768L)).thenReturn(new TownTagger.Centroid(10560000571768L, "Oelegem", "1011", 8, 1, 8, point4));
