@@ -31,5 +31,7 @@ public interface GeometrySerializer extends Closeable {
 
     Way write(LineString line, Map<String, String> tags);
 
+    long writeBoundary(LineString line, Map<String, String> tags);
+
     long writeRelation(List<RelationMember> members, Map<String, String> tags);
 }

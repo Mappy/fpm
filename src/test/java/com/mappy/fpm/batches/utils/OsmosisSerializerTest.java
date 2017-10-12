@@ -140,6 +140,46 @@ public class OsmosisSerializerTest {
     }
 
     @Test
+    public void should_write_boundary() throws Exception {
+        serializer.writeBoundary(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        serializer.writeBoundary(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 1.0),
+                        new Coordinate(1.0, 1.0),
+                        new Coordinate(0.0, 2.0)}),
+                Maps.newHashMap());
+
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Node).hasSize(6);
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Way).hasSize(2);
+    }
+
+    @Test
+    public void should_not_write_same_boundary() throws Exception {
+        serializer.writeBoundary(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        serializer.writeBoundary(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Node).hasSize(3);
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Way).hasSize(1);
+    }
+
+    @Test
     public void should_write_polygon() throws Exception {
         serializer.write(
                 polygon(new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(1.0, 1.0), new Coordinate(0.0, 1.0), new Coordinate(0.0, 0.0)),

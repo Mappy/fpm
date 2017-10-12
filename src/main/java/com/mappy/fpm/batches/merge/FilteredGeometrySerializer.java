@@ -43,6 +43,12 @@ public class FilteredGeometrySerializer implements GeometrySerializer {
     }
 
     @Override
+    public long writeBoundary(LineString line, Map<String, String> tags) {
+        delegate(line, tags);
+        return 0;
+    }
+
+    @Override
     public void write(MultiLineString polygon, Map<String, String> tags) {
         delegate(polygon, tags);
     }
