@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.vividsolutions.jts.geom.*;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
@@ -72,28 +73,24 @@ public class OsmosisSerializer implements GeometrySerializer {
 
     @Override
     public Way write(LineString line, Map<String, String> tags) {
-        Coordinate[] coordinates = line.getCoordinates();
-        List<WayNode> wayNodes = new ArrayList<>(coordinates.length + 1);
-        for (int i = 0; i < coordinates.length; i++) {
-            Coordinate coordinate = coordinates[i];
-            boolean start = i == 0;
-            boolean end = i == coordinates.length - 1;
-            int layer = Layers.layer(tags, start, end);
-            if ("ferry".equals(tags.get("route")) && !start && !end) {
-                while (exists(layer, coordinate)) {
-                    layer++;
-                }
-            }
-            long id = write(layer, coordinate);
-            int size = wayNodes.size();
-            if (size == 0 || (size > 0 && wayNodes.get(size - 1).getNodeId() != id)) {
-                wayNodes.add(new WayNode(id));
-            }
-        }
+        List<WayNode> wayNodes = getWayNodes(line, tags);
         Way way = new Way(ced(wayId(line), tags), wayNodes);
         sink.process(new WayContainer(way));
         return way;
     }
+
+    @Override
+    public long writeBoundary(LineString line, Map<String, String> tags) {
+        List<WayNode> wayNodes = getWayNodes(line, tags);
+        Long id = geohash(0, line.getCentroid().getCoordinate());
+        if (!wayTracker.contains(id)) {
+            wayTracker.add(id);
+            Way way = new Way(ced(id, tags), wayNodes);
+            sink.process(new WayContainer(way));
+        }
+        return id;
+    }
+
 
     @Override
     public void write(Polygon polygon, Map<String, String> tags) {
@@ -145,6 +142,29 @@ public class OsmosisSerializer implements GeometrySerializer {
         sink.release();
     }
 
+    @NotNull
+    private List<WayNode> getWayNodes(LineString line, Map<String, String> tags) {
+        Coordinate[] coordinates = line.getCoordinates();
+        List<WayNode> wayNodes = new ArrayList<>(coordinates.length + 1);
+        for (int i = 0; i < coordinates.length; i++) {
+            Coordinate coordinate = coordinates[i];
+            boolean start = i == 0;
+            boolean end = i == coordinates.length - 1;
+            int layer = Layers.layer(tags, start, end);
+            if ("ferry".equals(tags.get("route")) && !start && !end) {
+                while (exists(layer, coordinate)) {
+                    layer++;
+                }
+            }
+            long id = write(layer, coordinate);
+            int size = wayNodes.size();
+            if (size == 0 || (size > 0 && wayNodes.get(size - 1).getNodeId() != id)) {
+                wayNodes.add(new WayNode(id));
+            }
+        }
+        return wayNodes;
+    }
+
     private boolean exists(int layer, Coordinate coordinate) {
         return pointTracker.contains(geohash(layer, coordinate));
     }
@@ -167,6 +187,7 @@ public class OsmosisSerializer implements GeometrySerializer {
         wayTracker.add(id);
         return id;
     }
+
 
     private long relationId(long memberId, int layer) {
         long id = memberId + layer;

@@ -11,7 +11,6 @@ import com.vividsolutions.jts.geom.*;
 import org.jetbrains.annotations.NotNull;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
-import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import java.io.File;
 import java.util.List;
@@ -35,12 +34,12 @@ public class BoundariesShapefile extends TomtomShapefile {
     protected BoundariesShapefile(String filename, int tomtomLevel, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(filename);
         String[] split = filename.split("/");
-        String zone = split[split.length-1].split("_[_2]")[0];
+        String zone = split[split.length - 1].split("_[_2]")[0];
 
         this.osmLevel = osmLevelGenerator.getOsmLevel(zone, String.valueOf(tomtomLevel));
         this.tomtomLevel = String.valueOf(tomtomLevel);
         this.nameProvider = nameProvider;
-        if(new File(filename).exists()) {
+        if (new File(filename).exists()) {
             this.nameProvider.loadFromFile("___an.dbf", "NAME", false);
         }
     }
@@ -70,7 +69,7 @@ public class BoundariesShapefile extends TomtomShapefile {
             addPointWithRoleLabel(serializer, members, pointTags, multiPolygon);
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
-                for (int j=0; j < polygon.getNumInteriorRing(); j++){
+                for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
                     for (Geometry geom : LongLineSplitter.split(polygon.getInteriorRingN(j), 100)) {
                         addRelationMember(serializer, members, wayTags, (LineString) geom, "inner");
                     }
@@ -101,8 +100,8 @@ public class BoundariesShapefile extends TomtomShapefile {
     }
 
     private void addRelationMember(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString geom, String memberRole) {
-        Way way = serializer.write(geom, wayTags);
-        members.add(new RelationMember(way.getId(), Way, memberRole));
+        Long wayId = serializer.writeBoundary(geom, wayTags);
+        members.add(new RelationMember(wayId, Way, memberRole));
     }
 
     private void addPointWithRoleLabel(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags, MultiPolygon multiPolygon) {

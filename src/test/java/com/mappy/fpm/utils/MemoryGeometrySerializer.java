@@ -59,4 +59,10 @@ public class MemoryGeometrySerializer implements GeometrySerializer {
         relations.add(tags);
         return 0;
     }
+
+    @Override
+    public long writeBoundary(LineString line, Map<String, String> tags) {
+        linetrings.add(tags);
+        return 0;
+    }
 }
