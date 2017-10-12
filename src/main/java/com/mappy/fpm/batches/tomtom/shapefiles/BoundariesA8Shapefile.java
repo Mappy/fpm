@@ -43,7 +43,8 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
             Map<String, String> tags = newHashMap();
 
             tags.put("name", cityCenter.getName());
-            tags.put("addr:postcode", cityCenter.getPostcode());
+            Optional<String> postcode = Optional.ofNullable(cityCenter.getPostcode());
+            postcode.ifPresent(code -> tags.put("addr:postcode", code));
 
             switch (cityCenter.getAdminclass()) {
                 case 0:
