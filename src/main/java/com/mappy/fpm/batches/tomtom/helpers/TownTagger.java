@@ -32,11 +32,12 @@ public class TownTagger {
                     Feature feature = iterator.next();
                     Long id = feature.getLong("ID");
                     String name = feature.getString("NAME");
+                    String postcode = feature.getString("POSTCODE");
                     Integer adminclass = feature.getInteger("ADMINCLASS");
                     Integer citytyp = feature.getInteger("CITYTYP");
                     Integer dispclass = feature.getInteger("DISPCLASS");
                     Point point = feature.getPoint();
-                    Centroid centroid = new Centroid(id, name, adminclass, citytyp, dispclass, point);
+                    Centroid centroid = new Centroid(id, name, postcode, adminclass, citytyp, dispclass, point);
 
                     centroids.put(id, centroid);
                 }
@@ -56,6 +57,7 @@ public class TownTagger {
 
         private final Long id;
         private final String name;
+        private final String postcode;
         private final Integer adminclass;
         private final Integer citytyp;
         private final Integer dispclass;

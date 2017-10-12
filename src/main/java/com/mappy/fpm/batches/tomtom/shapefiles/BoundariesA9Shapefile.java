@@ -41,6 +41,7 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
             Map<String, String> tags = newHashMap();
 
             tags.put("name", cityCenter.getName());
+            tags.put("addr:postcode", cityCenter.getPostcode());
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
             switch (cityCenter.getAdminclass()) {
