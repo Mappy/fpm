@@ -26,7 +26,7 @@ public class Layers {
             if (level == 0) {
                 return 0;
             }
-            checkState(level >= -9 && level <= 9, "Too many layers");
+            checkState(level >= -10 && level <= 10, "Too many layers");
             return 2 * Math.abs(level) - (level < 0 ? 0 : 1);
         }
         return 0;

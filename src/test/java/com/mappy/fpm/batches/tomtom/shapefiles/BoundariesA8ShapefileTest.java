@@ -31,10 +31,10 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
 
-    private static NameProvider nameProvider = mock(NameProvider.class);
-
     @BeforeClass
     public static void setup() throws Exception {
+
+        NameProvider nameProvider = mock(NameProvider.class);
 
         when(nameProvider.getAlternateNames(10560000000250L)) //
                 .thenReturn(of("name", "Anderlecht", "name:nl", "AnderlechtNL", "name:fr", "AnderlechtFR"));
@@ -60,13 +60,13 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
         GeometryFactory factory = mock(GeometryFactory.class);
 
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.307077, 50.8366041}, 2), factory);
-        when(townTagger.get(10560000718742L)).thenReturn(new Centroid(10560000718742L, "Anderlecht", 8, 1, 7, point));
+        when(townTagger.get(10560000718742L)).thenReturn(new Centroid(10560000718742L, "Anderlecht", "123", 8, 1, 7, point));
 
         Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.3451859, 50.8251293}, 2), factory);
-        when(townTagger.get(10560000388234L)).thenReturn(new Centroid(10560000388234L, "Sint-Gillis", 8, 1, 8, point2));
+        when(townTagger.get(10560000388234L)).thenReturn(new Centroid(10560000388234L, "Sint-Gillis", "456", 8, 1, 8, point2));
 
         Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.3134424, 50.8055758}, 2), factory);
-        when(townTagger.get(10560000455427L)).thenReturn(new Centroid(10560000455427L, "Vorst", 8, 1, 8, point3));
+        when(townTagger.get(10560000455427L)).thenReturn(new Centroid(10560000455427L, "Vorst", "789", 8, 1, 8, point3));
 
         BoundariesA8Shapefile shapefile = new BoundariesA8Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
@@ -94,6 +94,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
         assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtNL", "Sint-GillisNL", "VorstNL");
         assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
         assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("21001", "21013", "21007");
+        assertThat(tags).extracting(t -> t.get("addr:postcode")).containsOnly("123", "456", "789");
         assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000250", "10560000000267", "10560000000263");
     }
 
