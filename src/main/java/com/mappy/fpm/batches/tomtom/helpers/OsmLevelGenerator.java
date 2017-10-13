@@ -7,7 +7,7 @@ import static java.util.stream.Stream.of;
 public class OsmLevelGenerator {
 
     private enum AdminLevel {
-        A0("2"), A1("4"), A2("6"), A7("6"), A8("8"), A9("9");
+        A0("2"), A1("4"), A2("6"), A7("6"), A8("8"), A9("9"), A10("10");
 
         @Getter
         private final String osmLevel;

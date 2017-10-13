@@ -47,14 +47,12 @@ public class BoundariesShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
         Long extId = feature.getLong("ID");
-        String order = feature.getString("ORDER0" + tomtomLevel);
+        Optional<String> order = Optional.ofNullable(feature.getString("ORDER0" + tomtomLevel));
 
         Map<String, String> tags = newHashMap();
         tags.putAll(nameProvider.getAlternateNames(extId));
-        tags.putAll(of(
-                "ref:tomtom", String.valueOf(extId),
-                "ref:INSEE", getInseeWithAlpha3(order)
-        ));
+        tags.put("ref:tomtom", String.valueOf(extId));
+        order.ifPresent(s -> tags.put("ref:INSEE", getInseeWithAlpha3(s)));
 
         List<RelationMember> members = newArrayList();
         String name = feature.getString("NAME");
