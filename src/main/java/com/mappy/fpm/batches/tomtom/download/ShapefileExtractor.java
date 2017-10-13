@@ -67,7 +67,7 @@ public class ShapefileExtractor {
                     "_sp.", // sign post paths
                     "_sg.", // sign post
                     "_ld.", // lane directions
-                    "_a0.",
+                    "_a0.", // country boundaries
                     "_a1.",
                     "_a2.",
                     "_a3.",
@@ -75,7 +75,8 @@ public class ShapefileExtractor {
                     "_a5.",
                     "_a6.",
                     "_a7.",
-                    "_a8.",
+                    "_oa07.", // extended cities boundaries
+                    "_a8.", // cities boundaries
                     "_a9.",
                     "_an.", // alternate names
                     "_bu.", // built-up area
