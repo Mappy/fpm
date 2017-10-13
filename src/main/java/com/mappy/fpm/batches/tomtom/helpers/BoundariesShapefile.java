@@ -21,6 +21,7 @@ import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.lang.String.valueOf;
+import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 
@@ -47,14 +48,12 @@ public class BoundariesShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
         Long extId = feature.getLong("ID");
-        String order = feature.getString("ORDER0" + tomtomLevel);
+        Optional<String> order = ofNullable(feature.getString("ORDER0" + tomtomLevel));
 
         Map<String, String> tags = newHashMap();
         tags.putAll(nameProvider.getAlternateNames(extId));
-        tags.putAll(of(
-                "ref:tomtom", String.valueOf(extId),
-                "ref:INSEE", getInseeWithAlpha3(order)
-        ));
+        tags.put("ref:tomtom", String.valueOf(extId));
+        order.ifPresent(alpha3 -> tags.put("ref:INSEE", getInseeWithAlpha3(alpha3)));
 
         List<RelationMember> members = newArrayList();
         String name = feature.getString("NAME");
