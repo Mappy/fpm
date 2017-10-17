@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BuiltUpShapefileTest {
+public class BuiltUpShapefileTest extends AbstractTest{
 
     private static Tomtom2OsmTestUtils.PbfContent pbfContent;
 
