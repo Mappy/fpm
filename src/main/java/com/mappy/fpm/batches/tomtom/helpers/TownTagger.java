@@ -10,13 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Inject;
 import java.io.File;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
 
 @Slf4j
 public class TownTagger {
 
-    private final Map<Long, Centroid> centroids = newHashMap();
+    private final Map<Long, Centroid> centroidsCity = newHashMap();
+    private final Map<Long, Centroid> centroidsHamlet = newHashMap();
 
     @Inject
     public TownTagger(TomtomFolder folder) {
@@ -31,6 +33,7 @@ public class TownTagger {
                 while (iterator.hasNext()) {
                     Feature feature = iterator.next();
                     Long id = feature.getLong("ID");
+                    Optional<Long> buaid = Optional.ofNullable(feature.getLong("BUAID"));
                     String name = feature.getString("NAME");
                     String postcode = feature.getString("POSTCODE");
                     Integer adminclass = feature.getInteger("ADMINCLASS");
@@ -38,8 +41,11 @@ public class TownTagger {
                     Integer dispclass = feature.getInteger("DISPCLASS");
                     Point point = feature.getPoint();
                     Centroid centroid = new Centroid(id, name, postcode, adminclass, citytyp, dispclass, point);
-
-                    centroids.put(id, centroid);
+                    centroidsCity.put(id, centroid);
+                    buaid.ifPresent(aLong -> {
+                        Centroid centroidhamlet = new Centroid(aLong, name, postcode, adminclass, citytyp, dispclass, point);
+                        centroidsHamlet.put(aLong, centroidhamlet);
+                    });
                 }
             }
         }
@@ -49,7 +55,11 @@ public class TownTagger {
     }
 
     public Centroid get(Long centroidId) {
-        return centroids.get(centroidId);
+        return centroidsCity.get(centroidId);
+    }
+
+    public Centroid getHamlet(Long centroidId) {
+        return centroidsHamlet.get(centroidId);
     }
 
     @Data
