@@ -58,10 +58,7 @@ public class BoundariesShapefile extends TomtomShapefile {
         List<RelationMember> members = newArrayList();
         String name = feature.getString("NAME");
         if (name != null) {
-            Map<String, String> wayTags = of(
-                    "name", name,
-                    "boundary", "administrative",
-                    "admin_level", osmLevel);
+            Map<String, String> wayTags = putWayTags(name);
             Map<String, String> pointTags = newHashMap(tags);
             pointTags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();
@@ -77,12 +74,25 @@ public class BoundariesShapefile extends TomtomShapefile {
                     addRelationMember(serializer, members, wayTags, (LineString) geom, "outer");
                 }
             }
-            tags.putAll(wayTags);
-            tags.put("type", "boundary");
-            tags.put("layer", osmLevel);
+
+            putRelationTags(tags, wayTags);
 
             finishRelation(serializer, tags, members, feature);
         }
+    }
+
+    @NotNull
+    protected Map<String, String> putWayTags(String name) {
+        return of(
+                "name", name,
+                "boundary", "administrative",
+                "admin_level", osmLevel);
+    }
+
+    protected void putRelationTags(Map<String, String> tags, Map<String, String> wayTags) {
+        tags.putAll(wayTags);
+        tags.put("type", "boundary");
+        tags.put("layer", osmLevel);
     }
 
     @NotNull
