@@ -1,8 +1,5 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
-import com.google.inject.Guice;
-import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
-import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
@@ -36,7 +33,6 @@ public class BuiltUpShapefileTest {
     public static void setup() throws Exception {
         NameProvider nameProvider = mock(NameProvider.class);
 
-
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("bu.shp")).thenReturn("src/test/resources/tomtom/boundaries/bu/rougnat___________bu.shp");
 
@@ -44,6 +40,19 @@ public class BuiltUpShapefileTest {
         when(osmLevelGenerator.getOsmLevel("rougnat", "10")).thenReturn("10");
 
         TownTagger townTagger = mock(TownTagger.class);
+        GeometryFactory factory = mock(GeometryFactory.class);
+
+        Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.560886, 51.190382}, 2), factory);
+        when(townTagger.getHamlet(12500001063055L)).thenReturn(new TownTagger.Centroid(12500001063055L, "Rougnat", "123", 8, 32, 7, point));
+
+        Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.601984, 51.181340}, 2), factory);
+        when(townTagger.getHamlet(12500001060481L)).thenReturn(new TownTagger.Centroid(12500001060481L, "Auzances", "456", 8, 32, 8, point2));
+
+        Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.606374, 51.162370}, 2), factory);
+        when(townTagger.getHamlet(12500001067545L)).thenReturn(new TownTagger.Centroid(12500001067545L, "La Chaux-Bourdue", null, 8, 32, 8, point3));
+
+        Point point4 = new Point(new PackedCoordinateSequence.Double(new double[]{4.596975, 51.210989}, 2), factory);
+        when(townTagger.getHamlet(12500001060737L)).thenReturn(new TownTagger.Centroid(112500001060737L, "Le Montely", "1011", 8, 32, 8, point4));
 
         BuiltUpShapefile shapefile = new BuiltUpShapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
@@ -63,9 +72,8 @@ public class BuiltUpShapefileTest {
                 .collect(toList());
 
         assertThat(tags).hasSize(4);
-        assertThat(tags).extracting(t -> t.get("boundary")).containsOnly("administrative");
-        assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("10");
-        assertThat(tags).extracting(t -> t.get("type")).containsOnly("boundary");
+        assertThat(tags).extracting(t -> t.get("landuse")).containsOnly("residential");
+        assertThat(tags).extracting(t -> t.get("type")).containsOnly("multipolygon");
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Rougnat", "Auzances", "La Chaux-Bourdue", "Le Montely");
         assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("12500001063055", "12500001060481", "12500001067545", "12500001060737");
     }
@@ -81,8 +89,7 @@ public class BuiltUpShapefileTest {
 
         assertThat(tags).hasSize(8);
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Rougnat", "Auzances", "La Chaux-Bourdue", "Le Montely");
-        assertThat(tags).extracting(t -> t.get("boundary")).containsOnly("administrative");
-        assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("10");
+        assertThat(tags).extracting(t -> t.get("place")).containsOnly("hamlet");
     }
 
     @Test
