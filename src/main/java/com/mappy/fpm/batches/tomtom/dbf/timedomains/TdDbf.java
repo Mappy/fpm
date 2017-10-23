@@ -15,7 +15,6 @@ public class TdDbf {
 
     private final ArrayListMultimap<Long, TimeDomains> timeDomainsMap;
 
-
     @Inject
     public TdDbf(TomtomFolder folder) {
         timeDomainsMap = loadTimeDomains(folder.getFile("td.dbf"));
@@ -35,11 +34,11 @@ public class TdDbf {
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
-                TimeDomains restriction = new TimeDomains(row.getLong("ID"));
+                TimeDomains restriction = new TimeDomains(row.getLong("ID"), row.getString("TIMEDOM"));
                 times.put(restriction.getId(), restriction);
             }
         }
-        log.info("Loaded {} time domains", times.size());
+        log.info("Loaded {} times domains", times.size());
 
         return times;
     }

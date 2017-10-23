@@ -36,19 +36,18 @@ public class RoadTagger {
     private final SignPosts signPosts;
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
-    private final TdDbf timeDomaine;
-
+    private final TdDbf timeDomain;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, TomtomStats tomtomStats, NameProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction, TdDbf timeDomaine
+                      SpeedRestrictionTagger speedRestriction, TdDbf timeDomain
     ) {
         this.speedProfiles = speedProfiles;
         this.stats = tomtomStats;
         this.nameProvider = nameProvider;
         this.signPosts = signPosts;
         this.lanes = lanes;
-        this.timeDomaine = timeDomaine;
+        this.timeDomain = timeDomain;
         this.speedRestriction = speedRestriction;
         this.nameProvider.loadFromFile("gc.dbf", "FULLNAME", true);
     }
@@ -67,7 +66,7 @@ public class RoadTagger {
         addTagIf("ref", feature.getString("SHIELDNUM"), feature.getString("SHIELDNUM") != null, tags);
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("oneway", "yes", isOneway(feature), tags);
-        List<TimeDomains> timeDomains = timeDomaine.getTimeDomains(id);
+        List<TimeDomains> timeDomains = timeDomain.getTimeDomains(id);
         addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);

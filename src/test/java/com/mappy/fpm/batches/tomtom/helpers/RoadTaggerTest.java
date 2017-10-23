@@ -74,11 +74,10 @@ public class RoadTaggerTest {
     @Test
     public void should_not_tag_vehicle_no_when_restriction_speed() {
         List<TimeDomains> timeDomainList = Lists.newArrayList();
-        timeDomainList.add(new TimeDomains(1L));
+        timeDomainList.add(new TimeDomains(1L, null));
         when(timeDomains.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).doesNotContainEntry("vehicle", "no");
     }
-
 
     @Test
     public void should_tag_pedestrian_roads() {
