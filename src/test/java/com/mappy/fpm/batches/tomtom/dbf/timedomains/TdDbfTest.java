@@ -4,7 +4,6 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,12 +22,8 @@ public class TdDbfTest {
 
     @Test
     public void should_read_time_domain_restriction() {
-        assertThat(tdDbf.getTimeDomains(14420000000590L)).isEqualTo(newArrayList(
+        assertThat(tdDbf.getTimeDomains(14420000000590L)).containsExactly(
                 new TimeDomains(14420000000590L, "[(h11){h7}]"),
-                new TimeDomains(14420000000590L, "[(h22){h8}]"),
-                new TimeDomains(14420000000590L, "[(h11){h7}]"),
-                new TimeDomains(14420000000590L, "[(h22){h8}]"),
-                new TimeDomains(14420000000590L, "[(h11){h7}]"),
-                new TimeDomains(14420000000590L, "[(h22){h8}]")));
+                new TimeDomains(14420000000590L, "[(h22){h8}]"));
     }
 }

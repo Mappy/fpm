@@ -9,11 +9,12 @@ import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TdDbf;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
 import com.mappy.fpm.batches.utils.Feature;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -36,19 +37,21 @@ public class RoadTagger {
     private final SignPosts signPosts;
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
-    private final TdDbf timeDomain;
+    private final TimeDomainsParser timeDomainsParser;
+    private final TdDbf tdDbf;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, TomtomStats tomtomStats, NameProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction, TdDbf timeDomain
+                      SpeedRestrictionTagger speedRestriction, TdDbf tdDbf, TimeDomainsParser timeDomainsParser
     ) {
         this.speedProfiles = speedProfiles;
         this.stats = tomtomStats;
         this.nameProvider = nameProvider;
         this.signPosts = signPosts;
         this.lanes = lanes;
-        this.timeDomain = timeDomain;
+        this.tdDbf = tdDbf;
         this.speedRestriction = speedRestriction;
+        this.timeDomainsParser = timeDomainsParser;
         this.nameProvider.loadFromFile("gc.dbf", "FULLNAME", true);
     }
 
@@ -66,8 +69,12 @@ public class RoadTagger {
         addTagIf("ref", feature.getString("SHIELDNUM"), feature.getString("SHIELDNUM") != null, tags);
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("oneway", "yes", isOneway(feature), tags);
-        List<TimeDomains> timeDomains = timeDomain.getTimeDomains(id);
+        Collection<TimeDomains> timeDomains = tdDbf.getTimeDomains(id);
         addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
+        if (timeDomains != null && !timeDomains.isEmpty()){
+            String openingHours = timeDomainsParser.parse(timeDomains);
+            addTagIf("opening_hours", openingHours, openingHours !=null, tags);
+        }
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
         if (!tags.containsValue("ferry")) {

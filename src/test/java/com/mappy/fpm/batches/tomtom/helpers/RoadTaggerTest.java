@@ -1,8 +1,6 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.mappy.fpm.batches.tomtom.TomtomStats;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
@@ -11,12 +9,16 @@ import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TdDbf;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
 import com.mappy.fpm.utils.MemoryFeature;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.utils.CollectionUtils.map;
 import static com.mappy.fpm.utils.MemoryFeature.onlyTags;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,12 +32,13 @@ public class RoadTaggerTest {
     private final NameProvider names = mock(NameProvider.class);
     private final SignPosts signPosts = mock(SignPosts.class);
     private final LaneTagger lanes = mock(LaneTagger.class);
-    private final TdDbf timeDomains = mock(TdDbf.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, mock(TomtomStats.class), names, signPosts, lanes, speedRestrictionTagger, timeDomains);
+    private final TdDbf tdDbf = mock(TdDbf.class);
+    private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, mock(TomtomStats.class), names, signPosts, lanes, speedRestrictionTagger, tdDbf, timeDomainsParser);
 
     @Before
     public void setup() {
-        when(speedProfiles.extracted(any(MemoryFeature.class))).thenReturn(Maps.newHashMap());
+        when(speedProfiles.extracted(any(MemoryFeature.class))).thenReturn(newHashMap());
     }
 
     @Test
@@ -73,9 +76,9 @@ public class RoadTaggerTest {
 
     @Test
     public void should_not_tag_vehicle_no_when_restriction_speed() {
-        List<TimeDomains> timeDomainList = Lists.newArrayList();
+        List<TimeDomains> timeDomainList = newArrayList();
         timeDomainList.add(new TimeDomains(1L, null));
-        when(timeDomains.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
+        when(tdDbf.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).doesNotContainEntry("vehicle", "no");
     }
 
@@ -150,5 +153,19 @@ public class RoadTaggerTest {
     public void should_add_ref_tag() throws Exception {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "SHIELDNUM", "A13")))).containsEntry("ref", "A13");
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0")))).doesNotContainKey("ref");
+    }
+
+    @Test
+    public void should_add_oppening_hours_tag() {
+        TimeDomains domainetomtom = new TimeDomains(456, "domainetomtom");
+        TimeDomains domainetomtom2 = new TimeDomains(789, "domainetomtom2");
+        List<TimeDomains> timeDomains = newArrayList(domainetomtom, domainetomtom2);
+        when(tdDbf.getTimeDomains(123)).thenReturn(timeDomains);
+        when(timeDomainsParser.parse(timeDomains)).thenReturn("10:00-14:00 off, 22:00-06:00 off");
+        MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
+
+        Map<String, String> tags = tagger.tag(feature);
+
+        assertThat(tags).containsEntry("opening_hours", "10:00-14:00 off, 22:00-06:00 off");
     }
 }
