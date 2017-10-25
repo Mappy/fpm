@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
@@ -19,7 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Mockito.*;
 
-public class TownShapefileTest {
+public class TownShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
     private GeometrySerializer serializer;
