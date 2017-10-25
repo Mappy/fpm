@@ -12,36 +12,43 @@ import static java.util.stream.Collectors.joining;
 @Slf4j
 public class TimeDomainsParser {
 
-    private static final Pattern HOUR_PATTERN = Pattern.compile("\\[\\(h(\\d{1,2})\\)\\{h(\\d{1,2})\\}\\]"); // [(h11){h7}]
-    private static final Pattern MONTH_PATTERN = Pattern.compile("\\[\\(M(\\d{1,2})\\)\\{M(\\d{1,2})\\}\\]"); // [(M3){M5}]
+    private static final Pattern DURATION_PATTERN = Pattern.compile("\\[\\((\\p{Alpha})(\\d{1,2})\\)\\{(\\p{Alpha})(\\d{1,2})\\}\\]");
 
     private enum Month {
         Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
     }
 
     public String parse(Collection<TimeDomains> tomtomTimesDomains) {
-
         return tomtomTimesDomains.stream().map(this::parse).collect(joining(", "));
     }
 
     private String parse(TimeDomains timeDomains) {
 
-        Matcher hourMatcher = HOUR_PATTERN.matcher(timeDomains.getDomain());
-        Matcher monthMatcher = MONTH_PATTERN.matcher(timeDomains.getDomain());
+        Matcher durationMatcher = DURATION_PATTERN.matcher(timeDomains.getDomain());
 
-        if (hourMatcher.find()) {
-            String begin_hour = hourMatcher.group(1);
-            String duration_hour = hourMatcher.group(2);
-            return String.format("%02d:00-%02d:00 off", valueOf(begin_hour), (valueOf(begin_hour) + valueOf(duration_hour)) % 24);
-
-        } else if (monthMatcher.find()) {
-            String begin_month = monthMatcher.group(1);
-            String duration_month = monthMatcher.group(2);
-            return String.format("%s-%s off", Month.values()[valueOf(begin_month) - 1], Month.values()[(valueOf(begin_month) + valueOf(duration_month) - 2) % 12]);
+        if (durationMatcher.find()) {
+            return getOpeningHoursFromDuration(durationMatcher);
 
         } else {
             log.warn("Unable to parse '{}'", timeDomains.getDomain());
             return "";
         }
+    }
+
+    private String getOpeningHoursFromDuration(Matcher durationMatcher) {
+        String beginMode = durationMatcher.group(1);
+        int beginIndex = valueOf(durationMatcher.group(2));
+        String durationMode = durationMatcher.group(3);
+        int durationIndex = valueOf(durationMatcher.group(4));
+
+        if("h".equals(beginMode) && "h".equals(durationMode)) {
+            return String.format("%02d:00-%02d:00 off", beginIndex, (beginIndex + durationIndex) % 24);
+
+        } else if("M".equals(beginMode) && "M".equals(durationMode)) {
+            return String.format("%s-%s off", Month.values()[beginIndex - 1], Month.values()[(beginIndex + durationIndex - 2) % 12]);
+        }
+
+        log.warn("Unable to parse duration {}", durationMatcher.group(0));
+        return "";
     }
 }
