@@ -21,14 +21,6 @@ public class FileBasedSort<T extends Storeable> implements Releasable {
     private final ChunkedObjectStore<T> chunkedEntityStore;
     private final List<T> addBuffer;
 
-    /**
-     * Creates a new instance.
-     * 
-     * @param serializationFactory
-     *            The factory defining the object serialisation implementation.
-     * @param comparator
-     *            The comparator to be used for sorting the results.
-     */
     public FileBasedSort(ObjectSerializationFactory serializationFactory, Comparator<T> comparator) {
         this.comparator = comparator;
         chunkedEntityStore = new ChunkedObjectStore<>(serializationFactory, "emta", "idx", false);
@@ -56,12 +48,6 @@ public class FileBasedSort<T extends Storeable> implements Releasable {
         }
     }
 
-    /**
-     * Adds a new object to be sorted.
-     * 
-     * @param value
-     *            The data object.
-     */
     public void add(T value) {
         // Add the new data entity to the add buffer.
         addBuffer.add(value);
@@ -77,10 +63,6 @@ public class FileBasedSort<T extends Storeable> implements Releasable {
      * Sorts the specified sub-section of the overall storage contents. This result list is not
      * backed by a file and should be persisted prior to being incorporated into a higher level
      * merge operation.
-     * 
-     * @param chunkCount
-     *            The number of chunks to sort.
-     * @return An iterator providing access to the sort result.
      */
     private ReleasableIterator<T> iterate(long chunkCount) {
         List<ReleasableIterator<T>> sources;

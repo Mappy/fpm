@@ -6,18 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.openstreetmap.osmosis.core.lifecycle.ReleasableIterator;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * This iterator examines a list of sorted input sources and merges them into a single sorted list.
- * 
- * @param <DataType>
- *            The object type to be sorted.
- * @author Brett Henderson
  */
 public class PriorityQueueMergingIterator<DataType> implements ReleasableIterator<DataType> {
     private final List<ReleasableIterator<DataType>> sources;
@@ -34,11 +26,6 @@ public class PriorityQueueMergingIterator<DataType> implements ReleasableIterato
 
     /**
      * Creates a new instance.
-     * 
-     * @param sources
-     *            The list of data sources.
-     * @param comparator
-     *            The comparator to be used for sorting.
      */
     public PriorityQueueMergingIterator(List<ReleasableIterator<DataType>> sources, Comparator<DataType> comparator) {
         this.sources = new ArrayList<>(sources);
