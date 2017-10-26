@@ -107,4 +107,14 @@ public class TimeDomainsParserTest {
 
         assertThat(osmTimeDomain).isEqualTo("Mo 05:00-06:00");
     }
+
+    @Test
+    public void should_translate_multiple_tomtom_weekday_and_hour_with_hour_duration_to_osm_opening_hours(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(t2t6){h10}]");
+
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+
+        assertThat(osmTimeDomain).isEqualTo("Mo,Fr 00:00-10:00");
+    }
+
 }

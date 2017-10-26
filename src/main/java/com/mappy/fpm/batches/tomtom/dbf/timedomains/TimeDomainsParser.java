@@ -75,11 +75,14 @@ public class TimeDomainsParser {
 
     private String generateWithWeekDay(List<Element> begin, Element duration) {
         int beginHour = 0;
-        if (begin.size() == 2) {
-            beginHour = begin.get(1).getIndex();
+        String days = begin.stream().filter(e -> "t".equals(e.mode)).map(e -> WeekDay.values()[e.index -1].name()).collect(joining(","));
+
+        Element last = begin.get(begin.size() - 1);
+        if ("h".equals(last.mode)) {
+            beginHour = last.getIndex();
         }
 
-        return String.format("%s %02d:00-%02d:00", WeekDay.values()[begin.get(0).getIndex() - 1], beginHour, (beginHour + duration.getIndex()) % 24);
+        return String.format("%s %02d:00-%02d:00", days, beginHour, (beginHour + duration.getIndex()) % 24);
     }
 
     private String getOpeningHoursFromInterval(Matcher matcher) {
@@ -114,11 +117,6 @@ public class TimeDomainsParser {
                 Element element = new Element(firstBegin.substring(0, 1), valueOf(firstBegin.substring(1, firstBegin.length())));
                 list.add(element);
                 index += firstBegin.length();
-            }
-
-            if (list.size() >= 2 && !"h".equals(list.get(1).mode)) {
-                log.warn("Unable to parse {}", group);
-                throw new IllegalArgumentException("Unable to parse " + group);
             }
 
             return list;
