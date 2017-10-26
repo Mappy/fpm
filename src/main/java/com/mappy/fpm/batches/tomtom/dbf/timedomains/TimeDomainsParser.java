@@ -4,10 +4,12 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Integer.valueOf;
 import static java.util.stream.Collectors.joining;
 
@@ -16,6 +18,8 @@ public class TimeDomainsParser {
 
     private static final Pattern DURATION_PATTERN = Pattern.compile("\\[\\((.*)\\)\\{(.*)\\}\\]");
     private static final Pattern INTERVAL_PATTERN = Pattern.compile("\\[\\((.*)\\)\\((.*)\\)\\]");
+
+    private static final Pattern BEGIN_PATTERN = Pattern.compile("(\\p{Alpha}\\d{1,2})");
 
     private enum Month {
         Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
@@ -50,18 +54,18 @@ public class TimeDomainsParser {
 
         Elements elements = parse(matcher);
 
-        Element begin = elements.getFirst();
+        List<Element> begin = elements.getFirst();
         Element duration = elements.getSecond();
-        if ("h".equals(begin.getMode()) && "h".equals(duration.getMode())) {
-            return String.format("%02d:00-%02d:00 off", begin.getIndex(), (begin.getIndex() + duration.getIndex()) % 24);
+        if ("h".equals(begin.get(0).getMode()) && "h".equals(duration.getMode())) {
+            return String.format("%02d:00-%02d:00 off", begin.get(0).getIndex(), (begin.get(0).getIndex() + duration.getIndex()) % 24);
 
-        } else if ("M".equals(begin.getMode()) && "M".equals(duration.getMode())) {
-            return String.format("%s-%s off", Month.values()[begin.getIndex() - 1], Month.values()[(begin.getIndex() + duration.getIndex() - 2) % 12]);
+        } else if ("M".equals(begin.get(0).getMode()) && "M".equals(duration.getMode())) {
+            return String.format("%s-%s off", Month.values()[begin.get(0).getIndex() - 1], Month.values()[(begin.get(0).getIndex() + duration.getIndex() - 2) % 12]);
 
-        } else if ("t".equals(begin.getMode())) {
-            return String.format("%s 00:00-%02d:00", WeekDay.values()[begin.getIndex() - 1], duration.getIndex());
+        } else if ("t".equals(begin.get(0).getMode())) {
+            return generateWithWeekDay(begin, duration);
 
-        } else if ("z".equals(begin.getMode())) {
+        } else if ("z".equals(begin.get(0).getMode())) {
             return null;
         }
 
@@ -69,17 +73,26 @@ public class TimeDomainsParser {
         throw new IllegalArgumentException("Unable to parse duration " + matcher.group(0));
     }
 
+    private String generateWithWeekDay(List<Element> begin, Element duration) {
+        int beginHour = 0;
+        if (begin.size() == 2) {
+            beginHour = begin.get(1).getIndex();
+        }
+
+        return String.format("%s %02d:00-%02d:00", WeekDay.values()[begin.get(0).getIndex() - 1], beginHour, (beginHour + duration.getIndex()) % 24);
+    }
+
     private String getOpeningHoursFromInterval(Matcher matcher) {
 
         Elements elements = parse(matcher);
 
-        Element begin = elements.getFirst();
+        List<Element> begin = elements.getFirst();
         Element end = elements.getSecond();
-        if ("h".equals(begin.getMode()) && "h".equals(end.getMode())) {
-            return String.format("%02d:00-%02d:00 off", begin.getIndex(), end.getIndex());
+        if ("h".equals(begin.get(0).getMode()) && "h".equals(end.getMode())) {
+            return String.format("%02d:00-%02d:00 off", begin.get(0).getIndex(), end.getIndex());
 
-        } else if ("M".equals(begin.getMode()) && "M".equals(end.getMode())) {
-            return String.format("%s-%s off", Month.values()[begin.getIndex() - 1], Month.values()[end.getIndex() - 1]);
+        } else if ("M".equals(begin.get(0).getMode()) && "M".equals(end.getMode())) {
+            return String.format("%s-%s off", Month.values()[begin.get(0).getIndex() - 1], Month.values()[end.getIndex() - 1]);
         }
 
         log.warn("Unable to parse interval {}", matcher.group(0));
@@ -87,15 +100,31 @@ public class TimeDomainsParser {
     }
 
     private Elements parse(Matcher matcher) {
-        return new Elements(parse(matcher.group(1)), parse(matcher.group(2)));
+        return new Elements(parse(matcher.group(1)), parse(matcher.group(2)).get(0));
     }
 
-    private Element parse(String group) {
+    private List<Element> parse(String group) {
+        List<Element> list = newArrayList();
         try {
-            return new Element(group.substring(0, 1), valueOf(group.substring(1, group.length())));
+            Matcher matcher = BEGIN_PATTERN.matcher(group);
+
+            int index = 0;
+            while (matcher.find(index)) {
+                String firstBegin = matcher.group(1);
+                Element element = new Element(firstBegin.substring(0, 1), valueOf(firstBegin.substring(1, firstBegin.length())));
+                list.add(element);
+                index += firstBegin.length();
+            }
+
+            if (list.size() >= 2 && !"h".equals(list.get(1).mode)) {
+                log.warn("Unable to parse {}", group);
+                throw new IllegalArgumentException("Unable to parse " + group);
+            }
+
+            return list;
 
         } catch (NumberFormatException nfe) {
-            return new Element("", 0);
+            return list;
         }
     }
 
@@ -107,7 +136,7 @@ public class TimeDomainsParser {
 
     @Data
     private static class Elements {
-        private final Element first;
+        private final List<Element> first;
         private final Element second;
     }
 }

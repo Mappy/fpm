@@ -91,12 +91,20 @@ public class TimeDomainsParserTest {
     }
 
     @Test
-    public void should_translate_tomtom_weekdays_to_osm_opening_hours(){
-        //[(t1){h5}]
+    public void should_translate_tomtom_weekday_with_hour_duration_to_osm_opening_hours(){
         TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(t1){h1}]");
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
         assertThat(osmTimeDomain).isEqualTo("Su 00:00-01:00");
+    }
+
+    @Test
+    public void should_translate_tomtom_weekday_and_hour_with_hour_duration_to_osm_opening_hours(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(t2h5){h1}]");
+
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+
+        assertThat(osmTimeDomain).isEqualTo("Mo 05:00-06:00");
     }
 }
