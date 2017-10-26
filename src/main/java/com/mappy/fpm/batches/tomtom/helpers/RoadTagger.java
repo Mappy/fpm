@@ -78,7 +78,7 @@ public class RoadTagger {
                 String openingHours = timeDomainsParser.parse(timeDomains);
                 addTagIf("opening_hours", openingHours, !"".equals(openingHours), tags);
             } catch (IllegalArgumentException iae) {
-                log.warn("Unable to parse opening hours.", iae);
+                log.warn("Unable to parse opening hours from " + timeDomains);
             }
         }
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
