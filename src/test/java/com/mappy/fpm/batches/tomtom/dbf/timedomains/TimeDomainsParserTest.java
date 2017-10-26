@@ -17,6 +17,28 @@ public class TimeDomainsParserTest {
         assertThat(openingHours).isEqualTo("");
     }
 
+    // INTERVAL
+
+    @Test
+    public void should_return_empty_string_when_time_interval_could_not_be_parsed() {
+
+        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[(Z11)(Q23)]")));
+
+        assertThat(openingHours).isEqualTo("");
+    }
+
+    @Test
+    public void should_translate_tomtom_month_interval_to_osm_opening_hours(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(M3)(M5)]");
+
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+
+        assertThat(osmTimeDomain).isEqualTo("Mar-May off");
+    }
+
+
+    // DURATION
+
     @Test
     public void should_return_empty_string_when_time_duration_could_not_be_parsed() {
 

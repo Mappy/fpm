@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.dbf.timedomains;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
@@ -12,7 +13,8 @@ import static java.util.stream.Collectors.joining;
 @Slf4j
 public class TimeDomainsParser {
 
-    private static final Pattern DURATION_PATTERN = Pattern.compile("\\[\\((\\p{Alpha})(\\d{1,2})\\)\\{(\\p{Alpha})(\\d{1,2})\\}\\]");
+    private static final Pattern DURATION_PATTERN = Pattern.compile("\\[\\((.*)\\)\\{(.*)\\}\\]");
+    private static final Pattern INTERVAL_PATTERN = Pattern.compile("\\[\\((.*)\\)\\((.*)\\)\\]");
 
     private enum Month {
         Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
@@ -25,9 +27,13 @@ public class TimeDomainsParser {
     private String parse(TimeDomains timeDomains) {
 
         Matcher durationMatcher = DURATION_PATTERN.matcher(timeDomains.getDomain());
+        Matcher intervalMatcher = INTERVAL_PATTERN.matcher(timeDomains.getDomain());
 
         if (durationMatcher.find()) {
             return getOpeningHoursFromDuration(durationMatcher);
+
+        } else if (intervalMatcher.find()) {
+            return getOpeningHoursFromInterval(intervalMatcher);
 
         } else {
             log.warn("Unable to parse '{}'", timeDomains.getDomain());
@@ -35,20 +41,42 @@ public class TimeDomainsParser {
         }
     }
 
-    private String getOpeningHoursFromDuration(Matcher durationMatcher) {
-        String beginMode = durationMatcher.group(1);
-        int beginIndex = valueOf(durationMatcher.group(2));
-        String durationMode = durationMatcher.group(3);
-        int durationIndex = valueOf(durationMatcher.group(4));
+    private String getOpeningHoursFromDuration(Matcher matcher) {
 
-        if("h".equals(beginMode) && "h".equals(durationMode)) {
-            return String.format("%02d:00-%02d:00 off", beginIndex, (beginIndex + durationIndex) % 24);
+        Element begin = parse(matcher.group(1));
+        Element duration = parse(matcher.group(2));
 
-        } else if("M".equals(beginMode) && "M".equals(durationMode)) {
-            return String.format("%s-%s off", Month.values()[beginIndex - 1], Month.values()[(beginIndex + durationIndex - 2) % 12]);
+        if("h".equals(begin.getMode()) && "h".equals(duration.getMode())) {
+            return String.format("%02d:00-%02d:00 off", begin.getIndex(), (begin.getIndex() + duration.getIndex()) % 24);
+
+        } else if("M".equals(begin.getMode()) && "M".equals(duration.getMode())) {
+            return String.format("%s-%s off", Month.values()[begin.getIndex() - 1], Month.values()[(begin.getIndex() + duration.getIndex() - 2) % 12]);
         }
 
-        log.warn("Unable to parse duration {}", durationMatcher.group(0));
+        log.warn("Unable to parse duration {}", matcher.group(0));
         return "";
+    }
+
+    private String getOpeningHoursFromInterval(Matcher matcher) {
+
+        Element begin = parse(matcher.group(1));
+        Element end = parse(matcher.group(2));
+
+        if("M".equals(begin.getMode()) && "M".equals(end.getMode())) {
+            return String.format("%s-%s off", Month.values()[begin.getIndex() - 1], Month.values()[end.getIndex() - 1]);
+        }
+
+        log.warn("Unable to parse interval {}", matcher.group(0));
+        return "";
+    }
+
+    private Element parse(String group) {
+        return new Element(group.substring(0, 1), valueOf(group.substring(1, group.length())));
+    }
+
+    @Data
+    private static class Element {
+        private final String mode;
+        private final int index;
     }
 }
