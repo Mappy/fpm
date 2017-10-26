@@ -21,6 +21,10 @@ public class TimeDomainsParser {
         Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
     }
 
+    private enum WeekDay {
+        Su, Mo, Tu, We, Th, Fr, Sa
+    }
+
     public String parse(Collection<TimeDomains> tomtomTimesDomains) {
         return tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
     }
@@ -53,6 +57,9 @@ public class TimeDomainsParser {
 
         } else if ("M".equals(begin.getMode()) && "M".equals(duration.getMode())) {
             return String.format("%s-%s off", Month.values()[begin.getIndex() - 1], Month.values()[(begin.getIndex() + duration.getIndex() - 2) % 12]);
+
+        } else if ("t".equals(begin.getMode())) {
+            return String.format("%s 00:00-%02d:00", WeekDay.values()[begin.getIndex() - 1], duration.getIndex());
 
         } else if ("z".equals(begin.getMode())) {
             return null;

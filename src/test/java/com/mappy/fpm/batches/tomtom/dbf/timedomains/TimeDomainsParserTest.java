@@ -89,4 +89,14 @@ public class TimeDomainsParserTest {
 
         assertThat(osmTimeDomain).isEqualTo("Oct-Feb off");
     }
+
+    @Test
+    public void should_translate_tomtom_weekdays_to_osm_opening_hours(){
+        //[(t1){h5}]
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(t1){h1}]");
+
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+
+        assertThat(osmTimeDomain).isEqualTo("Su 00:00-01:00");
+    }
 }
