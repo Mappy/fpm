@@ -11,6 +11,7 @@ import com.mappy.fpm.batches.tomtom.dbf.timedomains.TdDbf;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
 import com.mappy.fpm.batches.utils.Feature;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,6 +23,7 @@ import static com.mappy.fpm.batches.tomtom.helpers.Fow.*;
 import static com.mappy.fpm.batches.tomtom.helpers.Freeway.PART_OF_FREEWAY;
 
 @Singleton
+@Slf4j
 public class RoadTagger {
 
     public static final Integer TUNNEL = 1;
@@ -72,8 +74,12 @@ public class RoadTagger {
         Collection<TimeDomains> timeDomains = tdDbf.getTimeDomains(id);
         addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
         if (timeDomains != null && !timeDomains.isEmpty()){
-            String openingHours = timeDomainsParser.parse(timeDomains);
-            addTagIf("opening_hours", openingHours, openingHours !=null, tags);
+            try {
+                String openingHours = timeDomainsParser.parse(timeDomains);
+                addTagIf("opening_hours", openingHours, !"".equals(openingHours), tags);
+            } catch (IllegalArgumentException iae) {
+                log.warn("Unable to parse opening hours.", iae);
+            }
         }
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);

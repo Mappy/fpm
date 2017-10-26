@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +22,7 @@ public class TimeDomainsParser {
     }
 
     public String parse(Collection<TimeDomains> tomtomTimesDomains) {
-        return tomtomTimesDomains.stream().map(this::parse).collect(joining(", "));
+        return tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
     }
 
     private String parse(TimeDomains timeDomains) {
@@ -37,60 +38,66 @@ public class TimeDomainsParser {
 
         } else {
             log.warn("Unable to parse '{}'", timeDomains.getDomain());
-            return "";
+            throw new IllegalArgumentException("Unable to parse '" + timeDomains.getDomain() + "'");
         }
     }
 
     private String getOpeningHoursFromDuration(Matcher matcher) {
 
-        Element begin;
-        Element duration;
-        try {
-            begin = parse(matcher.group(1));
-            duration = parse(matcher.group(2));
-        } catch (NumberFormatException mfe) {
-            log.warn("Unable to parse duration {}", matcher.group(0));
-            return "";
-        }
+        Elements elements = parse(matcher);
 
+        Element begin = elements.getFirst();
+        Element duration = elements.getSecond();
         if ("h".equals(begin.getMode()) && "h".equals(duration.getMode())) {
             return String.format("%02d:00-%02d:00 off", begin.getIndex(), (begin.getIndex() + duration.getIndex()) % 24);
 
         } else if ("M".equals(begin.getMode()) && "M".equals(duration.getMode())) {
             return String.format("%s-%s off", Month.values()[begin.getIndex() - 1], Month.values()[(begin.getIndex() + duration.getIndex() - 2) % 12]);
+
+        } else if ("z".equals(begin.getMode())) {
+            return null;
         }
 
         log.warn("Unable to parse duration {}", matcher.group(0));
-        return "";
+        throw new IllegalArgumentException("Unable to parse duration " + matcher.group(0));
     }
 
     private String getOpeningHoursFromInterval(Matcher matcher) {
 
-        Element begin;
-        Element end;
-        try {
-            begin = parse(matcher.group(1));
-            end = parse(matcher.group(2));
-        } catch (NumberFormatException mfe) {
-            log.warn("Unable to parse interval {}", matcher.group(0));
-            return "";
-        }
+        Elements elements = parse(matcher);
 
+        Element begin = elements.getFirst();
+        Element end = elements.getSecond();
         if ("M".equals(begin.getMode()) && "M".equals(end.getMode())) {
             return String.format("%s-%s off", Month.values()[begin.getIndex() - 1], Month.values()[end.getIndex() - 1]);
         }
 
         log.warn("Unable to parse interval {}", matcher.group(0));
-        return "";
+        throw new IllegalArgumentException("Unable to parse interval " + matcher.group(0));
+    }
+
+    private Elements parse(Matcher matcher) {
+        return new Elements(parse(matcher.group(1)), parse(matcher.group(2)));
     }
 
     private Element parse(String group) {
-        return new Element(group.substring(0, 1), valueOf(group.substring(1, group.length())));
+        try {
+            return new Element(group.substring(0, 1), valueOf(group.substring(1, group.length())));
+
+        } catch (NumberFormatException nfe) {
+            return new Element("", 0);
+        }
     }
 
     @Data
     private static class Element {
         private final String mode;
         private final int index;
+    }
+
+    @Data
+    private static class Elements {
+        private final Element first;
+        private final Element second;
     }
 }

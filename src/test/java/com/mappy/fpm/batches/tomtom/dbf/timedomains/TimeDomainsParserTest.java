@@ -9,22 +9,16 @@ public class TimeDomainsParserTest {
 
     private final TimeDomainsParser parser = new TimeDomainsParser();
 
-    @Test
-    public void should_return_empty_string_when_time_domain_could_not_be_parsed() {
-
-        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "non-parsable")));
-
-        assertThat(openingHours).isEqualTo("");
+    @Test(expected = IllegalArgumentException.class)
+    public void should_throw_exception_when_time_domain_could_not_be_parsed() {
+        parser.parse(newHashSet(new TimeDomains(144, "non-parsable")));
     }
 
     // INTERVAL
 
-    @Test
-    public void should_return_empty_string_when_time_interval_could_not_be_parsed() {
-
-        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[(Z11)(Q23)]")));
-
-        assertThat(openingHours).isEqualTo("");
+    @Test(expected = IllegalArgumentException.class)
+    public void should_throw_exception_string_when_time_interval_could_not_be_parsed() {
+        parser.parse(newHashSet(new TimeDomains(144, "[(Z11)(Q23)]")));
     }
 
     @Test
@@ -39,10 +33,15 @@ public class TimeDomainsParserTest {
 
     // DURATION
 
-    @Test
-    public void should_return_empty_string_when_time_duration_could_not_be_parsed() {
+    @Test(expected = IllegalArgumentException.class)
+    public void should_throw_exception_string_when_time_duration_could_not_be_parsed() {
+        parser.parse(newHashSet(new TimeDomains(144, "[(Z11){Q23}]")));
+    }
 
-        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[(Z11){Q23}]")));
+    @Test
+    public void should_return_empty_string_when_time_duration_has_z_mode() {
+
+        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[(z37){z87}]")));
 
         assertThat(openingHours).isEqualTo("");
     }

@@ -156,10 +156,10 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_add_oppening_hours_tag() {
-        TimeDomains domainetomtom = new TimeDomains(456, "domainetomtom");
-        TimeDomains domainetomtom2 = new TimeDomains(789, "domainetomtom2");
-        List<TimeDomains> timeDomains = newArrayList(domainetomtom, domainetomtom2);
+    public void should_add_opening_hours_tag() {
+        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
+        TimeDomains domainTomtom2 = new TimeDomains(789, "domainetomtom2");
+        List<TimeDomains> timeDomains = newArrayList(domainTomtom, domainTomtom2);
         when(tdDbf.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenReturn("10:00-14:00 off, 22:00-06:00 off");
         MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
@@ -167,5 +167,30 @@ public class RoadTaggerTest {
         Map<String, String> tags = tagger.tag(feature);
 
         assertThat(tags).containsEntry("opening_hours", "10:00-14:00 off, 22:00-06:00 off");
+    }
+
+    @Test
+    public void should_ignore_non_meaning_time_domain() {
+        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
+        List<TimeDomains> timeDomains = newArrayList(domainTomtom);
+        when(tdDbf.getTimeDomains(123)).thenReturn(timeDomains);
+        when(timeDomainsParser.parse(timeDomains)).thenReturn("");
+        MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
+
+        Map<String, String> tags = tagger.tag(feature);
+
+        assertThat(tags).doesNotContainKeys("opening_hours");
+    }
+    @Test
+    public void should_ignore_non_parsable_time_domain() {
+        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
+        List<TimeDomains> timeDomains = newArrayList(domainTomtom);
+        when(tdDbf.getTimeDomains(123)).thenReturn(timeDomains);
+        when(timeDomainsParser.parse(timeDomains)).thenThrow(new IllegalArgumentException("Test exception"));
+        MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
+
+        Map<String, String> tags = tagger.tag(feature);
+
+        assertThat(tags).doesNotContainKeys("opening_hours");
     }
 }
