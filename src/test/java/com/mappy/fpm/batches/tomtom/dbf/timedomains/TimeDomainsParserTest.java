@@ -14,6 +14,16 @@ public class TimeDomainsParserTest {
         parser.parse(newHashSet(new TimeDomains(144, "non-parsable")));
     }
 
+    @Test
+    public void should_translate_tomtom_time_domain_collection_to_osm_opening_hours_string(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(h6){h2}]");
+        TimeDomains tomtomTimesDomains2 = new TimeDomains(14420000000590L, "[(h12)(h22)]");
+
+        String openingHours = parser.parse(newHashSet(tomtomTimesDomains, tomtomTimesDomains2));
+
+        assertThat(openingHours).isEqualTo("06:00-08:00 off, 12:00-22:00 off");
+    }
+
     // INTERVAL
 
     @Test(expected = IllegalArgumentException.class)
@@ -78,15 +88,5 @@ public class TimeDomainsParserTest {
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
         assertThat(osmTimeDomain).isEqualTo("Oct-Feb off");
-    }
-
-    @Test
-    public void should_translate_tomtom_time_domain_collection_to_osm_opening_hours_string(){
-        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(h6){h2}]");
-        TimeDomains tomtomTimesDomains2 = new TimeDomains(14420000000590L, "[(h22){h8}]");
-
-        String openingHours = parser.parse(newHashSet(tomtomTimesDomains, tomtomTimesDomains2));
-
-        assertThat(openingHours).isEqualTo("06:00-08:00 off, 22:00-06:00 off");
     }
 }

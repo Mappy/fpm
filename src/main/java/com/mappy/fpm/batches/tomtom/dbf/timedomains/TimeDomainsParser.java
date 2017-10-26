@@ -68,7 +68,10 @@ public class TimeDomainsParser {
 
         Element begin = elements.getFirst();
         Element end = elements.getSecond();
-        if ("M".equals(begin.getMode()) && "M".equals(end.getMode())) {
+        if ("h".equals(begin.getMode()) && "h".equals(end.getMode())) {
+            return String.format("%02d:00-%02d:00 off", begin.getIndex(), end.getIndex());
+
+        } else if ("M".equals(begin.getMode()) && "M".equals(end.getMode())) {
             return String.format("%s-%s off", Month.values()[begin.getIndex() - 1], Month.values()[end.getIndex() - 1]);
         }
 
