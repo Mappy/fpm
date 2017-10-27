@@ -96,7 +96,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Su 00:00-01:00");
+        assertThat(osmTimeDomain).isEqualTo("Su 00:00-01:00 off");
     }
 
     @Test
@@ -105,7 +105,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Mo 05:00-06:00");
+        assertThat(osmTimeDomain).isEqualTo("Mo 05:00-06:00 off");
     }
 
     @Test
@@ -114,7 +114,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Mo,Fr 00:00-10:00");
+        assertThat(osmTimeDomain).isEqualTo("Mo,Fr 00:00-10:00 off");
     }
 
 }

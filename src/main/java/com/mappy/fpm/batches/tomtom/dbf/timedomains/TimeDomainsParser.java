@@ -82,7 +82,7 @@ public class TimeDomainsParser {
             beginHour = last.getIndex();
         }
 
-        return String.format("%s %02d:00-%02d:00", days, beginHour, (beginHour + duration.getIndex()) % 24);
+        return String.format("%s %02d:00-%02d:00 off", days, beginHour, (beginHour + duration.getIndex()) % 24);
     }
 
     private String getOpeningHoursFromInterval(Matcher matcher) {
