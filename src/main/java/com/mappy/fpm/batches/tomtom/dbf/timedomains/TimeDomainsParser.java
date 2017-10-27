@@ -106,8 +106,8 @@ public class TimeDomainsParser {
         try {
             return new Elements(parse(matcher.group(1)), parse(matcher.group(2)).get(0));
         } catch (Exception e) {
-            log.info("Error when parsing element={}", matcher);
-            throw new RuntimeException(e);
+            log.warn("Error when parsing element={}", matcher);
+            throw new RuntimeException("Error when parsing element=" + matcher, e);
         }
     }
 
