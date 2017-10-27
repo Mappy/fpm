@@ -11,15 +11,16 @@ import java.util.regex.Pattern;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.lang.Integer.valueOf;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
 
 @Slf4j
 public class TimeDomainsParser {
 
-    private static final Pattern DURATION_PATTERN = Pattern.compile("\\[\\((.*)\\)\\{(.*)\\}\\]");
-    private static final Pattern INTERVAL_PATTERN = Pattern.compile("\\[\\((.*)\\)\\((.*)\\)\\]");
+    private static final Pattern DURATION_PATTERN = Pattern.compile("^\\[\\((.*)\\)\\{(.*)\\}\\]");
+    private static final Pattern INTERVAL_PATTERN = Pattern.compile("^\\[\\((.*)\\)\\((.*)\\)\\]");
 
-    private static final Pattern BEGIN_PATTERN = Pattern.compile("(\\p{Alpha}\\d{1,2})");
+    private static final Pattern MOTIF_PATTERN = Pattern.compile("(\\p{Alpha}\\d{1,2})");
 
     private enum Month {
         Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
@@ -30,7 +31,9 @@ public class TimeDomainsParser {
     }
 
     public String parse(Collection<TimeDomains> tomtomTimesDomains) {
-        return tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
+        String result = tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
+//        log.info("Parsing time domain from {} to {}", tomtomTimesDomains, result);
+        return result;
     }
 
     private String parse(TimeDomains timeDomains) {
@@ -39,10 +42,10 @@ public class TimeDomainsParser {
         Matcher intervalMatcher = INTERVAL_PATTERN.matcher(timeDomains.getDomain());
 
         if (durationMatcher.find()) {
-            return getOpeningHoursFromDuration(durationMatcher);
+            return getOpeningHours(durationMatcher, true);
 
         } else if (intervalMatcher.find()) {
-            return getOpeningHoursFromInterval(intervalMatcher);
+            return getOpeningHours(intervalMatcher, false);
 
         } else {
             log.warn("Unable to parse '{}'", timeDomains.getDomain());
@@ -50,22 +53,17 @@ public class TimeDomainsParser {
         }
     }
 
-    private String getOpeningHoursFromDuration(Matcher matcher) {
+    private String getOpeningHours(Matcher matcher, boolean isDuration) {
 
-        Elements elements = parse(matcher);
+        Elements elements = new Elements(parse(matcher.group(1)), parse(matcher.group(2)));
 
         List<Element> begin = elements.getFirst();
         List<Element> duration = elements.getSecond();
-        if ("h".equals(begin.get(0).getMode()) && "h".equals(duration.get(0).getMode())) {
-            return generateWithHours(begin, duration);
 
-        } else if ("M".equals(begin.get(0).getMode()) && "M".equals(duration.get(0).getMode())) {
-            return String.format("%s-%s off", Month.values()[begin.get(0).getIndex() - 1], Month.values()[(begin.get(0).getIndex() + duration.get(0).getIndex() - 2) % 12]);
+        if (begin.stream().anyMatch(e -> newArrayList("h", "M", "t").contains(e.mode))) {
+            return generate(begin, duration, isDuration);
 
-        } else if ("t".equals(begin.get(0).getMode())) {
-            return generateWithWeekDay(begin, duration);
-
-        } else if ("z".equals(begin.get(0).getMode())) {
+        } else if (begin.stream().anyMatch(e -> newArrayList("z").contains(e.mode))) {
             return null;
         }
 
@@ -73,50 +71,41 @@ public class TimeDomainsParser {
         throw new IllegalArgumentException("Unable to parse duration " + matcher.group(0));
     }
 
-    private String generateWithHours(List<Element> begin, List<Element> duration) {
-        int beginMinute = begin.stream().filter(e -> "m".equals(e.getMode())).map(Element::getIndex).findFirst().orElse(0);
-        int durationMinute = duration.stream().filter(e -> "m".equals(e.getMode())).map(Element::getIndex).findFirst().orElse(0);
+    private String generate(List<Element> begin, List<Element> duration, boolean isDuration) {
+        int beginMonth = getIndex(begin, "M");
+        int durationMonth = getIndex(duration, "M");
 
-        return String.format("%02d:%02d-%02d:%02d off", begin.get(0).getIndex(), beginMinute, (begin.get(0).getIndex() + duration.get(0).getIndex()) % 24, beginMinute + durationMinute);
-    }
-
-    private String generateWithWeekDay(List<Element> begin, List<Element> duration) {
-        int beginHour = 0;
-        String days = begin.stream().filter(e -> "t".equals(e.mode)).map(e -> WeekDay.values()[e.index -1].name()).collect(joining(","));
-
-        Element last = begin.get(begin.size() - 1);
-        if ("h".equals(last.mode)) {
-            beginHour = last.getIndex();
+        String month = "";
+        if (beginMonth + durationMonth > 0) {
+            int endMonth = isDuration ? (beginMonth + durationMonth - 1) % 12 : durationMonth;
+            month = format("%s-%s", Month.values()[beginMonth - 1], Month.values()[endMonth - 1]);
         }
 
-        return String.format("%s %02d:00-%02d:00 off", days, beginHour, (beginHour + duration.get(0).getIndex()) % 24);
-    }
+        String days = begin.stream().filter(e -> "t".equals(e.mode)).map(e -> WeekDay.values()[e.index - 1].name()).collect(joining(","));
 
-    private String getOpeningHoursFromInterval(Matcher matcher) {
+        int beginHour = getIndex(begin, "h");
+        int beginMinute = getIndex(begin, "m");
 
-        Elements elements = parse(matcher);
-
-        List<Element> begin = elements.getFirst();
-        List<Element> end = elements.getSecond();
-        if ("h".equals(begin.get(0).getMode()) && "h".equals(end.get(0).getMode())) {
-            return String.format("%02d:00-%02d:00 off", begin.get(0).getIndex(), end.get(0).getIndex());
-
-        } else if ("M".equals(begin.get(0).getMode()) && "M".equals(end.get(0).getMode())) {
-            return String.format("%s-%s off", Month.values()[begin.get(0).getIndex() - 1], Month.values()[end.get(0).getIndex() - 1]);
+        int durationHour = getIndex(duration, "h");
+        int durationMinute = getIndex(duration, "m");
+        String hours = "";
+        if (beginHour + beginMinute + durationHour + durationMinute > 0) {
+            int endHour = isDuration ? (beginHour + durationHour) % 24 + (beginMinute + durationMinute >= 60 ? 1 : 0) : durationHour;
+            int endMinute = isDuration ? (beginMinute + durationMinute) % 60 : durationMinute;
+            hours = format("%02d:%02d-%02d:%02d", beginHour, beginMinute, endHour, endMinute);
         }
 
-        log.warn("Unable to parse interval {}", matcher.group(0));
-        throw new IllegalArgumentException("Unable to parse interval " + matcher.group(0));
+        return format("%s%s %s", month, days, hours).trim() + " off";
     }
 
-    private Elements parse(Matcher matcher) {
-        return new Elements(parse(matcher.group(1)), parse(matcher.group(2)));
+    private Integer getIndex(List<Element> begin, String mode) {
+        return begin.stream().filter(e -> mode.equals(e.mode)).map(Element::getIndex).findFirst().orElse(0);
     }
 
     private List<Element> parse(String group) {
         List<Element> list = newArrayList();
         try {
-            Matcher matcher = BEGIN_PATTERN.matcher(group);
+            Matcher matcher = MOTIF_PATTERN.matcher(group);
 
             int index = 0;
             while (matcher.find(index)) {

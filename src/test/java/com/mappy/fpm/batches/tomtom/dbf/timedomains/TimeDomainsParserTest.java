@@ -117,6 +117,15 @@ public class TimeDomainsParserTest {
     }
 
     @Test
+    public void should_translate_tomtom_weekday_hour_and_minutes_with_hour_duration_to_osm_opening_hours(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(t2h6m30){h6m30}])]");
+
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+
+        assertThat(osmTimeDomain).isEqualTo("Mo 06:30-13:00 off");
+    }
+
+    @Test
     public void should_translate_multiple_tomtom_weekday_and_hour_with_hour_duration_to_osm_opening_hours(){
         TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(t2t6){h10}]");
 
