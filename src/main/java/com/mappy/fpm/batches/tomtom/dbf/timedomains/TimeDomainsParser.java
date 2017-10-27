@@ -122,7 +122,8 @@ public class TimeDomainsParser {
             return list;
 
         } catch (NumberFormatException nfe) {
-            return list;
+            log.warn("Unable to parse {}", group);
+            throw new IllegalArgumentException("Unable to parse " + group);
         }
     }
 
