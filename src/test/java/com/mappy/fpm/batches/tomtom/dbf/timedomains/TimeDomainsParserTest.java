@@ -73,6 +73,14 @@ public class TimeDomainsParserTest {
     }
 
     @Test
+    public void should_translate_tomtom_hour_and_minutes_duration_to_osm_opening_hours(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(h14m15){h1m15}])]");
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+
+        assertThat(osmTimeDomain).isEqualTo("14:15-15:30 off");
+    }
+
+    @Test
     public void should_translate_tomtom_month_duration_to_osm_opening_hours(){
         TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(M3){M5}]");
 

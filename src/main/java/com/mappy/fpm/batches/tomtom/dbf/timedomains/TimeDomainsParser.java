@@ -55,12 +55,12 @@ public class TimeDomainsParser {
         Elements elements = parse(matcher);
 
         List<Element> begin = elements.getFirst();
-        Element duration = elements.getSecond();
-        if ("h".equals(begin.get(0).getMode()) && "h".equals(duration.getMode())) {
-            return String.format("%02d:00-%02d:00 off", begin.get(0).getIndex(), (begin.get(0).getIndex() + duration.getIndex()) % 24);
+        List<Element> duration = elements.getSecond();
+        if ("h".equals(begin.get(0).getMode()) && "h".equals(duration.get(0).getMode())) {
+            return generateWithHours(begin, duration);
 
-        } else if ("M".equals(begin.get(0).getMode()) && "M".equals(duration.getMode())) {
-            return String.format("%s-%s off", Month.values()[begin.get(0).getIndex() - 1], Month.values()[(begin.get(0).getIndex() + duration.getIndex() - 2) % 12]);
+        } else if ("M".equals(begin.get(0).getMode()) && "M".equals(duration.get(0).getMode())) {
+            return String.format("%s-%s off", Month.values()[begin.get(0).getIndex() - 1], Month.values()[(begin.get(0).getIndex() + duration.get(0).getIndex() - 2) % 12]);
 
         } else if ("t".equals(begin.get(0).getMode())) {
             return generateWithWeekDay(begin, duration);
@@ -73,7 +73,14 @@ public class TimeDomainsParser {
         throw new IllegalArgumentException("Unable to parse duration " + matcher.group(0));
     }
 
-    private String generateWithWeekDay(List<Element> begin, Element duration) {
+    private String generateWithHours(List<Element> begin, List<Element> duration) {
+        int beginMinute = begin.stream().filter(e -> "m".equals(e.getMode())).map(Element::getIndex).findFirst().orElse(0);
+        int durationMinute = duration.stream().filter(e -> "m".equals(e.getMode())).map(Element::getIndex).findFirst().orElse(0);
+
+        return String.format("%02d:%02d-%02d:%02d off", begin.get(0).getIndex(), beginMinute, (begin.get(0).getIndex() + duration.get(0).getIndex()) % 24, beginMinute + durationMinute);
+    }
+
+    private String generateWithWeekDay(List<Element> begin, List<Element> duration) {
         int beginHour = 0;
         String days = begin.stream().filter(e -> "t".equals(e.mode)).map(e -> WeekDay.values()[e.index -1].name()).collect(joining(","));
 
@@ -82,7 +89,7 @@ public class TimeDomainsParser {
             beginHour = last.getIndex();
         }
 
-        return String.format("%s %02d:00-%02d:00 off", days, beginHour, (beginHour + duration.getIndex()) % 24);
+        return String.format("%s %02d:00-%02d:00 off", days, beginHour, (beginHour + duration.get(0).getIndex()) % 24);
     }
 
     private String getOpeningHoursFromInterval(Matcher matcher) {
@@ -90,12 +97,12 @@ public class TimeDomainsParser {
         Elements elements = parse(matcher);
 
         List<Element> begin = elements.getFirst();
-        Element end = elements.getSecond();
-        if ("h".equals(begin.get(0).getMode()) && "h".equals(end.getMode())) {
-            return String.format("%02d:00-%02d:00 off", begin.get(0).getIndex(), end.getIndex());
+        List<Element> end = elements.getSecond();
+        if ("h".equals(begin.get(0).getMode()) && "h".equals(end.get(0).getMode())) {
+            return String.format("%02d:00-%02d:00 off", begin.get(0).getIndex(), end.get(0).getIndex());
 
-        } else if ("M".equals(begin.get(0).getMode()) && "M".equals(end.getMode())) {
-            return String.format("%s-%s off", Month.values()[begin.get(0).getIndex() - 1], Month.values()[end.getIndex() - 1]);
+        } else if ("M".equals(begin.get(0).getMode()) && "M".equals(end.get(0).getMode())) {
+            return String.format("%s-%s off", Month.values()[begin.get(0).getIndex() - 1], Month.values()[end.get(0).getIndex() - 1]);
         }
 
         log.warn("Unable to parse interval {}", matcher.group(0));
@@ -103,7 +110,7 @@ public class TimeDomainsParser {
     }
 
     private Elements parse(Matcher matcher) {
-        return new Elements(parse(matcher.group(1)), parse(matcher.group(2)).get(0));
+        return new Elements(parse(matcher.group(1)), parse(matcher.group(2)));
     }
 
     private List<Element> parse(String group) {
@@ -136,6 +143,6 @@ public class TimeDomainsParser {
     @Data
     private static class Elements {
         private final List<Element> first;
-        private final Element second;
+        private final List<Element> second;
     }
 }
