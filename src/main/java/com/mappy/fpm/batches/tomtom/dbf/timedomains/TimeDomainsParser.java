@@ -75,7 +75,7 @@ public class TimeDomainsParser {
 
     private String generateWithWeekDay(List<Element> begin, Element duration) {
         int beginHour = 0;
-        String days = begin.stream().filter(e -> "t".equals(e.mode)).map(e -> WeekDay.values()[e.index -1].name()).collect(joining(","));
+        String days = begin.stream().filter(e -> "t".equals(e.mode)).map(e -> WeekDay.values()[e.index - 1].name()).collect(joining(","));
 
         Element last = begin.get(begin.size() - 1);
         if ("h".equals(last.mode)) {
@@ -103,7 +103,12 @@ public class TimeDomainsParser {
     }
 
     private Elements parse(Matcher matcher) {
-        return new Elements(parse(matcher.group(1)), parse(matcher.group(2)).get(0));
+        try {
+            return new Elements(parse(matcher.group(1)), parse(matcher.group(2)).get(0));
+        } catch (Exception e) {
+            log.info("Error when parsing element={}", matcher);
+            throw new RuntimeException(e);
+        }
     }
 
     private List<Element> parse(String group) {
