@@ -11,7 +11,7 @@ public class TimeDomainsParserTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void should_throw_exception_when_time_domain_could_not_be_parsed() {
-        parser.parse(newHashSet(new TimeDomains(144, "non-parsable")));
+        parser.parse(newHashSet(new TimeDomains(144, "error")));
     }
 
     @Test
@@ -68,6 +68,22 @@ public class TimeDomainsParserTest {
     public void should_return_empty_string_when_time_duration_has_l_mode() {
 
         String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[(l12){d1}]")));
+
+        assertThat(openingHours).isEqualTo("");
+    }
+
+    @Test
+    public void should_return_empty_string_when_time_duration_has_multiple_compound() {
+
+        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[[(h12){m30}]*[(d1){d15}]*[(M7){M1}]]")));
+
+        assertThat(openingHours).isEqualTo("");
+    }
+
+    @Test
+    public void should_return_empty_string_when_time_duration_has_plus_sign() {
+
+        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[[(d12){d1}] + [(d13){d1}]]")));
 
         assertThat(openingHours).isEqualTo("");
     }

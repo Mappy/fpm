@@ -38,13 +38,17 @@ public class TimeDomainsParser {
             osmOpeningHours = "1970-9999; " + osmOpeningHours;
         }
 
+        log.info("Parse {} to {}", tomtomTimesDomains, osmOpeningHours);
         return osmOpeningHours;
     }
 
     private String parse(TimeDomains timeDomains) {
 
         String domain = timeDomains.getDomain();
-        if(!domain.matches("[Mdfzlhtm\\d{1,2}*\\[\\]\\(\\)\\{\\}]*")) {
+        if (domain.matches(".*[+zfl].*") || domain.split("\\*").length > 2) {
+            return "";
+
+        } else if(!domain.matches("[Mdhtm\\d{1,2}*\\[\\]\\(\\)\\{\\}]*")) {
             log.warn("Unable to parse unknown char '{}'", domain);
             throw new IllegalArgumentException("Unable to parse unknown char '" + domain + "'");
         }
@@ -82,9 +86,6 @@ public class TimeDomainsParser {
 
         if (begin.stream().anyMatch(e -> newArrayList("h", "M", "t").contains(e.mode))) {
             return generate(begin, second, isDuration);
-
-        } else if (begin.stream().anyMatch(e -> newArrayList("z", "f", "l").contains(e.mode))) {
-            return null;
         }
 
         String type = isDuration ? "duration" : "interval";
