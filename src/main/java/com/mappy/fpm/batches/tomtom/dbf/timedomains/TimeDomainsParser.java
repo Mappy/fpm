@@ -18,6 +18,7 @@ import static java.util.stream.Collectors.joining;
 public class TimeDomainsParser {
 
     private static final Pattern DURATION_PATTERN = Pattern.compile("^\\[\\((.*)\\)\\{(.*)\\}\\]");
+    private static final Pattern COMPOUND_DURATION_PATTERN = Pattern.compile("^\\[\\[\\((.*)\\)\\{(.*)\\}\\]\\*\\[\\((.*)\\)\\{(.*)\\}\\]\\]");
     private static final Pattern INTERVAL_PATTERN = Pattern.compile("^\\[\\((.*)\\)\\((.*)\\)\\]");
 
     private static final Pattern MOTIF_PATTERN = Pattern.compile("(\\p{Alpha}\\d{1,2})");
@@ -31,25 +32,35 @@ public class TimeDomainsParser {
     }
 
     public String parse(Collection<TimeDomains> tomtomTimesDomains) {
-        return tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
+        String osmOpeningHours = tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
+
+        if (!"".equals(osmOpeningHours)) {
+            osmOpeningHours = "1970-9999; " + osmOpeningHours;
+        }
+
+        return osmOpeningHours;
     }
 
     private String parse(TimeDomains timeDomains) {
 
         String domain = timeDomains.getDomain();
-        if(!domain.matches("[Mdzhtm\\d{1,2}\\[\\]\\(\\)\\{\\}]*")) {
+        if(!domain.matches("[Mdfzlhtm\\d{1,2}*\\[\\]\\(\\)\\{\\}]*")) {
             log.warn("Unable to parse unknown char '{}'", domain);
             throw new IllegalArgumentException("Unable to parse unknown char '" + domain + "'");
         }
 
         Matcher durationMatcher = DURATION_PATTERN.matcher(domain);
         Matcher intervalMatcher = INTERVAL_PATTERN.matcher(domain);
+        Matcher compoundDurationMatcher = COMPOUND_DURATION_PATTERN.matcher(domain);
 
         if (durationMatcher.find()) {
             return getOpeningHours(durationMatcher, true);
 
         } else if (intervalMatcher.find()) {
             return getOpeningHours(intervalMatcher, false);
+
+        } else if (compoundDurationMatcher.find()) {
+            return getOpeningHours(compoundDurationMatcher, true);
 
         } else {
             log.warn("Unable to parse '{}'", domain);
@@ -58,14 +69,21 @@ public class TimeDomainsParser {
     }
 
     private String getOpeningHours(Matcher matcher, boolean isDuration) {
+        String beginMatch = matcher.group(1);
+        String secondMatch = matcher.group(2);
 
-        List<Element> begin = parse(matcher.group(1));
-        List<Element> second = parse(matcher.group(2));
+        if (matcher.groupCount() == 4) {
+            beginMatch += matcher.group(3);
+            secondMatch += matcher.group(4);
+        }
+
+        List<Element> begin = parse(beginMatch);
+        List<Element> second = parse(secondMatch);
 
         if (begin.stream().anyMatch(e -> newArrayList("h", "M", "t").contains(e.mode))) {
             return generate(begin, second, isDuration);
 
-        } else if (begin.stream().anyMatch(e -> newArrayList("z").contains(e.mode))) {
+        } else if (begin.stream().anyMatch(e -> newArrayList("z", "f", "l").contains(e.mode))) {
             return null;
         }
 

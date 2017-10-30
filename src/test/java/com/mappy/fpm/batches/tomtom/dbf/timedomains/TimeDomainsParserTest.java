@@ -21,7 +21,7 @@ public class TimeDomainsParserTest {
 
         String openingHours = parser.parse(newHashSet(tomtomTimesDomains, tomtomTimesDomains2));
 
-        assertThat(openingHours).isEqualTo("06:00-08:00 off, 12:00-22:00 off");
+        assertThat(openingHours).isEqualTo("1970-9999; 06:00-08:00 off, 12:00-22:00 off");
     }
 
     // INTERVAL
@@ -37,7 +37,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Mar-May off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Mar-May off");
     }
 
 
@@ -57,11 +57,27 @@ public class TimeDomainsParserTest {
     }
 
     @Test
+    public void should_return_empty_string_when_time_duration_has_f_mode() {
+
+        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[(f12){d1}]")));
+
+        assertThat(openingHours).isEqualTo("");
+    }
+
+    @Test
+    public void should_return_empty_string_when_time_duration_has_l_mode() {
+
+        String openingHours = parser.parse(newHashSet(new TimeDomains(144, "[(l12){d1}]")));
+
+        assertThat(openingHours).isEqualTo("");
+    }
+
+    @Test
     public void should_translate_tomtom_hour_duration_to_osm_opening_hours(){
         TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(h6){h2}]");
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("06:00-08:00 off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; 06:00-08:00 off");
     }
 
     @Test
@@ -69,7 +85,7 @@ public class TimeDomainsParserTest {
         TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(h22){h8}]");
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("22:00-06:00 off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; 22:00-06:00 off");
     }
 
     @Test
@@ -77,7 +93,7 @@ public class TimeDomainsParserTest {
         TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(h14m15){h1m15}])]");
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("14:15-15:30 off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; 14:15-15:30 off");
     }
 
     @Test
@@ -86,7 +102,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Mar-Jul off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Mar-Jul off");
     }
 
     @Test
@@ -95,7 +111,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Oct-Feb off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Oct-Feb off");
     }
 
     @Test
@@ -104,7 +120,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Su 00:00-01:00 off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Su 00:00-01:00 off");
     }
 
     @Test
@@ -113,7 +129,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Mo 05:00-06:00 off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Mo 05:00-06:00 off");
     }
 
     @Test
@@ -122,7 +138,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Mo 06:30-13:00 off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Mo 06:30-13:00 off");
     }
 
     @Test
@@ -131,7 +147,15 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("Mo,Fr 00:00-10:00 off");
+         assertThat(osmTimeDomain).isEqualTo("1970-9999; Mo,Fr 00:00-10:00 off");
     }
 
+    @Test
+    public void should_translate_multiple_tomtom_months_and_hour_with_hour_duration_to_osm_opening_hours(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[[(h11m30){h1}]*[(M6){M2}]]");
+
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Jun-Jul 11:30-12:30 off");
+    }
 }
