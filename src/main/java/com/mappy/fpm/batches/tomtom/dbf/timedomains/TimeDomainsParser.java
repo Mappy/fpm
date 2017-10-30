@@ -31,15 +31,19 @@ public class TimeDomainsParser {
     }
 
     public String parse(Collection<TimeDomains> tomtomTimesDomains) {
-        String result = tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
-//        log.info("Parsing time domain from {} to {}", tomtomTimesDomains, result);
-        return result;
+        return tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
     }
 
     private String parse(TimeDomains timeDomains) {
 
-        Matcher durationMatcher = DURATION_PATTERN.matcher(timeDomains.getDomain());
-        Matcher intervalMatcher = INTERVAL_PATTERN.matcher(timeDomains.getDomain());
+        String domain = timeDomains.getDomain();
+        if(!domain.matches("[Mdzhtm\\d{1,2}\\[\\]\\(\\)\\{\\}]*")) {
+            log.warn("Unable to parse unknown char '{}'", domain);
+            throw new IllegalArgumentException("Unable to parse unknown char '" + domain + "'");
+        }
+
+        Matcher durationMatcher = DURATION_PATTERN.matcher(domain);
+        Matcher intervalMatcher = INTERVAL_PATTERN.matcher(domain);
 
         if (durationMatcher.find()) {
             return getOpeningHours(durationMatcher, true);
@@ -48,58 +52,57 @@ public class TimeDomainsParser {
             return getOpeningHours(intervalMatcher, false);
 
         } else {
-            log.warn("Unable to parse '{}'", timeDomains.getDomain());
-            throw new IllegalArgumentException("Unable to parse '" + timeDomains.getDomain() + "'");
+            log.warn("Unable to parse '{}'", domain);
+            throw new IllegalArgumentException("Unable to parse '" + domain + "'");
         }
     }
 
     private String getOpeningHours(Matcher matcher, boolean isDuration) {
 
-        Elements elements = new Elements(parse(matcher.group(1)), parse(matcher.group(2)));
-
-        List<Element> begin = elements.getFirst();
-        List<Element> duration = elements.getSecond();
+        List<Element> begin = parse(matcher.group(1));
+        List<Element> second = parse(matcher.group(2));
 
         if (begin.stream().anyMatch(e -> newArrayList("h", "M", "t").contains(e.mode))) {
-            return generate(begin, duration, isDuration);
+            return generate(begin, second, isDuration);
 
         } else if (begin.stream().anyMatch(e -> newArrayList("z").contains(e.mode))) {
             return null;
         }
 
-        log.warn("Unable to parse duration {}", matcher.group(0));
-        throw new IllegalArgumentException("Unable to parse duration " + matcher.group(0));
+        String type = isDuration ? "duration" : "interval";
+        log.warn("Unable to parse {} : {}", type, matcher.group(0));
+        throw new IllegalArgumentException("Unable to parse " + type + " : " + matcher.group(0));
     }
 
-    private String generate(List<Element> begin, List<Element> duration, boolean isDuration) {
-        int beginMonth = getIndex(begin, "M");
-        int durationMonth = getIndex(duration, "M");
+    private String generate(List<Element> begins, List<Element> seconds, boolean isDuration) {
+        int beginMonth = getIndex(begins, "M");
+        int secondMonth = getIndex(seconds, "M");
 
         String month = "";
-        if (beginMonth + durationMonth > 0) {
-            int endMonth = isDuration ? (beginMonth + durationMonth - 1) % 12 : durationMonth;
+        if (beginMonth + secondMonth > 0) {
+            int endMonth = isDuration ? (beginMonth + secondMonth - 1) % 12 : secondMonth;
             month = format("%s-%s", Month.values()[beginMonth - 1], Month.values()[endMonth - 1]);
         }
 
-        String days = begin.stream().filter(e -> "t".equals(e.mode)).map(e -> WeekDay.values()[e.index - 1].name()).collect(joining(","));
+        String days = begins.stream().filter(e -> "t".equals(e.mode)).map(e -> WeekDay.values()[e.index - 1].name()).collect(joining(","));
 
-        int beginHour = getIndex(begin, "h");
-        int beginMinute = getIndex(begin, "m");
+        int beginHour = getIndex(begins, "h");
+        int beginMinute = getIndex(begins, "m");
 
-        int durationHour = getIndex(duration, "h");
-        int durationMinute = getIndex(duration, "m");
+        int secondHour = getIndex(seconds, "h");
+        int secondMinute = getIndex(seconds, "m");
         String hours = "";
-        if (beginHour + beginMinute + durationHour + durationMinute > 0) {
-            int endHour = isDuration ? (beginHour + durationHour) % 24 + (beginMinute + durationMinute >= 60 ? 1 : 0) : durationHour;
-            int endMinute = isDuration ? (beginMinute + durationMinute) % 60 : durationMinute;
+        if (beginHour + beginMinute + secondHour + secondMinute > 0) {
+            int endHour = isDuration ? (beginHour + secondHour) % 24 + (beginMinute + secondMinute >= 60 ? 1 : 0) : secondHour;
+            int endMinute = isDuration ? (beginMinute + secondMinute) % 60 : secondMinute;
             hours = format("%02d:%02d-%02d:%02d", beginHour, beginMinute, endHour, endMinute);
         }
 
         return format("%s%s %s", month, days, hours).trim() + " off";
     }
 
-    private Integer getIndex(List<Element> begin, String mode) {
-        return begin.stream().filter(e -> mode.equals(e.mode)).map(Element::getIndex).findFirst().orElse(0);
+    private Integer getIndex(List<Element> elements, String mode) {
+        return elements.stream().filter(e -> mode.equals(e.mode)).map(Element::getIndex).findFirst().orElse(0);
     }
 
     private List<Element> parse(String group) {
@@ -127,11 +130,5 @@ public class TimeDomainsParser {
     private static class Element {
         private final String mode;
         private final int index;
-    }
-
-    @Data
-    private static class Elements {
-        private final List<Element> first;
-        private final List<Element> second;
     }
 }
