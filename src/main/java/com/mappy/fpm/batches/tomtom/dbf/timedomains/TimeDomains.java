@@ -4,7 +4,6 @@ import com.google.common.collect.Ordering;
 import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 
-
 @Data
 public class TimeDomains implements Comparable<TimeDomains>{
 
