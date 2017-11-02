@@ -83,13 +83,7 @@ public class TimeDomainsParser {
         List<Element> begin = parse(beginMatch);
         List<Element> second = parse(secondMatch);
 
-        if (begin.stream().anyMatch(e -> newArrayList("h", "M", "t").contains(e.mode))) {
-            return generate(begin, second, isDuration);
-        }
-
-        String type = isDuration ? "duration" : "interval";
-        log.warn("Unable to parse {} : {}", type, matcher.group(0));
-        throw new IllegalArgumentException("Unable to parse " + type + " : " + matcher.group(0));
+        return generate(begin, second, isDuration);
     }
 
     private String generate(List<Element> begins, List<Element> seconds, boolean isDuration) {
@@ -125,23 +119,17 @@ public class TimeDomainsParser {
 
     private List<Element> parse(String group) {
         List<Element> list = newArrayList();
-        try {
-            Matcher matcher = MOTIF_PATTERN.matcher(group);
+        Matcher matcher = MOTIF_PATTERN.matcher(group);
 
-            int index = 0;
-            while (matcher.find(index)) {
-                String firstBegin = matcher.group(1);
-                Element element = new Element(firstBegin.substring(0, 1), valueOf(firstBegin.substring(1, firstBegin.length())));
-                list.add(element);
-                index += firstBegin.length();
-            }
-
-            return list;
-
-        } catch (NumberFormatException nfe) {
-            log.warn("Unable to parse {}", group);
-            throw new IllegalArgumentException("Unable to parse " + group);
+        int index = 0;
+        while (matcher.find(index)) {
+            String firstBegin = matcher.group(1);
+            Element element = new Element(firstBegin.substring(0, 1), valueOf(firstBegin.substring(1, firstBegin.length())));
+            list.add(element);
+            index += firstBegin.length();
         }
+
+        return list;
     }
 
     @Data
