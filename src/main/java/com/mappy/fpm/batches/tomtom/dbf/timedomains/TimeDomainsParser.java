@@ -38,7 +38,6 @@ public class TimeDomainsParser {
             osmOpeningHours = "1970-9999; " + osmOpeningHours;
         }
 
-        log.info("Parse {} to {}", tomtomTimesDomains, osmOpeningHours);
         return osmOpeningHours;
     }
 
