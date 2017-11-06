@@ -124,7 +124,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("1970-9999; Mar-Jul off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Mar-Aug off");
     }
 
     @Test
@@ -133,7 +133,7 @@ public class TimeDomainsParserTest {
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("1970-9999; Oct-Feb off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Oct-Mar off");
     }
 
     @Test
@@ -173,11 +173,20 @@ public class TimeDomainsParserTest {
     }
 
     @Test
-    public void should_translate_multiple_months_and_hour_with_hour_duration(){
-        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[[(h11m30){h1}]*[(M6){M2}]]");
+    public void should_translate_multiple_months_and_hours_with_month_and_hour_duration(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[[(h11m30){h1}]*[(M11){M1}]]");
 
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
 
-        assertThat(osmTimeDomain).isEqualTo("1970-9999; Jun-Jul 11:30-12:30 off");
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Nov-Dec 11:30-12:30 off");
+    }
+
+    @Test
+    public void should_translate_multiple_months_hour_and_weekdays_with_month_and_hour_duration(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[[(t2t3t4t5t6h7){h3}]*[(M11){M5}]]");
+
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+
+        assertThat(osmTimeDomain).isEqualTo("1970-9999; Nov-Apr Mo,Tu,We,Th,Fr 07:00-10:00 off");
     }
 }

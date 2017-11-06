@@ -91,8 +91,10 @@ public class TimeDomainsParser {
         int secondMonth = getIndex(seconds, "M");
 
         String month = "";
-        if (beginMonth + secondMonth > 0) {
-            int endMonth = isDuration ? (beginMonth + secondMonth - 1) % 12 : secondMonth;
+        int sumMonth = beginMonth + secondMonth;
+        if (sumMonth > 0) {
+            sumMonth = sumMonth > 12 ? sumMonth % 12 : sumMonth;
+            int endMonth = isDuration ? sumMonth : secondMonth;
             month = format("%s-%s", Month.values()[beginMonth - 1], Month.values()[endMonth - 1]);
         }
 
@@ -110,7 +112,7 @@ public class TimeDomainsParser {
             hours = format("%02d:%02d-%02d:%02d", beginHour, beginMinute, endHour, endMinute);
         }
 
-        return format("%s%s %s", month, days, hours).trim() + " off";
+        return format("%s %s %s off", month, days, hours).trim().replaceAll("\\s+", " ");
     }
 
     private Integer getIndex(List<Element> elements, String mode) {
