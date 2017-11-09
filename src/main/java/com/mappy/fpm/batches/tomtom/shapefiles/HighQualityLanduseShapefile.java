@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
-import com.google.common.collect.ImmutableMap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.utils.Feature;
@@ -9,9 +8,11 @@ import com.mappy.fpm.batches.utils.GeometrySerializer;
 import javax.inject.Inject;
 import java.util.Map;
 
+import static com.google.common.collect.Maps.newHashMap;
+
 public class HighQualityLanduseShapefile extends TomtomShapefile {
     private static final int PARK = 23;
-    private static final int GREEEN_URBAN_AREA = 14;
+    private static final int GREEN_URBAN_AREA = 14;
     private static final int GRASS = 13;
     private static final int FOREST = 10;
 
@@ -23,22 +24,29 @@ public class HighQualityLanduseShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer geometrySerializer, Feature feature) {
         Map<String, String> tags = tags(feature.getInteger("BLOCKCLASS"));
-        if (tags != null) {
+        if (!tags.isEmpty()) {
+            tags.put("source", "Tomtom - Citymap");
             geometrySerializer.write(feature.getMultiPolygon(), tags);
         }
     }
 
     private static Map<String, String> tags(Integer blockclass) {
+
+        Map<String, String> result = newHashMap();
         switch (blockclass) {
             case FOREST:
-                return ImmutableMap.of("landuse", "forest");
+                result.put("landuse", "forest");
+                break;
             case GRASS:
-                return ImmutableMap.of("landuse", "grass");
-            case GREEEN_URBAN_AREA:
-                return ImmutableMap.of("landuse", "grass");
+                result.put("landuse", "grass");
+                break;
+            case GREEN_URBAN_AREA:
+                result.put("landuse", "grass");
+                break;
             case PARK:
-                return ImmutableMap.of("leisure", "park");
+                result.put("leisure", "park");
+                break;
         }
-        return null;
+        return result;
     }
 }
