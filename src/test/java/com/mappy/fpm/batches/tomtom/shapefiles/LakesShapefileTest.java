@@ -17,5 +17,4 @@ public class LakesShapefileTest {
 
         assertThat(serializer.getMultipolygons()).extracting(m -> m.get("landuse")).containsOnly("grass").hasSize(10);
     }
-
 }
