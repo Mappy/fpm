@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Optional.ofNullable;
 
 public class BuiltUpShapefile extends BoundariesShapefile {
     private final TownTagger townTagger;
@@ -38,7 +39,6 @@ public class BuiltUpShapefile extends BoundariesShapefile {
         if (new File(folder.getFile("bu.shp")).exists()) {
             nameProvider.loadFromCityFile("smnm.dbf");
         }
-
     }
 
     @Override
@@ -47,8 +47,7 @@ public class BuiltUpShapefile extends BoundariesShapefile {
 
         if (cityCenter != null) {
             tags.putAll(of("name", cityCenter.getName(), "landuse", "residential"));
-            Optional<String> postcode = Optional.ofNullable(cityCenter.getPostcode());
-            postcode.ifPresent(code -> tags.put("addr:postcode", code));
+            ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
             switch (cityCenter.getCitytyp()) {
@@ -77,7 +76,6 @@ public class BuiltUpShapefile extends BoundariesShapefile {
         super.serialize(serializer, feature);
     }
 
-
     @Override
     protected void finishRelation(GeometrySerializer serializer, Map<String, String> adminTags, List<RelationMember> members, Feature feature) {
         if (cityCenter != null) {
@@ -98,6 +96,4 @@ public class BuiltUpShapefile extends BoundariesShapefile {
         tags.put("landuse", "residential");
         tags.put("layer", "10");
     }
-
-
 }

@@ -43,8 +43,7 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
             Map<String, String> tags = newHashMap();
 
             tags.put("name", cityCenter.getName());
-            Optional<String> postcode = Optional.ofNullable(cityCenter.getPostcode());
-            postcode.ifPresent(code -> tags.put("addr:postcode", code));
+            ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
 
             switch (cityCenter.getAdminclass()) {
                 case 0:
@@ -79,8 +78,7 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
                     break;
             }
 
-            Optional<Long> population = ofNullable(feature.getLong("POP"));
-            population.ifPresent(pop -> tags.put("population", String.valueOf(pop)));
+            ofNullable(feature.getLong("POP")).ifPresent(pop -> tags.put("population", String.valueOf(pop)));
             adminTags.putAll(tags);
 
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
@@ -91,7 +89,6 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
             }
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
             node.ifPresent(adminCenter -> members.add(new RelationMember(adminCenter.getId(), Node, "admin_center")));
-
         }
 
         serializer.writeRelation(members, adminTags);

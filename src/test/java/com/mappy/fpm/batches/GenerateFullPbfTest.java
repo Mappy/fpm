@@ -17,6 +17,11 @@ public class GenerateFullPbfTest {
     private final OsmMerger osmMerger = Mockito.spy(new OsmMerger());
     private final GenerateFullPbf generateFullPbf = new GenerateFullPbf(osmMerger, "src/test/resources/generateFullPbf", "target", "Europe.osm.pbf", 1);
 
+    @Test(expected = IllegalArgumentException.class)
+    public void should_throw_IllegalArgumentException_when_country_is_unknown() throws Exception {
+        generateFullPbf.run(newArrayList("fakeCountry"));
+    }
+
     @Test
     @Ignore
     public void should_generate_luxembourg() throws Exception {

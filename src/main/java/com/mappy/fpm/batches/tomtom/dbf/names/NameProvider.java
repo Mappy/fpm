@@ -40,7 +40,7 @@ public class NameProvider {
     private void readFile(String filename, String alternativeParamName, boolean hasSideName, Map<Long, List<AlternativeName>> alternateCityNames) {
         File file = new File(folder.getFile(filename));
         if (file.exists()) {
-            log.info("Opening {}", file);
+            log.info("Reading {}", file);
             try (DbfReader reader = new DbfReader(file)) {
                 DbfRow row;
                 Stopwatch stopwatch = Stopwatch.createStarted();

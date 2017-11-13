@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Optional.ofNullable;
 
 public class BoundariesA9Shapefile extends BoundariesShapefile {
 
@@ -41,8 +42,7 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
             Map<String, String> tags = newHashMap();
 
             tags.put("name", cityCenter.getName());
-            Optional<String> postcode = Optional.ofNullable(cityCenter.getPostcode());
-            postcode.ifPresent(code -> tags.put("addr:postcode", code));
+            ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
             switch (cityCenter.getAdminclass()) {
