@@ -4,12 +4,12 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import lombok.extern.slf4j.Slf4j;
-import org.jamel.dbf.DbfReader;
-import org.jamel.dbf.structure.DbfRow;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.util.Collection;
+
+import static org.jamel.dbf.processor.DbfProcessor.processDbf;
 
 @Slf4j
 public class TdDbf {
@@ -25,20 +25,20 @@ public class TdDbf {
         return timeDomainsMap.get(id);
     }
 
-    private static Multimap<Long, TimeDomains> loadTimeDomains(String filename) {
+    private Multimap<Long, TimeDomains> loadTimeDomains(String filename) {
         Multimap<Long, TimeDomains> times = TreeMultimap.create();
         File file = new File(filename);
         if (!file.exists()) {
+            log.info("File not found : {}", file.getAbsolutePath());
             return times;
         }
+
         log.info("Reading TD {}", file);
-        try (DbfReader reader = new DbfReader(file)) {
-            DbfRow row;
-            while ((row = reader.nextRow()) != null) {
-                TimeDomains restriction = new TimeDomains(row.getLong("ID"), row.getString("TIMEDOM"));
-                times.put(restriction.getId(), restriction);
-            }
-        }
+        processDbf(file, row -> {
+            TimeDomains restriction = new TimeDomains(((Double)row[0]).longValue(), new String((byte[]) row[3]).trim());
+            times.put(restriction.getId(), restriction);
+        });
+
         log.info("Loaded {} times domains", times.size());
 
         return times;

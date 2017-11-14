@@ -2,10 +2,9 @@ package com.mappy.fpm.batches.tomtom.dbf.maneuvers;
 
 import lombok.Data;
 
-import com.mappy.fpm.batches.utils.Feature;
-
 @Data
 public class Maneuver {
+
     private final Long junctionId;
     private final Long id;
     private final Integer featType;
@@ -15,10 +14,10 @@ public class Maneuver {
         return featType == 2101 || featType == 2103;
     }
 
-    public static Maneuver fromFeature(Feature feature) {
+    public static Maneuver fromFeature(Object[] entry) {
         return new Maneuver(
-                feature.getLong("JNCTID"),
-                feature.getLong("ID"),
-                feature.getInteger("FEATTYP"));
+                ((Double) entry[4]).longValue(),
+                ((Double) entry[0]).longValue(),
+                ((Double) entry[1]).intValue());
     }
 }

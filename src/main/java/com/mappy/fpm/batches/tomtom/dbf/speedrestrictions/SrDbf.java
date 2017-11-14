@@ -25,6 +25,7 @@ public class SrDbf {
         ArrayListMultimap<Long, SpeedRestriction> restrictions = ArrayListMultimap.create();
         File file = new File(filename);
         if (!file.exists()) {
+            log.info("File not found : {}", file.getAbsolutePath());
             return restrictions;
         }
         log.info("Reading SR {}", file);
