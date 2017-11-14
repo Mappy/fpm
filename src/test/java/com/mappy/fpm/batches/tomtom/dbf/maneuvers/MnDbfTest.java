@@ -5,8 +5,9 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MnShapefileTest {
-    private final MnShapefile mn = new MnShapefile(new TomtomFolder("src/test/resources/osmgenerator/", "andand"));
+public class MnDbfTest {
+
+    private final MnDbf mn = new MnDbf(new TomtomFolder("src/test/resources/osmgenerator/", "andand"));
 
     @Test
     public void should_load_maneuvers() {
@@ -18,7 +19,7 @@ public class MnShapefileTest {
 
     @Test
     public void should_not_fail_when_no_mn_file_exists() throws Exception {
-        MnShapefile mn = new MnShapefile(new TomtomFolder("src/test/resources/osmgenerator/", "other_country"));
+        MnDbf mn = new MnDbf(new TomtomFolder("src/test/resources/osmgenerator/", "other_country"));
 
         assertThat(mn.maneuvers()).isEmpty();
     }

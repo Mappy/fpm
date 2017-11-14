@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Inject;
 import java.util.Map;
 
+import static com.google.common.collect.ImmutableMap.of;
+import static java.lang.String.valueOf;
+
 @Slf4j
 public class TollTagger {
 
@@ -19,15 +22,15 @@ public class TollTagger {
     }
 
     public Map<String, String> tag(long id) {
-        return tollReader.tollForTomtomId(id).map(TollTagger::tags).orElse(ImmutableMap.of());
+        return tollReader.tollForTomtomId(id).map(TollTagger::tags).orElse(of());
     }
 
     private static ImmutableMap<String, String> tags(Toll t) {
-        return ImmutableMap.of( //
+        return of( //
                 "toll", "yes", //
                 "toll:name", t.getName(), //
-                "ref:mappy", t.getId(), //
-                "ref:asfa:1", t.getTollcode1(), //
-                "ref:asfa:2", t.getTollcode2());
+                "ref:mappy", valueOf(t.getId()), //
+                "ref:asfa:1", t.getTollCode1(), //
+                "ref:asfa:2", t.getTollCode2());
     }
 }

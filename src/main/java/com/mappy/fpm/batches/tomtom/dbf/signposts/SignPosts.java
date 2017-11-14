@@ -48,10 +48,10 @@ public class SignPosts {
     public SignPosts(TomtomFolder folder) {
         si = siFile(folder);
         sp = spFile(folder);
+        sg = sgFile(folder);
         lastWayOfPath = extractLastWay(sp);
         waysWithSign = regroupPerWays(sp);
         ways = nwFile(folder);
-        sg = sgFile(folder);
     }
 
     public Map<String, String> getTags(long tomtomId, boolean oneWay, Long fromJunctionId, Long toJunctionId) {
@@ -172,7 +172,7 @@ public class SignPosts {
         if (!file.exists()) {
             return signs;
         }
-        log.info("Reading SI file {}", file);
+        log.info("Reading SI {}", file);
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
@@ -192,7 +192,7 @@ public class SignPosts {
         if (!file.exists()) {
             return result;
         }
-        log.info("Reading SP file {}", file);
+        log.info("Reading SP {}", file);
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
@@ -231,7 +231,7 @@ public class SignPosts {
             return speeds;
         }
 
-        log.info("Reading SG File {}", file);
+        log.info("Reading SG {}", file);
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
@@ -249,14 +249,14 @@ public class SignPosts {
             return speeds;
         }
 
-        log.info("Reading SG File {}", file);
+        log.info("Reading NW {}", file);
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
                 speeds.put(row.getLong("ID"), new SignWay(row.getLong("ID"), row.getLong("F_JNCTID"), row.getLong("T_JNCTID")));
             }
         }
-        log.info("Loaded {} Sign posts junctions", speeds.size());
+        log.info("Loaded {} road segment", speeds.size());
         return speeds;
     }
 

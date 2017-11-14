@@ -7,13 +7,13 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class LaneDirectionsTest {
+public class LdDbfTest {
     private final TomtomFolder folder = mock(TomtomFolder.class);
 
     @Test
     public void should_parse_ld_file() throws Exception {
         when(folder.getFile("ld.dbf")).thenReturn(getClass().getResource("/tomtom/ld.dbf").getPath());
-        LaneDirections directions = new LaneDirections(folder);
+        LdDbf directions = new LdDbf(folder);
 
         assertThat(directions.containsKey(12500001779461L)).isTrue();
         assertThat(directions.containsKey(123L)).isFalse();

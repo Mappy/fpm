@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 public class ManeuversTest {
     private final MpDbf mp = mock(MpDbf.class);
-    private final MnShapefile mn = mock(MnShapefile.class);
+    private final MnDbf mn = mock(MnDbf.class);
 
     @Test
     public void should_generate_restricting_maneuver() {

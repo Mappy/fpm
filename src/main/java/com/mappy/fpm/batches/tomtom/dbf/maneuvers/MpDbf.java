@@ -12,6 +12,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 @Slf4j
 public class MpDbf {
+
     private final TomtomFolder folder;
 
     @Inject
@@ -24,7 +25,7 @@ public class MpDbf {
         if (!mpFile.exists()) {
             return newArrayList();
         }
-        log.info("Reading MP file {}", mpFile);
+        log.info("Reading MP {}", mpFile);
         List<ManeuverPath> paths = newArrayList();
         DbfProcessor.processDbf(mpFile, row -> {
             ManeuverPath path = ManeuverPath.fromDbf(row);

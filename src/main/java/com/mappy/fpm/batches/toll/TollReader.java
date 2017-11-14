@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.toll;
 
-import com.google.common.base.Charsets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
@@ -15,8 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
+import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
@@ -26,46 +25,33 @@ import static java.util.Optional.ofNullable;
 public class TollReader {
 
     private final Map<Long, Toll> tollsByTomtomId;
-    private final TomtomFolder tomtomFolder;
 
     @Inject
     public TollReader(TomtomFolder tomtomFolder) {
-        this.tomtomFolder = tomtomFolder;
-        tollsByTomtomId = tollsByTomtomId();
+        tollsByTomtomId = read(tomtomFolder.getTollsFile());
     }
 
     public Optional<Toll> tollForTomtomId(Long id) {
         return ofNullable(tollsByTomtomId.get(id));
     }
 
-    private Map<Long, Toll> tollsByTomtomId() {
-        return read(json -> {
-            try {
-                return json.getLong("tomtomId");
-            }
-            catch (JSONException e) {
-                throw propagate(e);
-            }
-        });
-    }
-
-    private <T> Map<T, Toll> read(Function<JSONObject, T> fun) {
+    private Map<Long, Toll> read(String tollsFile) {
         try {
-            Map<T, Toll> tolls = newHashMap();
+            Map<Long, Toll> tolls = newHashMap();
 
-            File file = new File(tomtomFolder.getTollsFile());
+            File file = new File(tollsFile);
 
             if (file.exists()) {
-                JSONArray array = new JSONArray(IOUtils.toString(file.toURI(), Charsets.UTF_8));
+                JSONArray array = new JSONArray(IOUtils.toString(file.toURI(), UTF_8));
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject json = array.getJSONObject(i);
-                    T apply = fun.apply(json);
-                    if (apply != null) {
-                        tolls.put(apply, new Toll(String.valueOf(json.getInt("id")), json.getString("name"), json.getString("tollcode1"), json.optString("tollcode2")));
-                    }
+                    tolls.put(json.getLong("tomtomId"), new Toll(json.getInt("id"), json.getString("name"), json.getString("tollcode1"), json.optString("tollcode2")));
                 }
+
+                log.info("Loaded {} tolls", tolls.size());
+
             } else {
-                log.info("No tolls file was found at {}", file.getAbsolutePath());
+                log.info("File not found : {}", file.getAbsolutePath());
             }
 
             return tolls;
@@ -77,9 +63,9 @@ public class TollReader {
 
     @Data
     public static class Toll {
-        private final String id;
+        private final Integer id;
         private final String name;
-        private final String tollcode1;
-        private final String tollcode2;
+        private final String tollCode1;
+        private final String tollCode2;
     }
 }

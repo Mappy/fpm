@@ -25,6 +25,7 @@ import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 @Slf4j
 @Singleton
 public class RestrictionsAccumulator {
+
     private final Maneuvers maneuvers;
     private final Map<Long, Long> wayByTomtomId = new Long2LongAVLTreeMap();
     private final Map<Long, Long> nodeByJunctionId = new Long2LongAVLTreeMap();

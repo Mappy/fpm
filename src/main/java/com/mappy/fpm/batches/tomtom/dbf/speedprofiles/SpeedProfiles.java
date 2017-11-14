@@ -1,44 +1,53 @@
 package com.mappy.fpm.batches.tomtom.dbf.speedprofiles;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.Speed.PrecomputeSpeedProfile;
 import com.mappy.fpm.batches.utils.Feature;
 
-import java.util.Collections;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Collections.min;
+import static java.util.Optional.ofNullable;
+
 public class SpeedProfiles {
-    private final HspnDbf hspnDbf;
+
+    private static final String TAG_PREFIX = "mappy_sp_";
+
+    private final HsnpDbf hsnpDbf;
     private final HsprDbf hsprDbf;
 
     @Inject
-    public SpeedProfiles(HspnDbf hspnDbf, HsprDbf hsprDbf) {
-        this.hspnDbf = hspnDbf;
+    public SpeedProfiles(HsnpDbf hsnpDbf, HsprDbf hsprDbf) {
+        this.hsnpDbf = hsnpDbf;
         this.hsprDbf = hsprDbf;
     }
 
-    public Map<String, String> extracted(Feature feature) {
-        Map<String, String> result = Maps.newHashMap();
-        for (Speed speed : hspnDbf.getById(feature.getLong("ID"))) {
-            speed.getFreeFlow().ifPresent(value -> result.put("mappy_sp_" + speed.direction() + "_" + "freeflow", value.toString()));
-            speed.getWeekDay().ifPresent(value -> result.put("mappy_sp_" + speed.direction() + "_" + "weekday", value.toString()));
-            speed.getWeekend().ifPresent(value -> result.put("mappy_sp_" + speed.direction() + "_" + "weekend", value.toString()));
-            speed.getWeek().ifPresent(value -> result.put("mappy_sp_" + speed.direction() + "_" + "week", value.toString()));
-            List<Double> mins = Lists.newArrayList();
-            for (int i = 0; i < speed.getProfiles().length; i++) {
-                PrecomputeSpeedProfile profile = hsprDbf.getProfileById(speed.getProfiles()[i]);
+    public Map<String, String> getTags(Feature feature) {
+        Map<String, String> tags = newHashMap();
+
+        for (Speed speed : hsnpDbf.getById(feature.getLong("ID"))) {
+
+            ofNullable(speed.getFreeFlow()).ifPresent(value -> tags.put(TAG_PREFIX + speed.direction() + "_freeflow", value.toString()));
+            ofNullable(speed.getWeekDay()).ifPresent(value -> tags.put(TAG_PREFIX + speed.direction() + "_weekday", value.toString()));
+            ofNullable(speed.getWeekend()).ifPresent(value -> tags.put(TAG_PREFIX + speed.direction() + "_weekend", value.toString()));
+            ofNullable(speed.getWeek()).ifPresent(value -> tags.put(TAG_PREFIX + speed.direction() + "_week", value.toString()));
+
+            List<Double> mins = newArrayList();
+            for (int i = 0; i < speed.getProfiles().size(); i++) {
+                PrecomputeSpeedProfile profile = hsprDbf.getProfileById(speed.getProfiles().get(i));
                 if (profile != null) {
-                    result.put("mappy_sp_" + speed.direction() + "_" + "profile" + (i + 1), profile.getProfile());
+                    tags.put(TAG_PREFIX + speed.direction() + "_profile" + (i + 1), profile.getProfile());
                     mins.add(profile.getMin());
                 }
             }
             if (!mins.isEmpty()) {
-                result.put("mappy_sp_" + speed.direction() + "_" + "min_speed_pct_freeflow", String.valueOf(Collections.min(mins)));
+                tags.put(TAG_PREFIX + speed.direction() + "_min_speed_pct_freeflow", String.valueOf(min(mins)));
             }
         }
-        return result;
+
+        return tags;
     }
 }

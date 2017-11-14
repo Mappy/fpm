@@ -3,7 +3,6 @@ package com.mappy.fpm.batches.tomtom.dbf.speedprofiles;
 import com.google.common.collect.TreeMultimap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.Speed.PrecomputeSpeedProfile;
-import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfile.TimeSlotSpeed;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
@@ -11,16 +10,17 @@ import org.jamel.dbf.structure.DbfRow;
 import javax.inject.Inject;
 import java.io.File;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 
 @Slf4j
 public class HsprDbf {
+
     private final Map<Integer, PrecomputeSpeedProfile> profiles;
 
     @Inject
@@ -35,14 +35,16 @@ public class HsprDbf {
     private static Map<Integer, PrecomputeSpeedProfile> loadSpeedProfiles(String filename) {
         File file = new File(filename);
         if (!file.exists()) {
+            log.info("File not found : {}", file.getAbsolutePath());
             return newHashMap();
         }
-        log.info("Reading HSPR {}", file);
+
         TreeMultimap<Integer, SpeedProfile> profilesMap = TreeMultimap.create();
+        log.info("Reading HSPR {}", file);
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
-                SpeedProfile profile = new SpeedProfile(row.getInt("PROFILE_ID"), new TimeSlotSpeed(row.getInt("TIME_SLOT"), row.getDouble("REL_SP")));
+                SpeedProfile profile = new SpeedProfile(row.getInt("PROFILE_ID"), row.getInt("TIME_SLOT"), row.getDouble("REL_SP"));
                 profilesMap.put(profile.getId(), profile);
             }
         }
@@ -55,13 +57,12 @@ public class HsprDbf {
         return new PrecomputeSpeedProfile(profile(speeds), min(speeds));
     }
 
-    private static String profile(Collection<SpeedProfile> speeds) {
-        return speeds.stream().findFirst().get().getId() + ":"
-                + speeds.stream().map(timeSlotSpeed -> String.valueOf((int) (100 - timeSlotSpeed.getTimeSlotSpeed().getRelSpeed()))).collect(joining("_"));
+    private static String profile(Collection<SpeedProfile> speedProfiles) {
+        return speedProfiles.stream().findFirst().get().getId() + ":"
+                + speedProfiles.stream().map(speedProfile -> String.valueOf((int) (100 - speedProfile.getRelSpeed()))).collect(joining("_"));
     }
 
-    private static Double min(Collection<SpeedProfile> speeds) {
-        return speeds.stream().map(sp -> sp.getTimeSlotSpeed().getRelSpeed()).min(Comparator.naturalOrder()).orElse(0.0);
+    private static Double min(Collection<SpeedProfile> speedProfiles) {
+        return speedProfiles.stream().map(SpeedProfile::getRelSpeed).min(naturalOrder()).orElse(0.0);
     }
-
 }

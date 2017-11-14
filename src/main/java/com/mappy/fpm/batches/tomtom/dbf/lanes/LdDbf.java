@@ -17,11 +17,12 @@ import static com.google.common.collect.Maps.newHashMap;
 import static java.util.stream.Collectors.joining;
 
 @Slf4j
-public class LaneDirections {
+public class LdDbf {
+
     private final Map<Long, List<String>> tags;
 
     @Inject
-    public LaneDirections(TomtomFolder folder) {
+    public LdDbf(TomtomFolder folder) {
         tags = ldFile(folder);
     }
 
@@ -39,7 +40,7 @@ public class LaneDirections {
             return newHashMap();
         }
         ArrayListMultimap<Long, LaneDirection> directions = ArrayListMultimap.create();
-        log.info("Reading LD file {}", file);
+        log.info("Reading LD {}", file);
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {

@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
-import com.google.common.collect.Maps;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
@@ -18,6 +17,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.helpers.Fow.*;
 import static com.mappy.fpm.batches.tomtom.helpers.Freeway.PART_OF_FREEWAY;
 
@@ -32,30 +32,33 @@ public class RoadTagger {
     private static final String BICYCLE = "bicycle";
     private static final String SERVICE = "service";
     private static final int ROAD_ELEMENT = 4110;
+
     private final SpeedProfiles speedProfiles;
     private final NameProvider nameProvider;
     private final SignPosts signPosts;
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
-    private final TimeDomainsParser timeDomainsParser;
+    private final TollTagger tolls;
     private final TdDbf tdDbf;
+    private final TimeDomainsParser timeDomainsParser;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, NameProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction, TdDbf tdDbf, TimeDomainsParser timeDomainsParser
+                      SpeedRestrictionTagger speedRestriction, TollTagger tolls, TdDbf tdDbf, TimeDomainsParser timeDomainsParser
     ) {
         this.speedProfiles = speedProfiles;
         this.nameProvider = nameProvider;
         this.signPosts = signPosts;
         this.lanes = lanes;
-        this.tdDbf = tdDbf;
         this.speedRestriction = speedRestriction;
+        this.tolls = tolls;
+        this.tdDbf = tdDbf;
         this.timeDomainsParser = timeDomainsParser;
         this.nameProvider.loadFromFile("gc.dbf", "FULLNAME", true);
     }
 
     public Map<String, String> tag(Feature feature) {
-        Map<String, String> tags = Maps.newHashMap();
+        Map<String, String> tags = newHashMap();
 
         Long id = feature.getLong("ID");
         tags.put("ref:tomtom", String.valueOf(id));
@@ -67,6 +70,9 @@ public class RoadTagger {
         addTagIf("ref", feature.getString("SHIELDNUM"), feature.getString("SHIELDNUM") != null, tags);
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("oneway", "yes", isOneway(feature), tags);
+
+        tags.putAll(tolls.tag(id));
+
         Collection<TimeDomains> timeDomains = tdDbf.getTimeDomains(id);
         addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
         if (timeDomains != null && !timeDomains.isEmpty()){
@@ -80,7 +86,7 @@ public class RoadTagger {
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
         if (!tags.containsValue("ferry")) {
-            tags.putAll(speedProfiles.extracted(feature));
+            tags.putAll(speedProfiles.getTags(feature));
             tags.putAll(speedRestriction.tag(feature));
             tags.putAll(highwayType(feature));
             tags.putAll(lanes.lanesFor(feature));
@@ -115,7 +121,7 @@ public class RoadTagger {
     }
 
     public static Map<String, String> level(Feature feature) {
-        Map<String, String> tags = Maps.newHashMap();
+        Map<String, String> tags = newHashMap();
         Integer fElev = feature.getInteger("F_ELEV");
         Integer tElev = feature.getInteger("T_ELEV");
 
@@ -138,7 +144,7 @@ public class RoadTagger {
     }
 
     private Map<String, String> highwayType(Feature feature) {
-        Map<String, String> tags = Maps.newHashMap();
+        Map<String, String> tags = newHashMap();
         Integer feattype = feature.getInteger("FEATTYP");
         if (feattype != null && feattype == ROAD_ELEMENT) {
             Integer fow = feature.getInteger("FOW");

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ManeuversIT {
     private final Maneuvers provider = new Maneuvers(new MpDbf(new TomtomFolder("src/test/resources/osmgenerator/", "andand")),
-            new MnShapefile(new TomtomFolder("src/test/resources/osmgenerator/", "andand")));
+            new MnDbf(new TomtomFolder("src/test/resources/osmgenerator/", "andand")));
 
     @Test
     public void should_generate_restricting_maneuver() {

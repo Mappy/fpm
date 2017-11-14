@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class LaneTaggerTest {
-    private final LaneDirections directions = mock(LaneDirections.class);
+    private final LdDbf directions = mock(LdDbf.class);
     private final LaneTagger tagger = new LaneTagger(directions);
 
     @Test

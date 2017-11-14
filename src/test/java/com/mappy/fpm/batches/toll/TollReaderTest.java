@@ -56,6 +56,6 @@ public class TollReaderTest {
 
         TollReader tollReader = new TollReader(tomtomFolder);
 
-        assertThat(tollReader.tollForTomtomId(12500001097987L)).isEqualTo(of(new Toll("1", "Péage d'Aigrefeuille", "4556", "4557")));
+        assertThat(tollReader.tollForTomtomId(12500001097987L)).isEqualTo(of(new Toll(1, "Péage d'Aigrefeuille", "4556", "4557")));
     }
 }

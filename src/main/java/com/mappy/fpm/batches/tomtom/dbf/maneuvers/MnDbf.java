@@ -11,11 +11,12 @@ import java.util.List;
 import static com.google.common.collect.Lists.newArrayList;
 
 @Slf4j
-public class MnShapefile {
+public class MnDbf {
+
     private final TomtomFolder folder;
 
     @Inject
-    public MnShapefile(TomtomFolder folder) {
+    public MnDbf(TomtomFolder folder) {
         this.folder = folder;
     }
 
@@ -25,7 +26,7 @@ public class MnShapefile {
         if (!mnFile.exists()) {
             return maneuvers;
         }
-        log.info("Reading MP file {}", mnFile.getAbsolutePath());
+        log.info("Reading MN {}", mnFile.getAbsolutePath());
         try (ShapefileIterator iterator = new ShapefileIterator(mnFile)) {
             while (iterator.hasNext()) {
                 Maneuver maneuver = Maneuver.fromFeature(iterator.next());

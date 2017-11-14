@@ -34,11 +34,12 @@ public class RoadTaggerTest {
     private final LaneTagger lanes = mock(LaneTagger.class);
     private final TdDbf tdDbf = mock(TdDbf.class);
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, names, signPosts, lanes, speedRestrictionTagger, tdDbf, timeDomainsParser);
+    private final TollTagger tollTagger = mock(TollTagger.class);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, names, signPosts, lanes, speedRestrictionTagger, tollTagger, tdDbf, timeDomainsParser);
 
     @Before
     public void setup() {
-        when(speedProfiles.extracted(any(MemoryFeature.class))).thenReturn(newHashMap());
+        when(speedProfiles.getTags(any(MemoryFeature.class))).thenReturn(newHashMap());
     }
 
     @Test
