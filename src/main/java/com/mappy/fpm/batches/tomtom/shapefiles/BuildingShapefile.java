@@ -11,6 +11,7 @@ import java.util.Map;
 import static com.google.common.collect.Maps.newHashMap;
 
 public class BuildingShapefile extends TomtomShapefile {
+
     @Inject
     public BuildingShapefile(TomtomFolder folder) {
         super(folder.getFile("2dbd.shp"));
@@ -19,6 +20,8 @@ public class BuildingShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer geometrySerializer, Feature feature) {
         Map<String, String> tags = newHashMap();
+
+        tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
 
         switch (feature.getInteger("BUILDCLASS")) {
             case 1:
