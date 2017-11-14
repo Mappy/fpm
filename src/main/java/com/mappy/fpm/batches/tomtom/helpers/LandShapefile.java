@@ -2,9 +2,11 @@ package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
-import com.mappy.fpm.batches.utils.*;
+import com.mappy.fpm.batches.utils.Feature;
+import com.mappy.fpm.batches.utils.GeometrySerializer;
 
-import java.util.*;
+import java.io.File;
+import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
 
@@ -15,25 +17,29 @@ public class LandShapefile extends TomtomShapefile {
     protected LandShapefile(NameProvider nameProvider, String filename) {
         super(filename);
         this.nameProvider = nameProvider;
-        this.nameProvider.loadFromFile("lxnm.dbf", "NAME", false);
+        if (new File(filename).exists()) {
+            this.nameProvider.loadFromFile("lxnm.dbf", "NAME", false);
+        }
     }
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
-        Integer feattype = feature.getInteger("FEATTYP");
-        if (7110 != feattype) {
-            Map<String, String> tags = completeTags(feature);
-            tags.putAll(nameProvider.getAlternateNames(feature.getLong("ID")));
-            serializer.write(feature.getMultiPolygon(), tags);
+        if (7110 != feature.getInteger("FEATTYP")) {
+            serializer.write(feature.getMultiPolygon(), completeTags(feature));
         }
     }
 
-    private static Map<String, String> completeTags(Feature feature) {
+    private Map<String, String> completeTags(Feature feature) {
         Map<String, String> tags = newHashMap();
+
+        tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
+
         String name = feature.getString("NAME");
         if (name != null) {
             tags.put("name", name);
         }
+        tags.putAll(nameProvider.getAlternateNames(feature.getLong("ID")));
+
         switch (feature.getInteger("FEATTYP")) {
             case 3110: // Built-up area
                 tags.put("landuse", "residential");

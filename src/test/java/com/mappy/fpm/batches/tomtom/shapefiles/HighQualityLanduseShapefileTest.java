@@ -27,16 +27,16 @@ public class HighQualityLanduseShapefileTest extends AbstractTest {
     public static void loadPbf() throws Exception {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
-        when(tomtomFolder.getFile("2dtb.shp")).thenReturn("src/test/resources/tomtom/landuse/paris_2dtb.shp");
+        when(tomtomFolder.getFile("2dtb.shp")).thenReturn("src/test/resources/tomtom/landuse/2dtb.shp");
 
         HighQualityLanduseShapefile shapefile = new HighQualityLanduseShapefile(tomtomFolder);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/paris.osm.pbf", "Test_TU");
+        GeometrySerializer serializer = new OsmosisSerializer("target/tests/2dtb.osm.pbf", "Test_TU");
 
         shapefile.serialize(serializer);
         serializer.close();
 
-        pbfContent = read(new File("target/tests/paris.osm.pbf"));
+        pbfContent = read(new File("target/tests/2dtb.osm.pbf"));
     }
 
     @Test
