@@ -8,6 +8,7 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.*;
 
 public class LakesShapefileTest {
+
     private final MemoryGeometrySerializer serializer = new MemoryGeometrySerializer();
     private final HighQualityLanduseShapefile shp = new HighQualityLanduseShapefile(new TomtomFolder(getClass().getResource("/osmgenerator/").getPath(), "citylights"));
 

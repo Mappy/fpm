@@ -1,7 +1,7 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
 import com.mappy.fpm.batches.AbstractTest;
-import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
+import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
@@ -27,8 +27,7 @@ import static org.mockito.Mockito.when;
 
 public class BuiltUpShapefileTest extends AbstractTest{
 
-    private static Tomtom2OsmTestUtils.PbfContent pbfContent;
-
+    private static PbfContent pbfContent;
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -63,7 +62,6 @@ public class BuiltUpShapefileTest extends AbstractTest{
 
         pbfContent = read(new File("target/tests/rougnat.osm.pbf"));
         assertThat(pbfContent.getRelations()).hasSize(4);
-
     }
 
     @Test
@@ -107,5 +105,4 @@ public class BuiltUpShapefileTest extends AbstractTest{
         assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("12500001063055", "12500001060481", "12500001067545", "12500001060737");
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Rougnat", "Auzances", "La Chaux-Bourdue", "Le Montely");
     }
-
 }

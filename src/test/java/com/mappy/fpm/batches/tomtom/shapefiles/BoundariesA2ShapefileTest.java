@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 public class BoundariesA2ShapefileTest extends AbstractTest {
 
-    public static PbfContent pbfContent;
+    private static PbfContent pbfContent;
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -125,5 +125,4 @@ public class BoundariesA2ShapefileTest extends AbstractTest {
         Relation vlaams = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000821")).findFirst().get();
         assertThat(vlaams.getMembers().stream().filter(relationMember -> relationMember.getRole().equals("outer")).collect(toList())).isNotEmpty();
     }
-
 }

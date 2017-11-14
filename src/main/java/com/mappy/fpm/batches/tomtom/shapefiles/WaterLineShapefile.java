@@ -42,6 +42,7 @@ public class WaterLineShapefile extends TomtomShapefile {
                 break;
         }
         tags.put("natural", "water");
+        tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
         tags.putAll(nameProvider.getAlternateNames(feature.getLong("ID")));
         geometrySerializer.write(feature.getMultiLineString(), tags);
     }

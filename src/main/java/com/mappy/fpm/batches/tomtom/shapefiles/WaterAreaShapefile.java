@@ -21,7 +21,7 @@ public class WaterAreaShapefile extends TomtomShapefile {
     private final NameProvider nameProvider;
 
     @Inject
-    public WaterAreaShapefile(NameProvider nameProvider, TomtomFolder folder) {
+    public WaterAreaShapefile(TomtomFolder folder, NameProvider nameProvider) {
         super(folder.getFile("wa.shp"));
         this.nameProvider = nameProvider;
         if(new File(folder.getFile("wa.shp")).exists()) {
@@ -43,6 +43,7 @@ public class WaterAreaShapefile extends TomtomShapefile {
             }
         }
         tags.put("natural", "water");
+        tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
         for (Geometry geometry : LargePolygonSplitter.split(feature.getMultiPolygon(), 0.01)) {
             write(serializer, tags, geometry);
         }
@@ -59,5 +60,4 @@ public class WaterAreaShapefile extends TomtomShapefile {
             throw new RuntimeException("Wrong type");
         }
     }
-
 }

@@ -1,14 +1,13 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
 import com.mappy.fpm.batches.AbstractTest;
-import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils;
+import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Entity;
-import net.morbz.osmonaut.osm.Relation;
 import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 public class Boundaries0A07ShapefileTest extends AbstractTest {
 
-    private static Tomtom2OsmTestUtils.PbfContent pbfContent;
+    private static PbfContent pbfContent;
 
     @BeforeClass
     public static void setup() throws Exception {
@@ -52,7 +51,6 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
 
         pbfContent = read(new File("target/tests/aquitaine.osm.pbf"));
     }
-
 
     @Test
     public void should_have_relations_with_all_tags() {
@@ -85,7 +83,6 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
         assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("7");
     }
 
-
     @Test
     public void should_have_relation_with_role_label_and_tag_name() throws Exception {
 
@@ -100,6 +97,4 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Limoges", "Angoulême", "Tulle", "Guéret", "Poitiers", "Niort", "La Rochelle");
         assertThat(tags).extracting(t -> t.get("name:en")).containsOnly(null, null, null, null, "Potter", null, null);
     }
-
-
 }

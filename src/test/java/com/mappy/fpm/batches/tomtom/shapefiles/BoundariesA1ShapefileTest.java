@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 public class BoundariesA1ShapefileTest extends AbstractTest {
 
-    public static PbfContent pbfContent;
+    private static PbfContent pbfContent;
 
     @BeforeClass
     public static void setup() throws Exception {
