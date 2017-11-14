@@ -1,7 +1,6 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.ImmutableMap;
-import com.mappy.fpm.batches.tomtom.TomtomStats;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
@@ -27,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class RoadTaggerTest {
+
     private final SpeedProfiles speedProfiles = mock(SpeedProfiles.class);
     private final SpeedRestrictionTagger speedRestrictionTagger = mock(SpeedRestrictionTagger.class);
     private final NameProvider names = mock(NameProvider.class);
@@ -34,7 +34,7 @@ public class RoadTaggerTest {
     private final LaneTagger lanes = mock(LaneTagger.class);
     private final TdDbf tdDbf = mock(TdDbf.class);
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, mock(TomtomStats.class), names, signPosts, lanes, speedRestrictionTagger, tdDbf, timeDomainsParser);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, names, signPosts, lanes, speedRestrictionTagger, tdDbf, timeDomainsParser);
 
     @Before
     public void setup() {

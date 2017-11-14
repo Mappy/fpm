@@ -1,7 +1,6 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.Maps;
-import com.mappy.fpm.batches.tomtom.TomtomStats;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
@@ -34,7 +33,6 @@ public class RoadTagger {
     private static final String SERVICE = "service";
     private static final int ROAD_ELEMENT = 4110;
     private final SpeedProfiles speedProfiles;
-    private final TomtomStats stats;
     private final NameProvider nameProvider;
     private final SignPosts signPosts;
     private final LaneTagger lanes;
@@ -43,11 +41,10 @@ public class RoadTagger {
     private final TdDbf tdDbf;
 
     @Inject
-    public RoadTagger(SpeedProfiles speedProfiles, TomtomStats tomtomStats, NameProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
+    public RoadTagger(SpeedProfiles speedProfiles, NameProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
                       SpeedRestrictionTagger speedRestriction, TdDbf tdDbf, TimeDomainsParser timeDomainsParser
     ) {
         this.speedProfiles = speedProfiles;
-        this.stats = tomtomStats;
         this.nameProvider = nameProvider;
         this.signPosts = signPosts;
         this.lanes = lanes;
@@ -58,7 +55,6 @@ public class RoadTagger {
     }
 
     public Map<String, String> tag(Feature feature) {
-        stats.increment("totalRoads");
         Map<String, String> tags = Maps.newHashMap();
 
         Long id = feature.getLong("ID");
@@ -112,7 +108,7 @@ public class RoadTagger {
         }
     }
 
-    public static void addTagIf(String key, Supplier<String> toExecute, boolean condition, Map<String, String> tags) {
+    private static void addTagIf(String key, Supplier<String> toExecute, boolean condition, Map<String, String> tags) {
         if (condition) {
             tags.put(key, toExecute.get());
         }
@@ -149,17 +145,13 @@ public class RoadTagger {
             Integer frc = feature.getInteger("FRC");
             if (PEDESTRIAN.is(fow)) {
                 tags.put(HIGHWAY, "pedestrian");
-                stats.increment("highway_pedestrian");
             } else if (STAIRS.is(fow)) {
                 tags.put(HIGHWAY, "steps");
-                stats.increment("highway_steps");
             } else if (WALKWAY.is(fow)) {
                 tags.put(HIGHWAY, "footway");
-                stats.increment("highway_footway");
             } else if (PARKING_PLACE.is(fow) || ENTRANCE_EXIT_CAR_PARK.is(fow)) {
                 tags.put(HIGHWAY, "service");
                 tags.put(SERVICE, "parking_aisle");
-                stats.increment("parking");
             } else if (frc != null) {
                 boolean isFreeway = PART_OF_FREEWAY.is(feature.getInteger("FREEWAY"));
                 tags.put(HIGHWAY, functionalRoadClass(frc, SLIP_ROAD.is(fow), isFreeway));
@@ -175,35 +167,28 @@ public class RoadTagger {
     private String functionalRoadClass(int frc, boolean link, boolean isFreeway) {
         switch (Frc.valueOf(frc)) {
             case MAJOR_ROAD:
-                stats.increment("highway_motorway");
                 return link ? "motorway_link" : "motorway";
 
             case LESS_THAN_MOTORWAY:
                 if (isFreeway) {
-                    stats.increment("highway_trunk");
                     return link ? "trunk_link" : "trunk";
                 } else {
-                    stats.increment("highway_primary");
                     return link ? "primary_link" : "primary";
                 }
 
             case OTHER_MAJOR_ROAD:
-                stats.increment("highway_primary");
                 return link ? "primary_link" : "primary";
 
             case SECONDARY_ROAD:
             case LOCAL_CONNECTING_ROAD:
             case LOCAL_ROAD_OF_HIGH_IMPORTANCE:
-                stats.increment("highway_secondary");
                 return link ? "secondary_link" : "secondary";
 
             case LOCAL_ROAD:
             case LOCAL_ROAD_OF_MINOR_IMPORTANCE:
-                stats.increment("highway_residential");
                 return link ? "tertiary_link" : "residential";
 
             default:
-                stats.increment("highway_unclassified");
                 return link ? "tertiary_link" : "unclassified";
         }
     }
