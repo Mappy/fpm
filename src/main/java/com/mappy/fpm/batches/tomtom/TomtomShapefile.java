@@ -1,20 +1,26 @@
 package com.mappy.fpm.batches.tomtom;
 
-import lombok.extern.slf4j.Slf4j;
-
 import com.google.common.base.Stopwatch;
-import com.mappy.fpm.batches.utils.Feature;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.ShapefileIterator;
+import com.mappy.fpm.batches.utils.*;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
-import static java.util.concurrent.TimeUnit.*;
+import static com.mappy.fpm.batches.GenerateFullPbf.OSM_SUFFIX;
+import static java.io.File.separator;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Slf4j
+@Getter
 public abstract class TomtomShapefile {
 
     private final String filename;
+    private String outputFile;
 
     protected TomtomShapefile(String filename) {
         this.filename = filename;
@@ -33,6 +39,13 @@ public abstract class TomtomShapefile {
                 }
                 log(counter, stopwatch.elapsed(MILLISECONDS));
                 complete(serializer);
+
+            } finally {
+                try {
+                    serializer.close();
+                } catch (IOException e) {
+                    log.error("Unable to correctly close serializer.");
+                }
             }
         }
         else {
@@ -43,6 +56,13 @@ public abstract class TomtomShapefile {
     private static void log(int counter, long time) {
         log.info("Added {} object(s){}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
     }
+
+    public final OsmosisSerializer getSerializer(String outputDirectory) throws FileNotFoundException {
+        outputFile = outputDirectory + separator + getOutputFileName() + OSM_SUFFIX;
+        return new OsmosisSerializer(new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(outputFile), false)), "Tomtom", DateTime.now().toDate());
+    }
+
+    public abstract String getOutputFileName();
 
     public abstract void serialize(GeometrySerializer serializer, Feature feature);
 

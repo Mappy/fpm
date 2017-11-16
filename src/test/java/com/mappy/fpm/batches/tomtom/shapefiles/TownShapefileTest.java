@@ -4,12 +4,10 @@ import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Node;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.File;
 
@@ -23,7 +21,7 @@ import static org.mockito.Mockito.*;
 public class TownShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
-    private GeometrySerializer serializer;
+    private OsmosisSerializer serializer;
 
     @Before
     public void setup() throws Exception {
@@ -37,13 +35,12 @@ public class TownShapefileTest extends AbstractTest {
         when(nameProvider.getAlternateCityNames(10560000407632L)) //
                 .thenReturn(of("name", "Scherdemaal", "name:nl", "neighbourhood", "name:fr", "quartier"));
 
-        TownShapefile townShapefile = new TownShapefile(tomtomFolder, nameProvider);
-        serializer = Mockito.spy(new OsmosisSerializer("target/tests/AnderlechtSM.osm.pbf", "Test_TU"));
+        TownShapefile shapefile = new TownShapefile(tomtomFolder, nameProvider);
 
-        townShapefile.serialize(serializer);
-        serializer.close();
+        serializer = spy(shapefile.getSerializer("target/tests/"));
+        shapefile.serialize(serializer);
 
-        pbfContent = read(new File("target/tests/AnderlechtSM.osm.pbf"));
+        pbfContent = read(new File("target/tests/sm.osm.pbf"));
     }
 
     @Test

@@ -35,6 +35,11 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
     }
 
     @Override
+    public String getOutputFileName() {
+        return "a8";
+    }
+
+    @Override
     public void finishRelation(GeometrySerializer serializer, Map<String, String> adminTags, List<RelationMember> members, Feature feature) {
 
         Centroid cityCenter = townTagger.get(feature.getLong("CITYCENTER"));

@@ -25,7 +25,7 @@ import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 
-public class BoundariesShapefile extends TomtomShapefile {
+public abstract class BoundariesShapefile extends TomtomShapefile {
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private final String osmLevel;

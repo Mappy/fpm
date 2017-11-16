@@ -4,8 +4,6 @@ import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Tags;
 import net.morbz.osmonaut.osm.Way;
 import org.junit.BeforeClass;
@@ -36,10 +34,7 @@ public class WaterAreaShapefileTest extends AbstractTest {
 
         verify(nameProvider).loadFromFile("wxnm.dbf", "NAME", false);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/wa.osm.pbf", "Test_TU");
-
-        shapefile.serialize(serializer);
-        serializer.close();
+        shapefile.serialize(shapefile.getSerializer("target/tests/"));
 
         pbfContent = read(new File("target/tests/wa.osm.pbf"));
     }

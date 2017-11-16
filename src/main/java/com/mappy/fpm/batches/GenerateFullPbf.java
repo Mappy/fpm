@@ -25,7 +25,7 @@ import static java.util.stream.Stream.of;
 
 @Slf4j
 public class GenerateFullPbf {
-    private static final String OSM_PBF_SUFFIX = ".osm.pbf";
+    public static final String OSM_SUFFIX = ".osm.pbf";
     private static final String TOWN_SUFFIX = "_2dbd.shp";
     private static final String COUNTRY_SUFFIX = "______________a0.shp";
     private static final String FERRY_SUFFIX = "___________fe.shp";
@@ -93,13 +93,13 @@ public class GenerateFullPbf {
 
             String zone = zoneFileName.replace(TOWN_SUFFIX, "").replace(ROAD_SUFFIX, "").replace(FERRY_SUFFIX, "").replace(COUNTRY_SUFFIX, "");
 
-            String pbfFolderName = outputDirectoryPath + "/" + country + "/pbfFiles";
-            File pbfFolder = new File(pbfFolderName);
-            if (!pbfFolder.exists()) {
-                pbfFolder.mkdirs();
-            }
+            Tomtom2Osm instance = createInjector(new Tomtom2OsmModule(
+                    inputDirectoryPath + "/" + country + "/",
+                    outputDirectoryPath + "/" + country + "/pbfFiles",
+                    outputDirectoryPath + "/splitter",
+                    zone)
+            ).getInstance(Tomtom2Osm.class);
 
-            Tomtom2Osm instance = createInjector(new Tomtom2OsmModule(inputDirectoryPath + "/" + country + "/", pbfFolderName, outputDirectoryPath + "/splitter", zone)).getInstance(Tomtom2Osm.class);
             Future<?> zoneFuture = executorService.submit(() -> {
                 try {
                     zonePbfFiles.add(instance.run());
@@ -110,7 +110,7 @@ public class GenerateFullPbf {
             zonesFutures.add(zoneFuture);
         }
 
-        String countryFile = outputDirectoryPath + "/" + country + "/" + country + OSM_PBF_SUFFIX;
+        String countryFile = outputDirectoryPath + "/" + country + "/" + country + OSM_SUFFIX;
         mergePbfFiles(zonePbfFiles, countryFile, zonesFutures);
 
         log.info("Done generating country : {}", country);

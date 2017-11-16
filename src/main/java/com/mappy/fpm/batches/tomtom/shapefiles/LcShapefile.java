@@ -12,4 +12,9 @@ public class LcShapefile extends LandShapefile {
     public LcShapefile(TomtomFolder folder, NameProvider nameProvider) {
         super(nameProvider, folder.getFile("lc.shp"));
     }
+
+    @Override
+    public String getOutputFileName() {
+        return "lc";
+    }
 }

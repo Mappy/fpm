@@ -26,7 +26,12 @@ public class WaterLineShapefile extends TomtomShapefile {
     }
 
     @Override
-    public void serialize(GeometrySerializer geometrySerializer, Feature feature) {
+    public String getOutputFileName() {
+        return "wl";
+    }
+
+    @Override
+    public void serialize(GeometrySerializer serializer, Feature feature) {
         Map<String, String> tags = newHashMap();
         String name = feature.getString("NAME");
         if (name != null) {
@@ -44,6 +49,6 @@ public class WaterLineShapefile extends TomtomShapefile {
         tags.put("natural", "water");
         tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
         tags.putAll(nameProvider.getAlternateNames(feature.getLong("ID")));
-        geometrySerializer.write(feature.getMultiLineString(), tags);
+        serializer.write(feature.getMultiLineString(), tags);
     }
 }

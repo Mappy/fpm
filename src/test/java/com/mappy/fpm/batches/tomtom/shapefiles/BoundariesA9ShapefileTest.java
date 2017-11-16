@@ -6,8 +6,6 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
@@ -33,6 +31,9 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
     @BeforeClass
     public static void setup() throws Exception {
 
+        TomtomFolder tomtomFolder = mock(TomtomFolder.class);
+        when(tomtomFolder.getFile("a9.shp")).thenReturn("src/test/resources/tomtom/boundaries/a9/Ranst___________a9.shp");
+
         NameProvider nameProvider = mock(NameProvider.class);
 
         when(nameProvider.getAlternateNames(10560000000077L)) //
@@ -53,9 +54,6 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
         when(nameProvider.getAlternateCityNames(10560000571768L)) //
                 .thenReturn(of("name", "Oelegem", "name:nl", "OelegemCNL", "name:fr", "OelegemCFR"));
 
-        TomtomFolder tomtomFolder = mock(TomtomFolder.class);
-        when(tomtomFolder.getFile("a9.shp")).thenReturn("src/test/resources/tomtom/boundaries/a9/Ranst___________a9.shp");
-
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("Ranst", "9")).thenReturn("9");
 
@@ -75,11 +73,10 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
         when(townTagger.get(10560000571768L)).thenReturn(new TownTagger.Centroid(10560000571768L, "Oelegem", "1011", 8, 1, 8, point4));
 
         BoundariesA9Shapefile shapefile = new BoundariesA9Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/Ranst.osm.pbf", "Test_TU");
-        shapefile.serialize(serializer);
-        serializer.close();
 
-        pbfContent = read(new File("target/tests/Ranst.osm.pbf"));
+        shapefile.serialize(shapefile.getSerializer("target/tests/"));
+
+        pbfContent = read(new File("target/tests/a9.osm.pbf"));
         assertThat(pbfContent.getRelations()).hasSize(4);
     }
 

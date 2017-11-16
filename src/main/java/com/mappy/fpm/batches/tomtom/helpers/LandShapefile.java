@@ -10,7 +10,7 @@ import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
 
-public class LandShapefile extends TomtomShapefile {
+public abstract class LandShapefile extends TomtomShapefile {
 
     private final NameProvider nameProvider;
 

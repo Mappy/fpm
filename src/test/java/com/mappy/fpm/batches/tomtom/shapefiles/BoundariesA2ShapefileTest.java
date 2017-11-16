@@ -4,8 +4,6 @@ import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Relation;
 import net.morbz.osmonaut.osm.RelationMember;
 import org.junit.BeforeClass;
@@ -13,10 +11,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.util.stream.Collectors.toList;
@@ -31,25 +27,20 @@ public class BoundariesA2ShapefileTest extends AbstractTest {
     @BeforeClass
     public static void setup() throws Exception {
 
-        NameProvider nameProvider = mock(NameProvider.class);
-        Map<String, String> names = newHashMap();
-        names.putAll(of("name", "Limburg"));
-        when(nameProvider.getAlternateNames(10560000000838L)).thenReturn(names);
-
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___a2.shp")).thenReturn("src/test/resources/tomtom/boundaries/a2/belbe2___________a2.shp");
+
+        NameProvider nameProvider = mock(NameProvider.class);
+        when(nameProvider.getAlternateNames(10560000000838L)).thenReturn(of("name", "Limburg"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("belbe2", "2")).thenReturn("6");
 
         BoundariesA2Shapefile shapefile = new BoundariesA2Shapefile(tomtomFolder, nameProvider, osmLevelGenerator);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/belbe2A2.osm.pbf", "Test_TU");
+        shapefile.serialize(shapefile.getSerializer("target/tests/"));
 
-        shapefile.serialize(serializer);
-        serializer.close();
-
-        pbfContent = read(new File("target/tests/belbe2A2.osm.pbf"));
+        pbfContent = read(new File("target/tests/a2.osm.pbf"));
     }
 
     @Test

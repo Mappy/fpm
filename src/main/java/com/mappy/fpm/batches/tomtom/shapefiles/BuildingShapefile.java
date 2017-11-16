@@ -18,7 +18,12 @@ public class BuildingShapefile extends TomtomShapefile {
     }
 
     @Override
-    public void serialize(GeometrySerializer geometrySerializer, Feature feature) {
+    public String getOutputFileName() {
+        return "2dbd";
+    }
+
+    @Override
+    public void serialize(GeometrySerializer serializer, Feature feature) {
         Map<String, String> tags = newHashMap();
 
         tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
@@ -72,6 +77,6 @@ public class BuildingShapefile extends TomtomShapefile {
                 tags.put("building", "yes");
                 break;
         }
-        geometrySerializer.write(feature.getMultiPolygon(), tags);
+        serializer.write(feature.getMultiPolygon(), tags);
     }
 }

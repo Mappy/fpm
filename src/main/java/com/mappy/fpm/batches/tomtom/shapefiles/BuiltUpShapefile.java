@@ -42,6 +42,11 @@ public class BuiltUpShapefile extends BoundariesShapefile {
     }
 
     @Override
+    public String getOutputFileName() {
+        return "bu";
+    }
+
+    @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
         cityCenter = townTagger.getHamlet(feature.getLong("ID"));
 

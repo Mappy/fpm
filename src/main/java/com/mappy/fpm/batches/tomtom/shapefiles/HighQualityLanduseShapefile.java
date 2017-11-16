@@ -22,11 +22,16 @@ public class HighQualityLanduseShapefile extends TomtomShapefile {
     }
 
     @Override
-    public void serialize(GeometrySerializer geometrySerializer, Feature feature) {
+    public String getOutputFileName() {
+        return "2dtb";
+    }
+
+    @Override
+    public void serialize(GeometrySerializer serializer, Feature feature) {
         Map<String, String> tags = tags(feature.getInteger("BLOCKCLASS"));
         if (!tags.isEmpty()) {
             tags.put("source", "Tomtom - Citymap");
-            geometrySerializer.write(feature.getMultiPolygon(), tags);
+            serializer.write(feature.getMultiPolygon(), tags);
         }
     }
 

@@ -5,8 +5,6 @@ import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Entity;
 import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
@@ -14,10 +12,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,25 +27,21 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
     @BeforeClass
     public static void setup() throws Exception {
 
-        NameProvider nameProvider = mock(NameProvider.class);
-        Map<String, String> names = newHashMap();
-        names.putAll(of("name", "Poitiers", "name:en", "Potter"));
-        when(nameProvider.getAlternateNames(12500007163496L)).thenReturn(names);
-
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___oa07.shp")).thenReturn("src/test/resources/tomtom/boundaries/oa07/aquitaine___________oa07.shp");
+
+
+        NameProvider nameProvider = mock(NameProvider.class);
+        when(nameProvider.getAlternateNames(12500007163496L)).thenReturn(of("name", "Poitiers", "name:en", "Potter"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("aquitaine", "6")).thenReturn("7");
 
         Boundaries0A07Shapefile shapefile = new Boundaries0A07Shapefile(tomtomFolder, nameProvider, osmLevelGenerator);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/aquitaine.osm.pbf", "Test_TU");
+        shapefile.serialize(shapefile.getSerializer("target/tests/"));
 
-        shapefile.serialize(serializer);
-        serializer.close();
-
-        pbfContent = read(new File("target/tests/aquitaine.osm.pbf"));
+        pbfContent = read(new File("target/tests/oa07.osm.pbf"));
     }
 
     @Test

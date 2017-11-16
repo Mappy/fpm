@@ -13,4 +13,9 @@ public class BoundariesA2Shapefile extends BoundariesShapefile {
     public BoundariesA2Shapefile(TomtomFolder folder, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(folder.getFile("___a2.shp"), 2, nameProvider, osmLevelGenerator);
     }
+
+    @Override
+    public String getOutputFileName() {
+        return "a2";
+    }
 }

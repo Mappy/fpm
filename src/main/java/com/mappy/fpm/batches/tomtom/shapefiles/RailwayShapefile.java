@@ -12,18 +12,25 @@ import java.util.Map;
 import static com.mappy.fpm.batches.tomtom.helpers.RoadTagger.*;
 
 public class RailwayShapefile extends TomtomShapefile {
+
     @Inject
     public RailwayShapefile(TomtomFolder folder) {
         super(folder.getFile("rr.shp"));
     }
 
     @Override
-    public void serialize(GeometrySerializer geometrySerializer, Feature feature) {
+    public String getOutputFileName() {
+        return "rr";
+    }
+
+    @Override
+    public void serialize(GeometrySerializer serializer, Feature feature) {
         Map<String, String> tags = Maps.newHashMap();
+        tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
         tags.put("railway", "rail");
         tags.putAll(level(feature));
         addTagIf("tunnel", "yes", TUNNEL.equals(feature.getInteger("PARTSTRUC")), tags);
         addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);
-        geometrySerializer.write(feature.getMultiLineString(), tags);
+        serializer.write(feature.getMultiLineString(), tags);
     }
 }

@@ -3,8 +3,6 @@ package com.mappy.fpm.batches.tomtom.shapefiles;
 import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Entity;
 import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
@@ -31,10 +29,7 @@ public class HighQualityLanduseShapefileTest extends AbstractTest {
 
         HighQualityLanduseShapefile shapefile = new HighQualityLanduseShapefile(tomtomFolder);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/2dtb.osm.pbf", "Test_TU");
-
-        shapefile.serialize(serializer);
-        serializer.close();
+        shapefile.serialize(shapefile.getSerializer("target/tests/"));
 
         pbfContent = read(new File("target/tests/2dtb.osm.pbf"));
     }

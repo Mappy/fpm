@@ -26,6 +26,11 @@ public class TownShapefile extends TomtomShapefile {
     }
 
     @Override
+    public String getOutputFileName() {
+        return "sm";
+    }
+
+    @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
 
         if (feature.getInteger("ADMINCLASS") > 9) {

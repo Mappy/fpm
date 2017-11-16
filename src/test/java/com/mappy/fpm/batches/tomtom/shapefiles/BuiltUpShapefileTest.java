@@ -6,8 +6,6 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
@@ -25,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BuiltUpShapefileTest extends AbstractTest{
+public class BuiltUpShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
 
@@ -56,11 +54,9 @@ public class BuiltUpShapefileTest extends AbstractTest{
 
         BuiltUpShapefile shapefile = new BuiltUpShapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/rougnat.osm.pbf", "Test_TU");
-        shapefile.serialize(serializer);
-        serializer.close();
+        shapefile.serialize(shapefile.getSerializer("target/tests/"));
 
-        pbfContent = read(new File("target/tests/rougnat.osm.pbf"));
+        pbfContent = read(new File("target/tests/bu.osm.pbf"));
         assertThat(pbfContent.getRelations()).hasSize(4);
     }
 

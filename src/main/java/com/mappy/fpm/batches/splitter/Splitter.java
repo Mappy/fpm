@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import static com.mappy.fpm.batches.GenerateFullPbf.OSM_SUFFIX;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
@@ -30,7 +31,7 @@ public class Splitter {
 
     @Inject
     public Splitter(@Named("com.mappy.fpm.serializer.output") String filename, SplitterSerializers kml) {
-        this.filename = filename;
+        this.filename = filename + OSM_SUFFIX;
         this.kml = kml;
     }
 

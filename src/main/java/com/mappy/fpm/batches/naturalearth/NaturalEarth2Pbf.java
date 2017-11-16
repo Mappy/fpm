@@ -11,8 +11,8 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
-import static com.google.inject.Guice.createInjector;
 import static com.google.inject.name.Names.named;
+import static com.mappy.fpm.batches.GenerateFullPbf.OSM_SUFFIX;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
@@ -44,14 +44,6 @@ public class NaturalEarth2Pbf {
                 .collect(toList());
     }
 
-    public static void main(String[] args) throws IOException {
-        String path = "/home/guillaume/Téléchargements/data";
-        if (args.length > 0) {
-            path = args[0];
-        }
-        createInjector(new NaturalEarthModule(path)).getInstance(NaturalEarth2Pbf.class).run();
-    }
-
     public static class NaturalEarthModule extends AbstractModule {
         private final String input;
 
@@ -63,7 +55,7 @@ public class NaturalEarth2Pbf {
         protected void configure() {
             bindConstant().annotatedWith(named("com.mappy.fpm.geonames")).to(input + "/geonames");
             bindConstant().annotatedWith(named("com.mappy.fpm.naturalearth.data")).to(input + "/naturalearth");
-            bindConstant().annotatedWith(named("com.mappy.fpm.serializer.output")).to(input + "/naturalearth.osm.pbf");
+            bindConstant().annotatedWith(named("com.mappy.fpm.serializer.output")).to(input + "/naturalearth" + OSM_SUFFIX);
             bindConstant().annotatedWith(named("com.mappy.fpm.serializer.username")).to("NaturalEarth");
         }
     }

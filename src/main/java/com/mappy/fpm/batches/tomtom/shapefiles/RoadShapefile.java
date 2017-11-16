@@ -11,6 +11,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import javax.inject.Inject;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.mappy.fpm.batches.tomtom.helpers.Fow.PARKING_GARAGE_BUILDING;
@@ -29,12 +30,18 @@ public class RoadShapefile extends TomtomShapefile {
     }
 
     @Override
+    public String getOutputFileName() {
+        return "nw";
+    }
+
+    @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
 
         if (!PARKING_GARAGE_BUILDING.is(feature.getInteger("FOW"))) {
             LineString raw = geom(feature);
             LineString geom = isReversed(feature) ? (LineString) raw.reverse() : raw;
-            Way way = serializer.write(geom, roadTagger.tag(feature));
+            Map<String, String> tags = roadTagger.tag(feature);
+            Way way = serializer.write(geom, tags);
             restrictions.register(feature, way);
         }
     }

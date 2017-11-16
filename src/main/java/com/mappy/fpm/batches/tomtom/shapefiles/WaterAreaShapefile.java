@@ -29,6 +29,12 @@ public class WaterAreaShapefile extends TomtomShapefile {
         }
     }
 
+    @Override
+    public String getOutputFileName() {
+        return "wa";
+    }
+
+    @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
         Integer type = feature.getInteger("TYP");
         Map<String, String> tags = newHashMap();

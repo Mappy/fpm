@@ -1,10 +1,9 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
-import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Tags;
 import net.morbz.osmonaut.osm.Way;
 import org.junit.BeforeClass;
@@ -18,7 +17,7 @@ import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-public class LuShapefileTest {
+public class LuShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
 
@@ -35,10 +34,7 @@ public class LuShapefileTest {
 
         verify(nameProvider).loadFromFile("lxnm.dbf", "NAME", false);
 
-        GeometrySerializer serializer = new OsmosisSerializer("target/tests/lu.osm.pbf", "Test_TU");
-
-        shapefile.serialize(serializer);
-        serializer.close();
+        shapefile.serialize(shapefile.getSerializer("target/tests/"));
 
         pbfContent = read(new File("target/tests/lu.osm.pbf"));
     }
