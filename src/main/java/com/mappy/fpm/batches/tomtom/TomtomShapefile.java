@@ -19,15 +19,15 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 @Getter
 public abstract class TomtomShapefile {
 
-    private final String filename;
+    private final File file;
     private String outputFile;
 
     protected TomtomShapefile(String filename) {
-        this.filename = filename;
+        file = new File(filename);
     }
 
     public void serialize(GeometrySerializer serializer) {
-        File file = new File(filename);
+
         if (file.exists()) {
             log.info("Opening {}", file.getAbsolutePath());
             try (ShapefileIterator iterator = new ShapefileIterator(file, true)) {

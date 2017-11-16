@@ -23,6 +23,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
 
 public class BuiltUpShapefile extends BoundariesShapefile {
+
     private final TownTagger townTagger;
     private String cityType;
     private TownTagger.Centroid cityCenter;

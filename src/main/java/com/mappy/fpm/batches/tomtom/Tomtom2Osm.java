@@ -44,8 +44,12 @@ public class Tomtom2Osm {
         for (ClassInfo clazz : shapefiles()) {
             log.info("Converting {}", clazz.getSimpleName());
             TomtomShapefile shapefile = (TomtomShapefile) injector.getInstance(clazz.load());
-            shapefile.serialize(shapefile.getSerializer(outputZone));
-            profilePbfFiles.add(shapefile.getOutputFile());
+            if (shapefile.getFile().exists()) {
+                shapefile.serialize(shapefile.getSerializer(outputZone));
+                profilePbfFiles.add(shapefile.getOutputFile());
+            } else {
+                log.info("No input file found");
+            }
         }
 
         osmMerger.merge(profilePbfFiles, outputZone + OSM_SUFFIX);
