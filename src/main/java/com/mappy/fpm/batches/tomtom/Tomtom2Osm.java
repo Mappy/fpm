@@ -45,7 +45,7 @@ public class Tomtom2Osm {
             log.info("Converting {}", clazz.getSimpleName());
             TomtomShapefile shapefile = (TomtomShapefile) injector.getInstance(clazz.load());
             if (shapefile.getFile().exists()) {
-                shapefile.serialize(shapefile.getSerializer(outputZone));
+                shapefile.serialize(outputZone);
                 profilePbfFiles.add(shapefile.getOutputFile());
             } else {
                 log.info("No input file found");

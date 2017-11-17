@@ -27,7 +27,7 @@ public class RailwayShapefileTest extends AbstractTest {
 
         RailwayShapefile shapefile = new RailwayShapefile(tomtomFolder);
 
-        shapefile.serialize(shapefile.getSerializer("target/tests/"));
+        shapefile.serialize("target/tests/");
 
         pbfContent = read(new File("target/tests/rr.osm.pbf"));
     }

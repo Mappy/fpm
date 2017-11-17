@@ -34,7 +34,7 @@ public class WaterAreaShapefileTest extends AbstractTest {
 
         verify(nameProvider).loadFromFile("wxnm.dbf", "NAME", false);
 
-        shapefile.serialize(shapefile.getSerializer("target/tests/"));
+        shapefile.serialize("target/tests/");
 
         pbfContent = read(new File("target/tests/wa.osm.pbf"));
     }

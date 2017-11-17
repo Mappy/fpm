@@ -27,7 +27,7 @@ public class BuildingShapefileTest extends AbstractTest {
 
         BuildingShapefile shapefile = new BuildingShapefile(tomtomFolder);
 
-        shapefile.serialize(shapefile.getSerializer("target/tests/"));
+        shapefile.serialize("target/tests/");
 
         pbfContent = read(new File("target/tests/2dbd.osm.pbf"));
     }

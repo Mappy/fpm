@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import static com.google.common.base.Throwables.propagate;
 import static com.mappy.fpm.batches.GenerateFullPbf.OSM_SUFFIX;
 import static java.io.File.separator;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -26,10 +27,11 @@ public abstract class TomtomShapefile {
         file = new File(filename);
     }
 
-    public void serialize(GeometrySerializer serializer) {
+    public void serialize(String outputDirectory) {
 
         if (file.exists()) {
             log.info("Opening {}", file.getAbsolutePath());
+            GeometrySerializer serializer = getSerializer(outputDirectory);
             try (ShapefileIterator iterator = new ShapefileIterator(file, true)) {
                 Stopwatch stopwatch = Stopwatch.createStarted();
                 int counter = 0;
@@ -57,9 +59,14 @@ public abstract class TomtomShapefile {
         log.info("Added {} object(s){}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
     }
 
-    public final OsmosisSerializer getSerializer(String outputDirectory) throws FileNotFoundException {
+    private OsmosisSerializer getSerializer(String outputDirectory) {
         outputFile = outputDirectory + separator + getOutputFileName() + OSM_SUFFIX;
-        return new OsmosisSerializer(new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(outputFile), false)), "Tomtom", DateTime.now().toDate());
+        try {
+            return new OsmosisSerializer(new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(outputFile), false)), "Tomtom", DateTime.now().toDate());
+        } catch (FileNotFoundException e) {
+            log.error("Unable to create output directory {}", outputDirectory, e);
+            throw propagate(e);
+        }
     }
 
     public abstract String getOutputFileName();

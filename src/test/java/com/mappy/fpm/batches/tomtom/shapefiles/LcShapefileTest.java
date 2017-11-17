@@ -34,7 +34,7 @@ public class LcShapefileTest extends AbstractTest {
 
         verify(nameProvider).loadFromFile("lxnm.dbf", "NAME", false);
 
-        shapefile.serialize(shapefile.getSerializer("target/tests/"));
+        shapefile.serialize("target/tests/");
 
         pbfContent = read(new File("target/tests/lc.osm.pbf"));
     }

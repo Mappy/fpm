@@ -4,7 +4,6 @@ import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
-import com.mappy.fpm.batches.utils.OsmosisSerializer;
 import net.morbz.osmonaut.osm.Node;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,14 +13,12 @@ import java.io.File;
 import static com.google.common.collect.ImmutableMap.of;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TownShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
-    private OsmosisSerializer serializer;
 
     @Before
     public void setup() throws Exception {
@@ -37,15 +34,9 @@ public class TownShapefileTest extends AbstractTest {
 
         TownShapefile shapefile = new TownShapefile(tomtomFolder, nameProvider);
 
-        serializer = spy(shapefile.getSerializer("target/tests/"));
-        shapefile.serialize(serializer);
+        shapefile.serialize("target/tests/");
 
         pbfContent = read(new File("target/tests/sm.osm.pbf"));
-    }
-
-    @Test
-    public void should_not_serialize_admin_class_lower_than_10() {
-        verify(serializer, times(2)).writePoint(any(), anyMap());
     }
 
     @Test

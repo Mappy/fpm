@@ -54,7 +54,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
 
         BuiltUpShapefile shapefile = new BuiltUpShapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
-        shapefile.serialize(shapefile.getSerializer("target/tests/"));
+        shapefile.serialize("target/tests/");
 
         pbfContent = read(new File("target/tests/bu.osm.pbf"));
         assertThat(pbfContent.getRelations()).hasSize(4);

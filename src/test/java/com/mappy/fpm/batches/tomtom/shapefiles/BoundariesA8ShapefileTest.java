@@ -68,7 +68,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
 
         BoundariesA8Shapefile shapefile = new BoundariesA8Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
-        shapefile.serialize(shapefile.getSerializer("target/tests/"));
+        shapefile.serialize("target/tests/");
 
         pbfContent = read(new File("target/tests/a8.osm.pbf"));
         assertThat(pbfContent.getRelations()).hasSize(3);

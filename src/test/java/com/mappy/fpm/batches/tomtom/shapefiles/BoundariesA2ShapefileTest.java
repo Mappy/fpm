@@ -38,7 +38,7 @@ public class BoundariesA2ShapefileTest extends AbstractTest {
 
         BoundariesA2Shapefile shapefile = new BoundariesA2Shapefile(tomtomFolder, nameProvider, osmLevelGenerator);
 
-        shapefile.serialize(shapefile.getSerializer("target/tests/"));
+        shapefile.serialize("target/tests/");
 
         pbfContent = read(new File("target/tests/a2.osm.pbf"));
     }
