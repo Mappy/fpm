@@ -5,17 +5,12 @@ import com.vividsolutions.jts.geom.*;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.joda.time.DateTime;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.WayContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.*;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -39,11 +34,6 @@ public class OsmosisSerializer implements GeometrySerializer {
         this.sink = sink;
         this.date = date;
         this.user = new OsmUser(1, userName);
-    }
-
-    @Inject
-    public OsmosisSerializer(@Named("com.mappy.fpm.serializer.output") String filename, @Named("com.mappy.fpm.serializer.username") String userName) throws FileNotFoundException {
-        this(new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(filename), false)), userName, DateTime.now().toDate());
     }
 
     @Override
@@ -158,7 +148,7 @@ public class OsmosisSerializer implements GeometrySerializer {
             }
             long id = write(layer, coordinate);
             int size = wayNodes.size();
-            if (size == 0 || (size > 0 && wayNodes.get(size - 1).getNodeId() != id)) {
+            if (size == 0 || wayNodes.get(size - 1).getNodeId() != id) {
                 wayNodes.add(new WayNode(id));
             }
         }

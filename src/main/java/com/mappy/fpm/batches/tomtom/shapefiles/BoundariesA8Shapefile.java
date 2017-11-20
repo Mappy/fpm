@@ -88,10 +88,6 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
 
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
-            if(serializer.containPoint(cityCenter.getPoint())) {
-                cityCenter.getPoint().getCoordinate().x = cityCenter.getPoint().getCoordinate().x +0.000001;
-                cityCenter.getPoint().getCoordinate().y = cityCenter.getPoint().getCoordinate().y +0.000001;
-            }
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
             node.ifPresent(adminCenter -> members.add(new RelationMember(adminCenter.getId(), Node, "admin_center")));
         }

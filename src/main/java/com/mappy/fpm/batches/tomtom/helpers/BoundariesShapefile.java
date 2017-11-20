@@ -8,7 +8,6 @@ import com.mappy.fpm.batches.utils.LongLineSplitter;
 import com.neovisionaries.i18n.CountryCode;
 import com.vividsolutions.jts.algorithm.Centroid;
 import com.vividsolutions.jts.geom.*;
-import org.jetbrains.annotations.NotNull;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 
@@ -81,7 +80,6 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         }
     }
 
-    @NotNull
     protected Map<String, String> putWayTags(String name) {
         return of(
                 "name", name,
@@ -95,7 +93,6 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         tags.put("layer", osmLevel);
     }
 
-    @NotNull
     private String getInseeWithAlpha3(String alpha3) {
         String alpha32 = alpha3;
         if (CountryCode.getByCode(alpha3) == null) {

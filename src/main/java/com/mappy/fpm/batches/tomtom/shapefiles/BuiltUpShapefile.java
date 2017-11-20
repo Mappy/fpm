@@ -5,10 +5,13 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.BoundariesShapefile;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
+import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
 import com.mappy.fpm.batches.utils.Feature;
+import com.mappy.fpm.batches.utils.Geohash;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
+import com.vividsolutions.jts.geom.Point;
 import org.jetbrains.annotations.NotNull;
-import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
+import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 
@@ -21,21 +24,18 @@ import java.util.Optional;
 import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
+import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 
 public class BuiltUpShapefile extends BoundariesShapefile {
 
     private final TownTagger townTagger;
     private String cityType;
-    private TownTagger.Centroid cityCenter;
-    private Map<String, String> tags;
 
     @Inject
     public BuiltUpShapefile(TomtomFolder folder, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator, TownTagger townTagger) {
         super(folder.getFile("bu.shp"), 10, nameProvider, osmLevelGenerator);
         this.townTagger = townTagger;
         this.cityType = "";
-        this.cityCenter = null;
-        this.tags = newHashMap();
 
         if (new File(folder.getFile("bu.shp")).exists()) {
             nameProvider.loadFromCityFile("smnm.dbf");
@@ -49,13 +49,9 @@ public class BuiltUpShapefile extends BoundariesShapefile {
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
-        cityCenter = townTagger.getHamlet(feature.getLong("ID"));
+        Centroid cityCenter = townTagger.getHamlet(feature.getLong("ID"));
 
         if (cityCenter != null) {
-            tags.putAll(of("name", cityCenter.getName(), "landuse", "residential"));
-            ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
-            tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
-
             switch (cityCenter.getCitytyp()) {
                 case 0:
                     cityType = "village";
@@ -69,13 +65,9 @@ public class BuiltUpShapefile extends BoundariesShapefile {
                 case 64:
                     cityType = "neighbourhood";
                     break;
-            }
-
-            tags.put("place", cityType);
-
-            if (serializer.containPoint(cityCenter.getPoint())) {
-                cityCenter.getPoint().getCoordinate().x = cityCenter.getPoint().getCoordinate().x + 0.000001;
-                cityCenter.getPoint().getCoordinate().y = cityCenter.getPoint().getCoordinate().y + 0.000001;
+                default:
+                    cityType = "";
+                    break;
             }
         }
 
@@ -84,9 +76,25 @@ public class BuiltUpShapefile extends BoundariesShapefile {
 
     @Override
     protected void finishRelation(GeometrySerializer serializer, Map<String, String> adminTags, List<RelationMember> members, Feature feature) {
+        Centroid cityCenter = townTagger.getHamlet(feature.getLong("ID"));
+
         if (cityCenter != null) {
-            Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
-            node.ifPresent(adminCenter -> members.add(new RelationMember(adminCenter.getId(), EntityType.Node, "admin_center")));
+
+            Map<String, String> tags = newHashMap();
+
+            tags.put("place", cityType);
+            tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
+            ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
+
+            Long adminCenter;
+            Point point = cityCenter.getPoint();
+            if (!serializer.containPoint(point)) {
+                Optional<Node> node = serializer.writePoint(point, tags);
+                adminCenter = node.map(Entity::getId).orElse(0L);
+            } else {
+                adminCenter = Geohash.encodeGeohash(0, point.getX(), point.getY());
+            }
+            members.add(new RelationMember(adminCenter, Node, "admin_center"));
             serializer.writeRelation(members, adminTags);
         }
     }

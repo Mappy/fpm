@@ -6,10 +6,12 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
+import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 import net.morbz.osmonaut.osm.Entity;
+import net.morbz.osmonaut.osm.RelationMember;
 import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,6 +19,7 @@ import org.junit.Test;
 import java.io.File;
 import java.util.List;
 
+import static com.google.common.collect.ImmutableMap.of;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +33,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
     @BeforeClass
     public static void setup() throws Exception {
         NameProvider nameProvider = mock(NameProvider.class);
+        when(nameProvider.getAlternateCityNames(12500001060481L)).thenReturn(of("name:fr", "Auzances_fr"));
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("bu.shp")).thenReturn("src/test/resources/tomtom/boundaries/bu/rougnat___________bu.shp");
@@ -40,17 +44,17 @@ public class BuiltUpShapefileTest extends AbstractTest {
         TownTagger townTagger = mock(TownTagger.class);
         GeometryFactory factory = mock(GeometryFactory.class);
 
-        Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.560886, 51.190382}, 2), factory);
-        when(townTagger.getHamlet(12500001063055L)).thenReturn(new TownTagger.Centroid(12500001063055L, "Rougnat", "123", 8, 32, 7, point));
+        Point point = new Point(new PackedCoordinateSequence.Double(new double[]{2.5027452, 46.0514552}, 2), factory);
+        when(townTagger.getHamlet(12500001063055L)).thenReturn(new Centroid(12500001063055L, "Rougnat", null, 8, 32, 7, point));
 
         Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.601984, 51.181340}, 2), factory);
-        when(townTagger.getHamlet(12500001060481L)).thenReturn(new TownTagger.Centroid(12500001060481L, "Auzances", "456", 8, 32, 8, point2));
+        when(townTagger.getHamlet(12500001060481L)).thenReturn(new Centroid(12500001060481L, "Auzances", "456", 8, 32, 8, point2));
 
         Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.606374, 51.162370}, 2), factory);
-        when(townTagger.getHamlet(12500001067545L)).thenReturn(new TownTagger.Centroid(12500001067545L, "La Chaux-Bourdue", null, 8, 32, 8, point3));
+        when(townTagger.getHamlet(12500001067545L)).thenReturn(new Centroid(12500001067545L, "La Chaux-Bourdue", "123", 8, 32, 8, point3));
 
         Point point4 = new Point(new PackedCoordinateSequence.Double(new double[]{4.596975, 51.210989}, 2), factory);
-        when(townTagger.getHamlet(12500001060737L)).thenReturn(new TownTagger.Centroid(112500001060737L, "Le Montely", "1011", 8, 32, 8, point4));
+        when(townTagger.getHamlet(12500001060737L)).thenReturn(new Centroid(112500001060737L, "Le Montely", "1011", 8, 32, 8, point4));
 
         BuiltUpShapefile shapefile = new BuiltUpShapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
@@ -58,6 +62,19 @@ public class BuiltUpShapefileTest extends AbstractTest {
 
         pbfContent = read(new File("target/tests/bu.osm.pbf"));
         assertThat(pbfContent.getRelations()).hasSize(4);
+    }
+
+    @Test
+    public void should_add_city_center_on_polygon() {
+        List<RelationMember> members = pbfContent.getRelations().stream()
+                .flatMap(r -> r.getMembers().stream())
+                .filter(m -> "admin_center".equals(m.getRole()))
+                .collect(toList());
+
+        assertThat(members).hasSize(4);
+        List<Tags> collect = members.stream().map(m -> m.getEntity().getTags()).collect(toList());
+        assertThat(collect).extracting(t -> t.get("addr:postcode")).containsOnly(null, "456", "123", "1011");
+        assertThat(collect).extracting(t -> t.get("name:fr")).containsOnly(null, "Auzances_fr");
     }
 
     @Test
