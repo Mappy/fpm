@@ -8,8 +8,6 @@ import com.mappy.fpm.batches.utils.GeometrySerializer;
 import java.io.File;
 import java.util.Map;
 
-import static com.google.common.collect.Maps.newHashMap;
-
 public abstract class LandShapefile extends TomtomShapefile {
 
     private final NameProvider nameProvider;
@@ -30,7 +28,7 @@ public abstract class LandShapefile extends TomtomShapefile {
     }
 
     private Map<String, String> completeTags(Feature feature) {
-        Map<String, String> tags = newHashMap();
+        Map<String, String> tags = getSpecificTags(feature);
 
         tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
 
@@ -43,9 +41,6 @@ public abstract class LandShapefile extends TomtomShapefile {
         switch (feature.getInteger("FEATTYP")) {
             case 3110: // Built-up area
                 tags.put("landuse", "residential");
-                break;
-            case 7120: // Forest (Woodland)
-                tags.put("landuse", "forest");
                 break;
             case 7170: // Park
             case 9732: // Airport Ground
@@ -105,4 +100,6 @@ public abstract class LandShapefile extends TomtomShapefile {
         }
         return tags;
     }
+
+    protected abstract Map<String,String> getSpecificTags(Feature feature);
 }

@@ -45,7 +45,7 @@ public class LcShapefileTest extends AbstractTest {
         assertThat(optRelation.isPresent()).isTrue();
 
         Tags tags = optRelation.get().getTags();
-        assertThat(tags.get("landuse")).contains("forest");
+        assertThat(tags.get("natural")).contains("wood");
         assertThat(tags.get("name")).contains("Belle-Vuebos");
         assertThat(tags.get("name:nl")).contains("Belle");
     }
