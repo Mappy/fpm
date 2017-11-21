@@ -74,6 +74,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
         assertThat(members).hasSize(4);
         List<Tags> collect = members.stream().map(m -> m.getEntity().getTags()).collect(toList());
         assertThat(collect).extracting(t -> t.get("addr:postcode")).containsOnly(null, "456", "123", "1011");
+        assertThat(collect).extracting(t -> t.get("name")).containsOnly(null, "Auzances", "La Chaux-Bourdue", "Le Montely");
         assertThat(collect).extracting(t -> t.get("name:fr")).containsOnly(null, "Auzances_fr");
     }
 

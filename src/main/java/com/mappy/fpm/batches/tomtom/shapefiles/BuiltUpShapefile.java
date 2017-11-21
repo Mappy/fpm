@@ -83,6 +83,7 @@ public class BuiltUpShapefile extends BoundariesShapefile {
             Map<String, String> tags = newHashMap();
 
             tags.put("place", cityType);
+            tags.put("name", adminTags.get("name"));
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
             ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
 
