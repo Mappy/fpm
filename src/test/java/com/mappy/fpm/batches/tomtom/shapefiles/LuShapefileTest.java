@@ -50,4 +50,15 @@ public class LuShapefileTest extends AbstractTest {
         assertThat(tags.get("name:nl")).contains("Universitair Kinderziekenhuis");
         assertThat(tags.get("name:fr")).contains("Hôpital Universitaire Des Enfants");
     }
+
+    @Test
+    public void should_tag_national_park_according_to_type(){
+        Optional<Way> optWay = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001001680")).findFirst();
+        assertThat(optWay.isPresent()).isTrue();
+        assertThat(optWay.get().getTags().get("landuse")).contains("grass");
+
+        optWay = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001000884")).findFirst();
+        assertThat(optWay.isPresent()).isTrue();
+        assertThat(optWay.get().getTags().get("boundary")).contains("protected_area");
+    }
 }

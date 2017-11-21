@@ -8,6 +8,8 @@ import com.mappy.fpm.batches.utils.GeometrySerializer;
 import java.io.File;
 import java.util.Map;
 
+import static com.google.common.collect.ImmutableMap.of;
+
 public abstract class LandShapefile extends TomtomShapefile {
 
     private final NameProvider nameProvider;
@@ -43,50 +45,10 @@ public abstract class LandShapefile extends TomtomShapefile {
                 tags.put("landuse", "residential");
                 break;
             case 7170: // Park
-            case 9732: // Airport Ground
-                tags.put("landuse", "grass");
+                tags.putAll(getParkTags(feature.getInteger("DISPLTYP")));
                 break;
             case 7180: // Island
                 tags.put("place", "island");
-                break;
-            case 9715: // Industrial Area
-                tags.put("landuse", "industrial");
-                break;
-            case 9776: // Airport Runway
-                tags.put("aeroway", "runway");
-                break;
-            case 9788: // Cemetery
-                tags.put("landuse", "cemetery");
-                break;
-            case 9790: // Shopping Ground
-                tags.put("landuse", "retail");
-                break;
-            case 9789:// Military Ground
-                tags.put("landuse", "military");
-                break;
-            case 9768: // Stadium
-                tags.put("leisure", "stadium");
-                break;
-            case 9780: // Institution
-                tags.put("landuse", "institutional");
-                break;
-            case 9771: // University
-                tags.put("amenity", "university");
-                break;
-            case 9756: // Parking area
-                tags.put("amenity", "parking");
-                break;
-            case 9744: // Golf course
-                tags.put("leisure", "golf_course");
-                break;
-            case 9733: // Amusement Park Ground
-                tags.put("tourism", "theme_park");
-                break;
-            case 9748: // Hospital Ground
-                tags.put("amenity", "hospital");
-                break;
-            case 9720: // Industrial Harbour Area
-                tags.put("landuse", "port");
                 break;
             case 9353: // Company Ground
                 tags.put("landuse", "commercial");
@@ -94,12 +56,58 @@ public abstract class LandShapefile extends TomtomShapefile {
             case 9710: // Beach, Dune and Plain Sand
                 tags.put("natural", "beach");
                 break;
+            case 9715: // Industrial Area
+                tags.put("landuse", "industrial");
+                break;
+            case 9720: // Industrial Harbour Area
+                tags.put("landuse", "port");
+                break;
             case 9725: // Moors & Heathland
                 tags.put("natural", "grassland");
+                break;
+            case 9732: // Airport Ground
+                tags.put("landuse", "grass");
+                break;
+            case 9733: // Amusement Park Ground
+                tags.put("tourism", "theme_park");
+                break;
+            case 9744: // Golf course
+                tags.put("leisure", "golf_course");
+                break;
+            case 9748: // Hospital Ground
+                tags.put("amenity", "hospital");
+                break;
+            case 9756: // Parking area
+                tags.put("amenity", "parking");
+                break;
+            case 9768: // Stadium
+                tags.put("leisure", "stadium");
+                break;
+            case 9771: // University
+                tags.put("amenity", "university");
+                break;
+            case 9776: // Airport Runway
+                tags.put("aeroway", "runway");
+                break;
+            case 9780: // Institution
+                tags.put("landuse", "institutional");
+                break;
+            case 9788: // Cemetery
+                tags.put("landuse", "cemetery");
+                break;
+            case 9789:// Military Ground
+                tags.put("landuse", "military");
+                break;
+            case 9790: // Shopping Ground
+                tags.put("landuse", "retail");
                 break;
         }
         return tags;
     }
 
-    protected abstract Map<String,String> getSpecificTags(Feature feature);
+    private Map<String, String> getParkTags(Integer displayType) {
+        return displayType > 1 ? of("boundary", "protected_area") : of("landuse", "grass");
+    }
+
+    protected abstract Map<String, String> getSpecificTags(Feature feature);
 }
