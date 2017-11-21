@@ -1,16 +1,14 @@
 package com.mappy.fpm.batches.tomtom.shapefiles;
 
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
-import com.mappy.fpm.batches.tomtom.helpers.BoundariesShapefile;
-import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
 import com.mappy.fpm.batches.utils.Feature;
-import com.mappy.fpm.batches.utils.Geohash;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.vividsolutions.jts.geom.Point;
-import org.jetbrains.annotations.NotNull;
+import com.mappy.fpm.batches.utils.LongLineSplitter;
+import com.vividsolutions.jts.geom.*;
 import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
@@ -22,20 +20,25 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableMap.of;
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.vividsolutions.jts.algorithm.Centroid.getCentroid;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
+import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 
-public class BuiltUpShapefile extends BoundariesShapefile {
+public class BuiltUpShapefile extends TomtomShapefile {
 
+    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    private final NameProvider nameProvider;
     private final TownTagger townTagger;
-    private String cityType;
 
     @Inject
-    public BuiltUpShapefile(TomtomFolder folder, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator, TownTagger townTagger) {
-        super(folder.getFile("bu.shp"), 10, nameProvider, osmLevelGenerator);
+    public BuiltUpShapefile(TomtomFolder folder, NameProvider nameProvider, TownTagger townTagger) {
+        super(folder.getFile("bu.shp"));
+        this.nameProvider = nameProvider;
         this.townTagger = townTagger;
-        this.cityType = "";
 
         if (new File(folder.getFile("bu.shp")).exists()) {
             nameProvider.loadFromCityFile("smnm.dbf");
@@ -49,66 +52,88 @@ public class BuiltUpShapefile extends BoundariesShapefile {
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
-        Centroid cityCenter = townTagger.getHamlet(feature.getLong("ID"));
+        String name = feature.getString("NAME");
+        if (name != null) {
+            Long extId = feature.getLong("ID");
 
+            Map<String, String> tags = nameProvider.getAlternateNames(extId);
+            tags.put("ref:tomtom", String.valueOf(extId));
+            tags.put("name", name);
+            Centroid cityCenter = townTagger.getHamlet(extId);
+
+            List<RelationMember> members = newArrayList();
+            MultiPolygon multiPolygon = feature.getMultiPolygon();
+            String cityType = getCityType(cityCenter);
+
+            getLabel(serializer, tags, multiPolygon).ifPresent(members::add);
+
+            getAdminCenter(serializer, name, cityCenter, cityType).ifPresent(members::add);
+
+            members.addAll(addPolygons(serializer, name, multiPolygon, cityType));
+
+            tags.putAll(of("type", "multipolygon", "landuse", "residential", "layer", "10"));
+            serializer.writeRelation(members, tags);
+        }
+    }
+
+    private String getCityType(Centroid cityCenter) {
         if (cityCenter != null) {
             switch (cityCenter.getCitytyp()) {
                 case 0:
-                    cityType = "village";
-                    break;
+                    return "village";
                 case 1:
-                    cityType = cityCenter.getDispclass() < 8 ? "city" : "town";
-                    break;
+                    return cityCenter.getDispclass() < 8 ? "city" : "town";
                 case 32:
-                    cityType = "hamlet";
-                    break;
+                    return "hamlet";
                 case 64:
-                    cityType = "neighbourhood";
-                    break;
+                    return "neighbourhood";
                 default:
-                    cityType = "";
-                    break;
+                    return "";
             }
+        } else {
+            return "";
         }
-
-        super.serialize(serializer, feature);
     }
 
-    @Override
-    protected void finishRelation(GeometrySerializer serializer, Map<String, String> adminTags, List<RelationMember> members, Feature feature) {
-        Centroid cityCenter = townTagger.getHamlet(feature.getLong("ID"));
+    private Optional<RelationMember> getLabel(GeometrySerializer serializer, Map<String, String> tags, MultiPolygon multiPolygon) {
+        Optional<Node> labelNode = serializer.writePoint(GEOMETRY_FACTORY.createPoint(getCentroid(multiPolygon)), tags);
+        return labelNode.map(node -> new RelationMember(node.getId(), Node, "label"));
+    }
+
+    private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, String name, Centroid cityCenter, String cityType) {
 
         if (cityCenter != null) {
+            Map<String, String> adminTags = nameProvider.getAlternateCityNames(cityCenter.getId());
+            adminTags.put("place", cityType);
+            adminTags.put("name", name);
+            ofNullable(cityCenter.getPostcode()).ifPresent(code -> adminTags.put("addr:postcode", code));
 
-            Map<String, String> tags = newHashMap();
-
-            tags.put("place", cityType);
-            tags.put("name", adminTags.get("name"));
-            tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
-            ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
-
-            Long adminCenter;
-            Point point = cityCenter.getPoint();
-            if (!serializer.containPoint(point)) {
-                Optional<Node> node = serializer.writePoint(point, tags);
-                adminCenter = node.map(Entity::getId).orElse(0L);
-            } else {
-                adminCenter = Geohash.encodeGeohash(0, point.getX(), point.getY());
-            }
-            members.add(new RelationMember(adminCenter, Node, "admin_center"));
-            serializer.writeRelation(members, adminTags);
+            Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
+            Long adminCenter = node.map(Entity::getId).orElse(0L);
+            return of(new RelationMember(adminCenter, Node, "admin_center"));
+        } else {
+            return empty();
         }
     }
 
-    @NotNull
-    protected Map<String, String> putWayTags(String name) {
-        return of("name", name, "place", cityType);
-    }
+    private List<RelationMember> addPolygons(GeometrySerializer serializer, String name, MultiPolygon multiPolygon, String cityType) {
+        List<RelationMember> result = newArrayList();
 
-    protected void putRelationTags(Map<String, String> tags, Map<String, String> wayTags) {
-        tags.put("type", "multipolygon");
-        tags.put("name", wayTags.get("name"));
-        tags.put("landuse", "residential");
-        tags.put("layer", "10");
+        Map<String, String> wayTags = of("name", name, "place", cityType);
+        for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+            Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
+            for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
+                for (Geometry geom : LongLineSplitter.split(polygon.getInteriorRingN(j), 100)) {
+                    Long wayId = serializer.writeBoundary((LineString) geom, wayTags);
+                    result.add(new RelationMember(wayId, Way, "inner"));
+                }
+            }
+            for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
+                Long wayId = serializer.writeBoundary((LineString) geom, wayTags);
+                result.add(new RelationMember(wayId, Way, "outer"));
+            }
+        }
+
+        return result;
     }
 }

@@ -4,7 +4,6 @@ import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
-import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -20,6 +19,7 @@ import java.io.File;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,13 +33,13 @@ public class BuiltUpShapefileTest extends AbstractTest {
     @BeforeClass
     public static void setup() throws Exception {
         NameProvider nameProvider = mock(NameProvider.class);
-        when(nameProvider.getAlternateCityNames(12500001060481L)).thenReturn(of("name:fr", "Auzances_fr"));
+        when(nameProvider.getAlternateCityNames(12500001063055L)).thenReturn(newHashMap(of("name:fr", "Rougnat_fr")));
+        when(nameProvider.getAlternateCityNames(12500001060481L)).thenReturn(newHashMap(of("name:fr", "Auzances_fr")));
+        when(nameProvider.getAlternateCityNames(12500001067545L)).thenReturn(newHashMap(of("name:fr", "La Chaux-Bourdue_fr")));
+        when(nameProvider.getAlternateCityNames(112500001060737L)).thenReturn(newHashMap(of("name:fr", "Le Montely_fr")));
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("bu.shp")).thenReturn("src/test/resources/tomtom/boundaries/bu/rougnat___________bu.shp");
-
-        OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
-        when(osmLevelGenerator.getOsmLevel("rougnat", "10")).thenReturn("10");
 
         TownTagger townTagger = mock(TownTagger.class);
         GeometryFactory factory = mock(GeometryFactory.class);
@@ -56,7 +56,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
         Point point4 = new Point(new PackedCoordinateSequence.Double(new double[]{4.596975, 51.210989}, 2), factory);
         when(townTagger.getHamlet(12500001060737L)).thenReturn(new Centroid(112500001060737L, "Le Montely", "1011", 8, 32, 8, point4));
 
-        BuiltUpShapefile shapefile = new BuiltUpShapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
+        BuiltUpShapefile shapefile = new BuiltUpShapefile(tomtomFolder, nameProvider, townTagger);
 
         shapefile.serialize("target/tests/");
 
@@ -74,8 +74,8 @@ public class BuiltUpShapefileTest extends AbstractTest {
         assertThat(members).hasSize(4);
         List<Tags> collect = members.stream().map(m -> m.getEntity().getTags()).collect(toList());
         assertThat(collect).extracting(t -> t.get("addr:postcode")).containsOnly(null, "456", "123", "1011");
-        assertThat(collect).extracting(t -> t.get("name")).containsOnly(null, "Auzances", "La Chaux-Bourdue", "Le Montely");
-        assertThat(collect).extracting(t -> t.get("name:fr")).containsOnly(null, "Auzances_fr");
+        assertThat(collect).extracting(t -> t.get("name")).containsOnly("Rougnat", "Auzances", "La Chaux-Bourdue", "Le Montely");
+        assertThat(collect).extracting(t -> t.get("name:fr")).containsOnly("Rougnat_fr", "Auzances_fr", "La Chaux-Bourdue_fr", "Le Montely_fr");
     }
 
     @Test
