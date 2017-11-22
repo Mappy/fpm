@@ -41,12 +41,6 @@ public class TownShapefile extends TomtomShapefile {
 
             switch (feature.getInteger("CITYTYP")) {
                 case 0:
-                    tags.put("place", "village");
-                    break;
-                case 1:
-                    tags.put("place", feature.getInteger("DISPCLASS") < 8 ? "city" : "town");
-                    break;
-                case 32:
                     tags.put("place", "hamlet");
                     break;
                 case 64:
