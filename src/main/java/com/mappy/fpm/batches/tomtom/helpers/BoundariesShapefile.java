@@ -80,14 +80,11 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         }
     }
 
-    protected Map<String, String> putWayTags(String name) {
-        return of(
-                "name", name,
-                "boundary", "administrative",
-                "admin_level", osmLevel);
+    private Map<String, String> putWayTags(String name) {
+        return of("name", name, "boundary", "administrative", "admin_level", osmLevel);
     }
 
-    protected void putRelationTags(Map<String, String> tags, Map<String, String> wayTags) {
+    private void putRelationTags(Map<String, String> tags, Map<String, String> wayTags) {
         tags.putAll(wayTags);
         tags.put("type", "boundary");
         tags.put("layer", osmLevel);

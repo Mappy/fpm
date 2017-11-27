@@ -25,7 +25,7 @@ public class PbfSink implements Sink {
     public void writeHeader(HeaderBBox bbox) {
         serializer.finishHeader(HeaderBlock.newBuilder()
                 .setBbox(bbox)
-                .setSource("databatches")
+                .setSource("fpm")
                 .setOsmosisReplicationTimestamp(new Date().getTime()));
     }
 }

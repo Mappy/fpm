@@ -11,10 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 @Slf4j
 public class TownTagger {
@@ -57,6 +59,10 @@ public class TownTagger {
 
     public Centroid getHamlet(Long centroidId) {
         return centroidsHamlet.get(centroidId);
+    }
+
+    public List<Centroid> getCapital(int tomtomLevel) {
+        return centroidsCity.values().stream().filter(centroid -> centroid.getAdminclass() <= tomtomLevel).collect(toList());
     }
 
     @Data
