@@ -48,6 +48,7 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
 
             tags.put("name", cityCenter.getName());
             ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
+            cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
             switch (cityCenter.getAdminclass()) {
@@ -68,20 +69,6 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
                     break;
             }
 
-            switch (cityCenter.getCitytyp()) {
-                case 0:
-                    tags.put("place", "village");
-                    break;
-                case 1:
-                    tags.put("place", cityCenter.getDispclass() < 8 ? "city" : "town");
-                    break;
-                case 32:
-                    tags.put("place", "hamlet");
-                    break;
-                case 64:
-                    tags.put("place", "neighbourhood");
-                    break;
-            }
 
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
             node.ifPresent(adminCenter -> members.add(new RelationMember(adminCenter.getId(), Node, "admin_center")));

@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.vividsolutions.jts.algorithm.Centroid.getCentroid;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
@@ -63,35 +64,15 @@ public class BuiltUpShapefile extends TomtomShapefile {
 
             List<RelationMember> members = newArrayList();
             MultiPolygon multiPolygon = feature.getMultiPolygon();
-            String cityType = getCityType(cityCenter);
 
             getLabel(serializer, tags, multiPolygon).ifPresent(members::add);
 
-            getAdminCenter(serializer, name, cityCenter, cityType).ifPresent(members::add);
+            getAdminCenter(serializer, name, cityCenter).ifPresent(members::add);
 
-            members.addAll(addPolygons(serializer, name, multiPolygon, cityType));
+            members.addAll(addPolygons(serializer, name, multiPolygon, cityCenter));
 
             tags.putAll(of("type", "multipolygon", "landuse", "residential", "layer", "10"));
             serializer.writeRelation(members, tags);
-        }
-    }
-
-    private String getCityType(Centroid cityCenter) {
-        if (cityCenter != null) {
-            switch (cityCenter.getCitytyp()) {
-                case 0:
-                    return "village";
-                case 1:
-                    return cityCenter.getDispclass() < 8 ? "city" : "town";
-                case 32:
-                    return "hamlet";
-                case 64:
-                    return "neighbourhood";
-                default:
-                    return "";
-            }
-        } else {
-            return "";
         }
     }
 
@@ -100,12 +81,12 @@ public class BuiltUpShapefile extends TomtomShapefile {
         return labelNode.map(node -> new RelationMember(node.getId(), Node, "label"));
     }
 
-    private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, String name, Centroid cityCenter, String cityType) {
+    private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, String name, Centroid cityCenter) {
 
         if (cityCenter != null) {
             Map<String, String> adminTags = nameProvider.getAlternateCityNames(cityCenter.getId());
-            adminTags.put("place", cityType);
             adminTags.put("name", name);
+            cityCenter.getPlace().ifPresent(p -> adminTags.put("place", p));
             ofNullable(cityCenter.getPostcode()).ifPresent(code -> adminTags.put("addr:postcode", code));
 
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
@@ -116,10 +97,12 @@ public class BuiltUpShapefile extends TomtomShapefile {
         }
     }
 
-    private List<RelationMember> addPolygons(GeometrySerializer serializer, String name, MultiPolygon multiPolygon, String cityType) {
+    private List<RelationMember> addPolygons(GeometrySerializer serializer, String name, MultiPolygon multiPolygon, Centroid cityCenter) {
         List<RelationMember> result = newArrayList();
 
-        Map<String, String> wayTags = of("name", name, "place", cityType);
+        Map<String, String> wayTags = newHashMap(of("name", name));
+        ofNullable(cityCenter).map(Centroid::getPlace).ifPresent(p -> wayTags.put("place", p.get()));
+
         for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
             Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
             for (int j = 0; j < polygon.getNumInteriorRing(); j++) {

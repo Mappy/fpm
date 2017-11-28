@@ -48,6 +48,7 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
             Map<String, String> tags = newHashMap();
 
             tags.put("name", cityCenter.getName());
+            cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
             ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
 
             switch (cityCenter.getAdminclass()) {
@@ -68,20 +69,6 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
                     break;
             }
 
-            switch (cityCenter.getCitytyp()) {
-                case 0:
-                    tags.put("place", "village");
-                    break;
-                case 1:
-                    tags.put("place", cityCenter.getDispclass() < 8 ? "city" : "town");
-                    break;
-                case 32:
-                    tags.put("place", "hamlet");
-                    break;
-                case 64:
-                    tags.put("place", "neighbourhood");
-                    break;
-            }
 
             ofNullable(feature.getLong("POP")).ifPresent(pop -> tags.put("population", String.valueOf(pop)));
             adminTags.putAll(tags);

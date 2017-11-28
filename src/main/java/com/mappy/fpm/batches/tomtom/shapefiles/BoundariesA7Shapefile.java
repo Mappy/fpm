@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 
@@ -43,9 +42,28 @@ public class BoundariesA7Shapefile extends BoundariesShapefile {
         List<Centroid> capitals = townTagger.getCapital(TOMTOM_LEVEL).stream().filter(c -> feature.getGeometry().contains(c.getPoint())).collect(toList());
 
         if(!capitals.isEmpty()) {
-            Optional<Node> node = serializer.writePoint(capitals.get(0).getPoint(), tags);
-            ofNullable(feature.getLong("POP")).ifPresent(pop -> tags.put("population", String.valueOf(pop)));
+            Centroid cityCenter = capitals.get(0);
+            cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
 
+            switch (cityCenter.getAdminclass()) {
+                case 0:
+                    tags.put("capital", "yes");
+                    break;
+                case 1:
+                    tags.put("capital", "1");
+                    break;
+                case 7:
+                    tags.put("capital", "6");
+                    break;
+                case 8:
+                    tags.put("capital", "8");
+                    break;
+                case 9:
+                    tags.put("capital", "9");
+                    break;
+            }
+
+            Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
             node.ifPresent(adminCenter -> members.add(new RelationMember(adminCenter.getId(), Node, "admin_center")));
         }
 

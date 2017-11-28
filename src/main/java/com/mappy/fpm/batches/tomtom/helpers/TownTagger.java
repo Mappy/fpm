@@ -13,8 +13,11 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
@@ -80,6 +83,26 @@ public class TownTagger {
 
         public Centroid() {
             this(null, null, null, null, null, null, null);
+        }
+
+        public Optional<String> getPlace() {
+            Optional<String> place = empty();
+
+            switch (citytyp) {
+                case 0:
+                    place = of("village");
+                    break;
+                case 1:
+                    place = of(dispclass < 8 ? "city" : "town");
+                    break;
+                case 32:
+                    place = of("hamlet");
+                    break;
+                case 64:
+                    place = of("neighbourhood");
+                    break;
+            }
+            return place;
         }
     }
 }
