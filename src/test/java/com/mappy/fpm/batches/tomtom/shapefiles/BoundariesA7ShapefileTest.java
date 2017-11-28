@@ -40,13 +40,18 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
 
         NameProvider nameProvider = mock(NameProvider.class);
         when(nameProvider.getAlternateNames(10560000000808L)).thenReturn(of("name", "Brussel Hoofdstad", "name:fr", "Brussel Hoofdstad FR", "name:nl", "Brussel Hoofdstad NL"));
+        when(nameProvider.getAlternateNames(10560000000823L)).thenReturn(of("name", "Halle-Vilvoorde", "name:fr", "Halle-Vilvoorde FR", "name:nl", "Halle-Vilvoorde NL"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
+        when(osmLevelGenerator.getOsmLevel("b", "0")).thenReturn("2");
         when(osmLevelGenerator.getOsmLevel("b", "7")).thenReturn("7");
 
         TownTagger townTagger = mock(TownTagger.class);
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.307077, 50.8366041}, 2), new GeometryFactory());
-        when(townTagger.getCapital(7)).thenReturn(newArrayList(new Centroid(10560022000808L, "Brussel Hoofdstad", "21000", 0, 1, 2, point)));
+        Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.232918, 50.737785}, 2), new GeometryFactory());
+        when(townTagger.getCapital(7)).thenReturn(newArrayList(
+                new Centroid(10560022000808L, "Brussel Hoofdstad", "21000", 0, 1, 2, point),
+                new Centroid(10560033000808L, "Halle", "23000", 7, 1, 10, point2)));
 
         BoundariesA7Shapefile shapefile = new BoundariesA7Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 
@@ -97,10 +102,10 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
-        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Brussel Hoofdstad");
-        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("Brussel Hoofdstad FR");
-        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("Brussel Hoofdstad NL");
-        assertThat(tags).extracting(t -> t.get("capital")).containsOnly("yes");
-        assertThat(tags).extracting(t -> t.get("place")).containsOnly("city");
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Brussel Hoofdstad", "Halle-Vilvoorde");
+        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("Brussel Hoofdstad FR", "Halle-Vilvoorde FR");
+        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("Brussel Hoofdstad NL", "Halle-Vilvoorde NL");
+        assertThat(tags).extracting(t -> t.get("capital")).containsOnly("yes", "7");
+        assertThat(tags).extracting(t -> t.get("place")).containsOnly("city", "town");
     }
 }

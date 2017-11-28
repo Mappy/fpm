@@ -45,23 +45,8 @@ public class BoundariesA7Shapefile extends BoundariesShapefile {
             Centroid cityCenter = capitals.get(0);
             cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
 
-            switch (cityCenter.getAdminclass()) {
-                case 0:
-                    tags.put("capital", "yes");
-                    break;
-                case 1:
-                    tags.put("capital", "1");
-                    break;
-                case 7:
-                    tags.put("capital", "6");
-                    break;
-                case 8:
-                    tags.put("capital", "8");
-                    break;
-                case 9:
-                    tags.put("capital", "9");
-                    break;
-            }
+            String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass().toString());
+            tags.put("capital", "2".equals(capital) ? "yes" : capital);
 
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
             node.ifPresent(adminCenter -> members.add(new RelationMember(adminCenter.getId(), Node, "admin_center")));

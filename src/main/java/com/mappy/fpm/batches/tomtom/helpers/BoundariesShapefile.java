@@ -29,13 +29,17 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private final String osmLevel;
     private final String tomtomLevel;
+
+    protected final OsmLevelGenerator osmLevelGenerator;
     protected final NameProvider nameProvider;
+    protected final String zone;
 
     protected BoundariesShapefile(String filename, int tomtomLevel, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(filename);
         String[] split = filename.split("/");
-        String zone = split[split.length - 1].split("_[_2]")[0];
+        zone = split[split.length - 1].split("_[_2]")[0];
 
+        this.osmLevelGenerator = osmLevelGenerator;
         this.osmLevel = osmLevelGenerator.getOsmLevel(zone, String.valueOf(tomtomLevel));
         this.tomtomLevel = String.valueOf(tomtomLevel);
         this.nameProvider = nameProvider;

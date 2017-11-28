@@ -55,10 +55,11 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
                 .thenReturn(of("name", "Oelegem", "name:nl", "OelegemCNL", "name:fr", "OelegemCFR"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
+        when(osmLevelGenerator.getOsmLevel("Ranst", "8")).thenReturn("8");
         when(osmLevelGenerator.getOsmLevel("Ranst", "9")).thenReturn("9");
 
         TownTagger townTagger = mock(TownTagger.class);
-        GeometryFactory factory = mock(GeometryFactory.class);
+        GeometryFactory factory = new GeometryFactory();
 
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.560886, 51.190382}, 2), factory);
         when(townTagger.get(10560000419571L)).thenReturn(new TownTagger.Centroid(10560000419571L, "Ranst", "123", 8, 1, 7, point));
