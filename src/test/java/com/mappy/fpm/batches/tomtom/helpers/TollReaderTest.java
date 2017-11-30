@@ -1,7 +1,7 @@
-package com.mappy.fpm.batches.toll;
+package com.mappy.fpm.batches.tomtom.helpers;
 
-import com.mappy.fpm.batches.toll.TollReader.Toll;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.tomtom.helpers.TollReader.Toll;
 import org.junit.Test;
 
 import static java.util.Optional.empty;

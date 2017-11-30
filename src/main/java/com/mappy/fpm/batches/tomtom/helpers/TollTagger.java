@@ -1,8 +1,7 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.ImmutableMap;
-import com.mappy.fpm.batches.toll.TollReader;
-import com.mappy.fpm.batches.toll.TollReader.Toll;
+import com.mappy.fpm.batches.tomtom.helpers.TollReader.Toll;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
