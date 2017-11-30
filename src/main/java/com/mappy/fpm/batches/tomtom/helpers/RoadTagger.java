@@ -54,7 +54,7 @@ public class RoadTagger {
         this.tolls = tolls;
         this.tdDbf = tdDbf;
         this.timeDomainsParser = timeDomainsParser;
-        this.nameProvider.loadFromFile("gc.dbf", "FULLNAME", true);
+        this.nameProvider.loadFromFile("gc.dbf");
     }
 
     public Map<String, String> tag(Feature feature) {

@@ -32,7 +32,7 @@ public class WaterAreaShapefileTest extends AbstractTest {
 
         WaterAreaShapefile shapefile = new WaterAreaShapefile(tomtomFolder, nameProvider);
 
-        verify(nameProvider).loadFromFile("wxnm.dbf", "NAME", false);
+        verify(nameProvider).loadFromFile("wxnm.dbf");
 
         shapefile.serialize("target/tests/");
 

@@ -33,7 +33,7 @@ public class WaterLineShapefileTest extends AbstractTest {
 
         WaterLineShapefile shapefile = new WaterLineShapefile(tomtomFolder, nameProvider);
 
-        verify(nameProvider).loadFromFile("wxnm.dbf", "NAME", false);
+        verify(nameProvider).loadFromFile("wxnm.dbf");
 
         shapefile.serialize("target/tests/");
 

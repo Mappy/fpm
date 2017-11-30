@@ -32,7 +32,7 @@ public class LuShapefileTest extends AbstractTest {
 
         LuShapefile shapefile = new LuShapefile(tomtomFolder, nameProvider);
 
-        verify(nameProvider).loadFromFile("lxnm.dbf", "NAME", false);
+        verify(nameProvider).loadFromFile("lxnm.dbf");
 
         shapefile.serialize("target/tests/");
 

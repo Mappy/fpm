@@ -29,15 +29,17 @@ public class NameProvider {
         this.folder = folder;
     }
 
-    public void loadFromFile(String filename, String alternativeParamName, boolean hasSideName) {
-        readFile(filename, alternativeParamName, hasSideName, alternateNames);
+    public void loadFromFile(String filename) {
+        alternateNames.putAll(readFile(filename, "gc.dbf".equals(filename) ? "FULLNAME" : "NAME", "gc.dbf".equals(filename)));
     }
 
     public void loadFromCityFile(String filename) {
-        readFile(filename, "NAME", false, alternateCityNames);
+        alternateCityNames.putAll(readFile(filename, "NAME", false));
     }
 
-    private void readFile(String filename, String alternativeParamName, boolean hasSideName, Map<Long, List<AlternativeName>> alternateCityNames) {
+    private Map<Long, List<AlternativeName>> readFile(String filename, String alternativeParamName, boolean hasSideName) {
+        Map<Long, List<AlternativeName>> alternates = newHashMap();
+
         File file = new File(folder.getFile(filename));
         if (file.exists()) {
             log.info("Reading {}", file);
@@ -47,10 +49,10 @@ public class NameProvider {
                 int counter = 0;
                 while ((row = reader.nextRow()) != null) {
                     AlternativeName altName = AlternativeName.fromDbf(row, alternativeParamName, hasSideName);
-                    List<AlternativeName> altNames = alternateCityNames.containsKey(altName.getId()) ? alternateCityNames.get(altName.getId()) : newArrayList();
+                    List<AlternativeName> altNames = alternates.containsKey(altName.getId()) ? alternates.get(altName.getId()) : newArrayList();
 
                     altNames.add(altName);
-                    alternateCityNames.put(altName.getId(), altNames);
+                    alternates.put(altName.getId(), altNames);
                     counter++;
                 }
                 long time = stopwatch.elapsed(MILLISECONDS);
@@ -61,6 +63,8 @@ public class NameProvider {
         else {
             log.info("File not found : {}", file.getAbsolutePath());
         }
+
+        return alternates;
     }
 
     public Map<String, String> getAlternateNames(Long tomtomId) {
@@ -77,7 +81,8 @@ public class NameProvider {
         if (an != null) {
             an.forEach(alternativeName -> {
                 try {
-                    tags.put("name:" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
+                    String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
+                    tags.put(keyPrefix + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
                 }
                 catch (IllegalArgumentException e) {
                     tags.put("alt_name", alternativeName.getName());

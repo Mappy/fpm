@@ -21,7 +21,7 @@ public class WaterLineShapefile extends TomtomShapefile {
         super(folder.getFile("wl.shp"));
         this.nameProvider = nameProvider;
         if(new File(folder.getFile("wl.shp")).exists()) {
-            this.nameProvider.loadFromFile("wxnm.dbf", "NAME", false);
+            this.nameProvider.loadFromFile("wxnm.dbf");
         }
     }
 

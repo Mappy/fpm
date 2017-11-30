@@ -5,21 +5,22 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class NameProviderTest {
 
     @Test
     public void should_add_alternative_names() {
         NameProvider np = new NameProvider(new TomtomFolder("src/test/resources/tomtom/", "andorra"));
-        np.loadFromFile("an.dbf", "NAME", false);
+        np.loadFromFile("an.dbf");
         Map<String, String> tags = np.getAlternateNames(10200000000008L);
-        assertEquals(tags.size(), 6);
-        assertEquals(tags.get("name:ca"), "Andorra_cat");
-        assertEquals(tags.get("name:fr"), "Andorre");
-        assertEquals(tags.get("name:de"), "Andorra_ger");
-        assertEquals(tags.get("name:en"), "Andorra_eng");
-        assertEquals(tags.get("name:es"), "Andorra_spa");
-        assertEquals(tags.get("alt_name"), "Andorra_aaa");
+        assertThat(tags).hasSize(7);
+        assertThat(tags.get("name:ca")).isEqualTo("Andorra_cat");
+        assertThat(tags.get("name:fr")).isEqualTo("Andorre");
+        assertThat(tags.get("alt_name:fr")).isEqualTo("Principauté d'andorre");
+        assertThat(tags.get("name:de")).isEqualTo("Andorra_ger");
+        assertThat(tags.get("name:en")).isEqualTo("Andorra_eng");
+        assertThat(tags.get("name:es")).isEqualTo("Andorra_spa");
+        assertThat(tags.get("alt_name")).isEqualTo("Andorra_aaa");
     }
 }
