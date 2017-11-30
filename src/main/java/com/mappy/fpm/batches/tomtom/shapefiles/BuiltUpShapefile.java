@@ -89,6 +89,11 @@ public class BuiltUpShapefile extends TomtomShapefile {
             cityCenter.getPlace().ifPresent(p -> adminTags.put("place", p));
             ofNullable(cityCenter.getPostcode()).ifPresent(code -> adminTags.put("addr:postcode", code));
 
+            if(serializer.containPoint(cityCenter.getPoint())) {
+                cityCenter.getPoint().getCoordinate().x += 0.00001;
+                cityCenter.getPoint().getCoordinate().y += 0.00001;
+            }
+
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
             Long adminCenter = node.map(Entity::getId).orElse(0L);
             return of(new RelationMember(adminCenter, Node, "admin_center"));

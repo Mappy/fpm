@@ -8,10 +8,10 @@ import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 import net.morbz.osmonaut.osm.Entity;
 import net.morbz.osmonaut.osm.RelationMember;
 import net.morbz.osmonaut.osm.Tags;
+import org.geotools.geometry.jts.LiteCoordinateSequence;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,16 +44,16 @@ public class BuiltUpShapefileTest extends AbstractTest {
         TownTagger townTagger = mock(TownTagger.class);
         GeometryFactory factory = mock(GeometryFactory.class);
 
-        Point point = new Point(new PackedCoordinateSequence.Double(new double[]{2.5027452, 46.0514552}, 2), factory);
+        Point point = new Point(new LiteCoordinateSequence(new double[]{2.5027452, 46.0514552}, 2), factory);
         when(townTagger.getHamlet(12500001063055L)).thenReturn(new Centroid(12500001063055L, "Rougnat", null, 8, 32, 7, point));
 
-        Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.601984, 51.181340}, 2), factory);
+        Point point2 = new Point(new LiteCoordinateSequence(new double[]{4.601984, 51.181340}, 2), factory);
         when(townTagger.getHamlet(12500001060481L)).thenReturn(new Centroid(12500001060481L, "Auzances", "456", 8, 32, 8, point2));
 
-        Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.606374, 51.162370}, 2), factory);
+        Point point3 = new Point(new LiteCoordinateSequence(new double[]{4.606374, 51.162370}, 2), factory);
         when(townTagger.getHamlet(12500001067545L)).thenReturn(new Centroid(12500001067545L, "La Chaux-Bourdue", "123", 8, 32, 8, point3));
 
-        Point point4 = new Point(new PackedCoordinateSequence.Double(new double[]{4.596975, 51.210989}, 2), factory);
+        Point point4 = new Point(new LiteCoordinateSequence(new double[]{4.596975, 51.210989}, 2), factory);
         when(townTagger.getHamlet(12500001060737L)).thenReturn(new Centroid(112500001060737L, "Le Montely", "1011", 8, 32, 8, point4));
 
         BuiltUpShapefile shapefile = new BuiltUpShapefile(tomtomFolder, nameProvider, townTagger);
