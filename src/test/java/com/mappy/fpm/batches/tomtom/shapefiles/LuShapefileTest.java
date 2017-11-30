@@ -45,20 +45,27 @@ public class LuShapefileTest extends AbstractTest {
         assertThat(optWay.isPresent()).isTrue();
 
         Tags tags = optWay.get().getTags();
-        assertThat(tags.get("amenity")).contains("hospital");
-        assertThat(tags.get("name")).contains("Universitair Kinderziekenhuis Koningin Fabiola");
-        assertThat(tags.get("name:nl")).contains("Universitair Kinderziekenhuis");
-        assertThat(tags.get("name:fr")).contains("Hôpital Universitaire Des Enfants");
+        assertThat(tags.get("amenity")).isEqualTo("hospital");
+        assertThat(tags.get("name")).isEqualTo("Universitair Kinderziekenhuis Koningin Fabiola");
+        assertThat(tags.get("name:nl")).isEqualTo("Universitair Kinderziekenhuis");
+        assertThat(tags.get("name:fr")).isEqualTo("Hôpital Universitaire Des Enfants");
     }
 
     @Test
     public void should_tag_national_park_according_to_type(){
-        Optional<Way> optWay = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001001680")).findFirst();
-        assertThat(optWay.isPresent()).isTrue();
-        assertThat(optWay.get().getTags().get("landuse")).contains("grass");
+        Optional<Way> park = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001001680")).findFirst();
+        assertThat(park.isPresent()).isTrue();
+        assertThat(park.get().getTags().get("landuse")).isEqualTo("grass");
 
-        optWay = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001000884")).findFirst();
-        assertThat(optWay.isPresent()).isTrue();
-        assertThat(optWay.get().getTags().get("boundary")).contains("protected_area");
+        park = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001000884")).findFirst();
+        assertThat(park.isPresent()).isTrue();
+        assertThat(park.get().getTags().get("boundary")).isEqualTo("protected_area");
+    }
+
+    @Test
+    public void should_tag_airport() {
+        Optional<Way> airport = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001002409")).findFirst();
+        assertThat(airport.isPresent()).isTrue();
+        assertThat(airport.get().getTags().get("aeroway")).isEqualTo("aerodrome");
     }
 }

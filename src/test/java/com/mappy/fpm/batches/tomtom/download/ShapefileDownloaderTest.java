@@ -32,12 +32,12 @@ public class ShapefileDownloaderTest {
         HttpClient httpClient = mock(HttpClient.class);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
 
-        shapefileDownloader = new ShapefileDownloader(new File("target"), httpClient);
+        shapefileDownloader = new ShapefileDownloader(new File("target/download"), httpClient);
     }
 
     @Test
     public void should_download_shapefiles() {
-        File folder = new File("target/Andorre");
+        File folder = new File("target/download/Andorre");
         if (folder.exists()) {
             Stream.of(folder.listFiles()).forEach(file -> file.delete());
             folder.delete();

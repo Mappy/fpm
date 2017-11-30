@@ -66,7 +66,7 @@ public abstract class LandShapefile extends TomtomShapefile {
                 tags.put("natural", "grassland");
                 break;
             case 9732: // Airport Ground
-                tags.put("landuse", "grass");
+                tags.put("aeroway", "aerodrome");
                 break;
             case 9733: // Amusement Park Ground
                 tags.put("tourism", "theme_park");
