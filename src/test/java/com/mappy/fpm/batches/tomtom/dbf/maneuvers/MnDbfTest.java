@@ -18,7 +18,7 @@ public class MnDbfTest {
     }
 
     @Test
-    public void should_not_fail_when_no_mn_file_exists() throws Exception {
+    public void should_not_fail_when_no_mn_file_exists() {
         MnDbf mn = new MnDbf(new TomtomFolder("src/test/resources/osmgenerator/", "other_country"));
 
         assertThat(mn.maneuvers()).isEmpty();

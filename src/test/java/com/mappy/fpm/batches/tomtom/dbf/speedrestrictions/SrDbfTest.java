@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 public class SrDbfTest {
     @Test
-    public void should_parse_sr() throws Exception {
+    public void should_parse_sr() {
         TomtomFolder folder = mock(TomtomFolder.class);
         when(folder.getFile("sr.dbf")).thenReturn(getClass().getResource("/tomtom/sr2.dbf").getPath());
 

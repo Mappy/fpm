@@ -25,7 +25,7 @@ public class RoadShapefileTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void loadPbf() throws Exception {
+    public static void loadPbf() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("nw.shp")).thenReturn("src/test/resources/tomtom/road/nw.shp");

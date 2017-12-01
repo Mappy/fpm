@@ -29,7 +29,7 @@ public class ManeuversTest {
     }
 
     @Test
-    public void should_not_fail_when_no_mp_file_exists() throws Exception {
+    public void should_not_fail_when_no_mp_file_exists() {
         when(mp.paths()).thenReturn(newArrayList());
         when(mn.maneuvers()).thenReturn(newArrayList());
 
@@ -38,7 +38,7 @@ public class ManeuversTest {
     }
 
     @Test
-    public void should_create_maneuver_with_multiple_ways() throws Exception {
+    public void should_create_maneuver_with_multiple_ways() {
         when(mp.paths()).thenReturn(newArrayList(
                 new ManeuverPath(14420000070072L, 1L, 14420000006953L, 4110L),
                 new ManeuverPath(14420000070072L, 3L, 14420000051735L, 4110L),

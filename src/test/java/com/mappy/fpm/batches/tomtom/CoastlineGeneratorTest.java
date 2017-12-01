@@ -12,7 +12,7 @@ public class CoastlineGeneratorTest {
     private final OsmosisSerializer serializer = mock(OsmosisSerializer.class);
 
     @Test
-    public void should_generate_coastline() throws Exception {
+    public void should_generate_coastline() {
 
         new CoastlineGenerator("src/test/resources/tomtom/coastline", "src/test/resources", serializer).run();
 

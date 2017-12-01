@@ -33,7 +33,7 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void setup() throws Exception {
+    public static void setup() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___a7.shp")).thenReturn("src/test/resources/tomtom/boundaries/a7/b___a7.shp");
@@ -61,7 +61,7 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_members_with_tags() throws Exception {
+    public void should_have_members_with_tags() {
 
         Relation brussel = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000808")).findFirst().get();
         assertThat(brussel.getTags().size()).isEqualTo(11);
@@ -78,7 +78,7 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relation_with_role_label_and_tags() throws Exception {
+    public void should_have_relation_with_role_label_and_tags() {
         Tags labels = pbfContent.getRelations().stream()//
                 .flatMap(relation -> relation.getMembers().stream())//
                 .filter(relationMember -> relationMember.getRole().equals("label"))//
@@ -94,7 +94,7 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relation_with_tags_and_admin_centers() throws Exception {
+    public void should_have_relation_with_tags_and_admin_centers() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())

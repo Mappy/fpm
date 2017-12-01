@@ -30,7 +30,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void setup() throws Exception {
+    public static void setup() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("a8.shp")).thenReturn("src/test/resources/tomtom/boundaries/a8/Anderlecht___________a8.shp");
@@ -75,7 +75,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relations_with_all_tags() throws Exception {
+    public void should_have_relations_with_all_tags() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .map(Entity::getTags)
@@ -94,7 +94,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relations_with_tags_and_role_outer() throws Exception {
+    public void should_have_relations_with_tags_and_role_outer() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())
@@ -109,7 +109,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relation_with_role_label_and_tag_name() throws Exception {
+    public void should_have_relation_with_role_label_and_tag_name() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())
@@ -126,7 +126,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relation_with_tags_and_admin_centers() throws Exception {
+    public void should_have_relation_with_tags_and_admin_centers() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())
@@ -143,7 +143,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_Anderlecht_as_capital() throws Exception {
+    public void should_have_Anderlecht_as_capital() {
         List<Tags> tags = pbfContent.getNodes().stream()
                 .filter(node -> node.getTags().size() != 0)
                 .map(Entity::getTags)

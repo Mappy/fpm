@@ -20,7 +20,7 @@ public class BuildingShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void loadPbf() throws Exception {
+    public static void loadPbf() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("2dbd.shp")).thenReturn("src/test/resources/tomtom/building/2dbd.shp");
@@ -33,7 +33,7 @@ public class BuildingShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_generate_building_file() throws Exception {
+    public void should_generate_building_file() {
 
         assertThat(pbfContent.getRelations()).hasSize(12);
         assertThat(pbfContent.getWays()).hasSize(2140);

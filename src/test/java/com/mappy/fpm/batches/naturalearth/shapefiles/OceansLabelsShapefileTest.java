@@ -11,7 +11,7 @@ public class OceansLabelsShapefileTest {
     private final OceansLabelsShapefile shp = new OceansLabelsShapefile(getClass().getResource("/naturalearth").getPath());
 
     @Test
-    public void should_serialize_ocean_labels() throws Exception {
+    public void should_serialize_ocean_labels() {
         shp.serialize(serializer);
 
         assertThat(serializer.getPoints()).extracting(m -> m.get("place")).contains("ocean");

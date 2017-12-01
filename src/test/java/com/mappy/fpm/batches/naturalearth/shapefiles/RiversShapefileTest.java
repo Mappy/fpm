@@ -11,7 +11,7 @@ public class RiversShapefileTest {
     private final RiversShapefile shp = new RiversShapefile(getClass().getResource("/naturalearth").getPath());
 
     @Test
-    public void should_serialize_rivers() throws Exception {
+    public void should_serialize_rivers() {
         shp.serialize(serializer);
 
         assertThat(serializer.getMultilinestrings()).extracting(m -> "waterway".equals(m.get("stream"))).hasSize(10);

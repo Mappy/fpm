@@ -25,7 +25,7 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void setup() throws Exception {
+    public static void setup() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___oa07.shp")).thenReturn("src/test/resources/tomtom/boundaries/oa07/aquitaine___________oa07.shp");
@@ -61,7 +61,7 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
 
 
     @Test
-    public void should_have_relations_with_tags_and_role_outer() throws Exception {
+    public void should_have_relations_with_tags_and_role_outer() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())
@@ -76,7 +76,7 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relation_with_role_label_and_tag_name() throws Exception {
+    public void should_have_relation_with_role_label_and_tag_name() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())

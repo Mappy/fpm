@@ -14,7 +14,7 @@ public class LargePolygonSplitterTest {
     private static final GeometryFactory gf = new GeometryFactory();
 
     @Test
-    public void should_not_split_small_polygon() throws Exception {
+    public void should_not_split_small_polygon() {
         Polygon polygon = polygon(
                 new Coordinate(0.0, 0.0),
                 new Coordinate(1.0, 0.0),
@@ -28,7 +28,7 @@ public class LargePolygonSplitterTest {
     }
 
     @Test
-    public void should_split_polygon_in_4() throws Exception {
+    public void should_split_polygon_in_4() {
         Polygon polygon = polygon(
                 new Coordinate(0.0, 0.0),
                 new Coordinate(1.0, 0.0),
@@ -46,7 +46,7 @@ public class LargePolygonSplitterTest {
     }
 
     @Test
-    public void should_split_polygon_in_16() throws Exception {
+    public void should_split_polygon_in_16() {
         Polygon polygon = polygon(
                 new Coordinate(0.0, 0.0),
                 new Coordinate(1.0, 0.0),

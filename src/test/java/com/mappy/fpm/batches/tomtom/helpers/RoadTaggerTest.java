@@ -43,14 +43,14 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_add_level_tag() throws Exception {
+    public void should_add_level_tag() {
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0")))).containsEntry("layer", "0");
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "1", "T_ELEV", "1")))).containsEntry("layer", "1");
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "1")))).containsEntry("layer:from", "0").containsEntry("layer:to", "1");
     }
 
     @Test
-    public void should_tag_roundabout() throws Exception {
+    public void should_tag_roundabout() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "4")))).containsEntry("junction", "roundabout");
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "1")))).doesNotContainEntry("junction", "roundabout");
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "4")))).containsEntry("junction", "roundabout");
@@ -58,14 +58,14 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_tag_ferries() throws Exception {
+    public void should_tag_ferries() {
         assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "NAME", "Calais - Douvres", "MINUTES", "10.902")))).containsEntry("route", "ferry")
                 .containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54");
         assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "MINUTES", "10", "", "")))).containsEntry("route", "ferry").doesNotContainKey("name");
     }
 
     @Test
-    public void should_tag_ferries_without_cars() throws Exception {
+    public void should_tag_ferries_without_cars() {
         assertThat(tagger.tag(onlyTags(map("FT", "1", "FEATTYP", "4110", "ID", "123", "MINUTES", "10.902", "F_ELEV", "0", "T_ELEV", "0", "FOW", "14", "NAME", "Calais - Douvres", "ONEWAY", "N"))))
                 .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54").containsEntry("vehicle", "no");
     }
@@ -127,14 +127,14 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_add_bridge_and_tunnel() throws Exception {
+    public void should_add_bridge_and_tunnel() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "PARTSTRUC", "0")))).doesNotContainKey("tunnel").doesNotContainKey("bridge");
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "PARTSTRUC", "1")))).containsEntry("tunnel", "yes");
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "PARTSTRUC", "2")))).containsEntry("bridge", "yes");
     }
 
     @Test
-    public void should_tag_motorway_link() throws Exception {
+    public void should_tag_motorway_link() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10", "FRC", "0"))))
                 .containsEntry("highway", "motorway_link");
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10", "FRC", "7"))))
@@ -142,7 +142,7 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_tag_oneway() throws Exception {
+    public void should_tag_oneway() {
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("ID", "123", "ONEWAY", "FT", "F_ELEV", "0", "T_ELEV", "0", "FT", "0")))).containsEntry("oneway", "yes");
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("ID", "123", "ONEWAY", "TF", "F_ELEV", "0", "T_ELEV", "0", "FT", "0")))).containsEntry("oneway", "yes");
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("ID", "123", "ONEWAY", "N", "F_ELEV", "0", "T_ELEV", "0", "FT", "0")))).doesNotContainKey("oneway");
@@ -151,7 +151,7 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_add_ref_tag() throws Exception {
+    public void should_add_ref_tag() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "SHIELDNUM", "A13")))).containsEntry("ref", "A13");
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0")))).doesNotContainKey("ref");
     }

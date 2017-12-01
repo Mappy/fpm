@@ -22,7 +22,7 @@ public class WaterLineShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void loadPbf() throws Exception {
+    public static void loadPbf() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("wl.shp")).thenReturn("src/test/resources/tomtom/waterline/wl.shp");
@@ -41,7 +41,7 @@ public class WaterLineShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_generate_waterlines() throws Exception {
+    public void should_generate_waterlines() {
         List<Way> ways = pbfContent.getWays();
 
         Optional<Way> optRiver = ways.stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "12501000193184")).findFirst();

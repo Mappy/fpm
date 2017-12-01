@@ -11,7 +11,7 @@ public class RailRoadsShapefileTest {
     private final RailRoadsShapefile shp = new RailRoadsShapefile(getClass().getResource("/naturalearth").getPath());
 
     @Test
-    public void should_serialize_roads() throws Exception {
+    public void should_serialize_roads() {
         shp.serialize(serializer);
 
         assertThat(serializer.getMultilinestrings()).extracting(m -> m.get("railway")).containsOnly("rail");

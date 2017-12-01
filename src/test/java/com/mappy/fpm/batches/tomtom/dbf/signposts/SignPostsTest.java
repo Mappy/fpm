@@ -19,7 +19,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_load_signs() throws Exception {
+    public void should_load_signs() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp.dbf").getPath());
 
@@ -30,7 +30,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_generate_tags_for_one_way() throws Exception {
+    public void should_generate_tags_for_one_way() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp.dbf").getPath());
 
@@ -41,7 +41,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_generate_tags_for_bidirectional_way() throws Exception {
+    public void should_generate_tags_for_bidirectional_way() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp.dbf").getPath());
 
@@ -52,7 +52,7 @@ public class SignPostsTest {
     }
 
    @Test
-   public void should_generate_tag_for_signpost_on_intermediate_junction() throws Exception {
+   public void should_generate_tag_for_signpost_on_intermediate_junction() {
        when(folder.getFile("sg.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_sg.dbf").getPath());
        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_si.dbf").getPath());
        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_sp.dbf").getPath());
@@ -70,7 +70,7 @@ public class SignPostsTest {
    }
 
     @Test
-    public void should_prefer_large_sign() throws Exception {
+    public void should_prefer_large_sign() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si2.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp2.dbf").getPath());
 
@@ -80,7 +80,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_load_exits() throws Exception {
+    public void should_load_exits() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si3.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp3.dbf").getPath());
 
@@ -90,7 +90,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_distinguish_road_references_and_destinations_references() throws Exception {
+    public void should_distinguish_road_references_and_destinations_references() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si4.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp4.dbf").getPath());
 
@@ -101,7 +101,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_load_road_references_on_shield() throws Exception {
+    public void should_load_road_references_on_shield() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si5.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp5.dbf").getPath());
 
@@ -112,7 +112,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_load_pictogramme() throws Exception {
+    public void should_load_pictogramme() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si3.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp3.dbf").getPath());
 
@@ -123,7 +123,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_load_signpost_header() throws Exception {
+    public void should_load_signpost_header() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si5.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp5.dbf").getPath());
 
@@ -133,7 +133,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_load_signpost_content() throws Exception {
+    public void should_load_signpost_content() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si4.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp4.dbf").getPath());
 
@@ -143,7 +143,7 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_load_signpost_content_with_picto() throws Exception {
+    public void should_load_signpost_content_with_picto() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si6.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp6.dbf").getPath());
 

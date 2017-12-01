@@ -17,7 +17,7 @@ public class CountriesShapefileTest {
     private final CountriesShapefile shp = new CountriesShapefile(getClass().getResource("/naturalearth").getPath(), geonames);
 
     @Test
-    public void should_serialize_countries() throws Exception {
+    public void should_serialize_countries() {
         shp.serialize(serializer);
 
         assertThat(serializer.getPoints())
@@ -26,7 +26,7 @@ public class CountriesShapefileTest {
     }
 
     @Test
-    public void should_add_french_names() throws Exception {
+    public void should_add_french_names() {
         when(geonames.frenchNames("NLD")).thenReturn(newArrayList(new AlternateName("Pays-Bas", false, false, false, false)));
 
         shp.serialize(serializer);

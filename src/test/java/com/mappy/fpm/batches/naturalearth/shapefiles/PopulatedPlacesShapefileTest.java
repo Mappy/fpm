@@ -16,7 +16,7 @@ public class PopulatedPlacesShapefileTest {
     private final PopulatedPlacesShapefile shp = new PopulatedPlacesShapefile(getClass().getResource("/naturalearth").getPath(), geonames);
 
     @Test
-    public void should_serialize_place() throws Exception {
+    public void should_serialize_place() {
         shp.serialize(serializer);
 
         assertThat(serializer.getPoints())
@@ -26,7 +26,7 @@ public class PopulatedPlacesShapefileTest {
     }
 
     @Test
-    public void should_serialize_capital() throws Exception {
+    public void should_serialize_capital() {
         shp.serialize(serializer);
 
         assertThat(serializer.getPoints())
@@ -36,7 +36,7 @@ public class PopulatedPlacesShapefileTest {
     }
 
     @Test
-    public void should_add_geonames_names() throws Exception {
+    public void should_add_geonames_names() {
         when(geonames.frenchNames(260114)).thenReturn(newArrayList(new AlternateName("La Canée", false, false, false, false)));
 
         shp.serialize(serializer);

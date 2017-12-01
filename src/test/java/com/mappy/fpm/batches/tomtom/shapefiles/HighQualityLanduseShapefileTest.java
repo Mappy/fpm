@@ -22,7 +22,7 @@ public class HighQualityLanduseShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void loadPbf() throws Exception {
+    public static void loadPbf() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("2dtb.shp")).thenReturn("src/test/resources/tomtom/landuse/2dtb.shp");

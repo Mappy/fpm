@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.*;
 
 public class LaneDirectionTest {
     @Test
-    public void should_read_lane_info() throws Exception {
+    public void should_read_lane_info() {
         assertThat(LaneDirection.parse(65, "R100")).isEqualTo(
                 new LaneDirection(newArrayList(Straight, Left), newArrayList(0)));
         assertThat(LaneDirection.parse(129, "R011")).isEqualTo(

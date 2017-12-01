@@ -18,7 +18,7 @@ public class MpDbfTest {
     }
 
     @Test
-    public void should_not_fail_when_no_mp_file_exists() throws Exception {
+    public void should_not_fail_when_no_mp_file_exists() {
         MpDbf mp = new MpDbf(new TomtomFolder("src/test/resources/osmgenerator/", "other_country"));
         assertThat(mp.paths()).isEmpty();
     }

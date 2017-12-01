@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.*;
 
 public class GeohashTest {
     @Test
-    public void should_encode_point() throws Exception {
+    public void should_encode_point() {
         assertThat(encodeGeohash(0, 1.0, 1.0)).isEqualTo(1525778252023487L);
         assertThat(encodeGeohash(1, 1.0, 1.0)).isEqualTo(37554575270987455L);
         assertThat(encodeGeohash(2, 1.0, 1.0)).isEqualTo(73583372289951423L);
@@ -17,20 +17,20 @@ public class GeohashTest {
     }
 
     @Test
-    public void should_remove_layer() throws Exception {
+    public void should_remove_layer() {
         assertThat(withoutLayer(encodeGeohash(1, 1.0, 1.0))).isEqualTo(encodeGeohash(0, 1.0, 1.0));
         assertThat(withoutLayer(encodeGeohash(5, 3.0, 48.0))).isEqualTo(encodeGeohash(0, 3.0, 48.0));
     }
 
     @Test
-    public void should_return_layer() throws Exception {
+    public void should_return_layer() {
         assertThat(Geohash.getLayer(encodeGeohash(5, 3.0, 48.0))).isEqualTo(5);
         assertThat(Geohash.getLayer(encodeGeohash(0, 1.0, 1.0))).isEqualTo(0);
         assertThat(Geohash.getLayer(encodeGeohash(2, 4.0, 55.0))).isEqualTo(2);
     }
 
     @Test
-    public void should_encode_and_decode_geohash() throws Exception {
+    public void should_encode_and_decode_geohash() {
         assertThat(decodeString(encodeString("u0d1h30d"))).isEqualTo("u0d1h30d");
 
         assertThat(decodeString(encodeGeohash(0, 1.0, 1.0))).isEqualTo("s00twy01mtw");
@@ -38,7 +38,7 @@ public class GeohashTest {
     }
 
     @Test
-    public void should_decode_geohash() throws Exception {
+    public void should_decode_geohash() {
         LatLong decode = Geohash.decodeGeohash(encodeGeohash(0, 2.294351, 48.858844));
 
         assertThat(decode.getLat()).isCloseTo(48.858844, within(0.000001));

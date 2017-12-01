@@ -22,7 +22,7 @@ public class LcShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void loadPbf() throws Exception {
+    public static void loadPbf() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("lc.shp")).thenReturn("src/test/resources/tomtom/landcover/lc.shp");
@@ -40,7 +40,7 @@ public class LcShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_change_name_to_french_when_available() throws Exception {
+    public void should_change_name_to_french_when_available() {
         Optional<Relation> optRelation = pbfContent.getRelations().stream().filter(relation -> relation.getTags().hasKeyValue("ref:tomtom", "10560001002712")).findFirst();
         assertThat(optRelation.isPresent()).isTrue();
 

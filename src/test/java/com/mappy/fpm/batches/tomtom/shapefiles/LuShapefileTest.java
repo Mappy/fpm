@@ -22,7 +22,7 @@ public class LuShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void loadPbf() throws Exception {
+    public static void loadPbf() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("lu.shp")).thenReturn("src/test/resources/tomtom/landuse/lu.shp");
@@ -40,7 +40,7 @@ public class LuShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_change_name_to_french_when_available() throws Exception {
+    public void should_change_name_to_french_when_available() {
         Optional<Way> optWay = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001002272")).findFirst();
         assertThat(optWay.isPresent()).isTrue();
 

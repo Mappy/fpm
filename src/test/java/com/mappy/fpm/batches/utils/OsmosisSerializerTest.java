@@ -27,7 +27,7 @@ public class OsmosisSerializerTest {
     private final OsmosisSerializer serializer = new OsmosisSerializer(sink, "user", timestamp);
 
     @Test
-    public void should_write_points() throws Exception {
+    public void should_write_points() {
         serializer.write(point(42.0), ImmutableMap.of("place", "city", "name", "Paris"));
         serializer.write(point(42.1), ImmutableMap.of("place", "town"));
 
@@ -45,7 +45,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_not_write_duplicate_points_on_ways() throws Exception {
+    public void should_not_write_duplicate_points_on_ways() {
         serializer.write(
                 linestring(
                         new Coordinate[]{
@@ -66,7 +66,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_increment_way_id_if_aready_exists() throws Exception {
+    public void should_increment_way_id_if_already_exists() {
 
         serializer.write(
                 linestring(
@@ -87,7 +87,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_generate_relation_id() throws Exception {
+    public void should_generate_relation_id() {
         writeWays();
         serializer.writeRelation(newArrayList(
                 new RelationMember(1525972802595572L, Way, "from"),
@@ -102,7 +102,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_generate_relation_id_with_same_way() throws Exception {
+    public void should_generate_relation_id_with_same_way() {
         writeWays();
         serializer.writeRelation(newArrayList(
                 new RelationMember(1525972802595572L, Way, "from")), newHashMap());
@@ -115,7 +115,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_not_generate_same_relation_id_with_layer() throws Exception {
+    public void should_not_generate_same_relation_id_with_layer() {
         writeWays();
         serializer.writeRelation(newArrayList(
                 new RelationMember(1525972802595572L, Way, "from")), ImmutableMap.of("layer", "0"));
@@ -128,7 +128,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_write_ways() throws Exception {
+    public void should_write_ways() {
         serializer.write(
                 multilinestring(
                         new Coordinate[]{new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(2.0, 0.0)},
@@ -140,7 +140,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_write_boundary() throws Exception {
+    public void should_write_boundary() {
         serializer.writeBoundary(linestring(
                 new Coordinate[]{
                         new Coordinate(0.0, 0.0),
@@ -160,7 +160,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_not_write_same_boundary() throws Exception {
+    public void should_not_write_same_boundary() {
         serializer.writeBoundary(linestring(
                 new Coordinate[]{
                         new Coordinate(0.0, 0.0),
@@ -180,7 +180,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_write_polygon() throws Exception {
+    public void should_write_polygon() {
         serializer.write(
                 polygon(new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(1.0, 1.0), new Coordinate(0.0, 1.0), new Coordinate(0.0, 0.0)),
                 ImmutableMap.of("landuse", "residential"));
@@ -199,7 +199,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_discard_consecutive_duplicated_points() throws Exception {
+    public void should_discard_consecutive_duplicated_points() {
         serializer.write(
                 polygon(new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(1.0, 1.0), new Coordinate(1.0000000001, 1.0), new Coordinate(0.0, 1.0), new Coordinate(0.0, 0.0)),
                 ImmutableMap.of("landuse", "residential"));
@@ -218,7 +218,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_write_polygon_with_holes() throws Exception {
+    public void should_write_polygon_with_holes() {
         serializer.write(
                 polygon(
                         new Coordinate[]{new Coordinate(0.0, 0.0), new Coordinate(10.0, 0.0), new Coordinate(10.0, 10.0), new Coordinate(0.0, 10.0), new Coordinate(0.0, 0.0)},
@@ -237,7 +237,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_write_polygon_without_holes_as_way() throws Exception {
+    public void should_write_polygon_without_holes_as_way() {
         serializer.write(
                 polygon(new Coordinate[]{new Coordinate(0.0, 0.0), new Coordinate(1.0, 0.0), new Coordinate(1.0, 1.0), new Coordinate(0.0, 1.0), new Coordinate(0.0, 0.0)}, new Coordinate[][]{}),
                 ImmutableMap.of("natural", "water"));
@@ -256,7 +256,7 @@ public class OsmosisSerializerTest {
     }
 
     @Test
-    public void should_write_multipolygon() throws Exception {
+    public void should_write_multipolygon() {
         Polygon polygon1 = polygon(
                 new Coordinate[]{new Coordinate(0.0, 0.0), new Coordinate(10.0, 0.0), new Coordinate(10.0, 10.0), new Coordinate(0.0, 10.0), new Coordinate(0.0, 0.0)},
                 new Coordinate[][]{new Coordinate[]{new Coordinate(2.0, 2.0), new Coordinate(3.0, 2.0), new Coordinate(3.0, 3.0), new Coordinate(2.0, 3.0), new Coordinate(2.0, 2.0)}});

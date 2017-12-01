@@ -14,7 +14,7 @@ public class BoundaryLinesLandShapefileTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void should_serialize_airports() throws Exception {
+    public void should_serialize_airports() {
         shp.serialize(serializer);
 
         assertThat(serializer.getMultilinestrings())

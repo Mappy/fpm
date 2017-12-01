@@ -11,7 +11,7 @@ public class LdDbfTest {
     private final TomtomFolder folder = mock(TomtomFolder.class);
 
     @Test
-    public void should_parse_ld_file() throws Exception {
+    public void should_parse_ld_file() {
         when(folder.getFile("ld.dbf")).thenReturn(getClass().getResource("/tomtom/ld.dbf").getPath());
         LdDbf directions = new LdDbf(folder);
 

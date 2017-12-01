@@ -8,8 +8,9 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LayersTest {
+
     @Test
-    public void should_be_0_by_default() throws Exception {
+    public void should_be_0_by_default() {
         ImmutableMap<String, String> tags = ImmutableMap.of();
 
         assertThat(Layers.layer(tags, true, false)).isEqualTo(0);
@@ -18,7 +19,7 @@ public class LayersTest {
     }
 
     @Test
-    public void should_handle_way_at_same_level() throws Exception {
+    public void should_handle_way_at_same_level() {
         Map<String, String> tags = ImmutableMap.of("layer", "1");
 
         assertThat(Layers.layer(tags, true, false)).isEqualTo(1);
@@ -27,7 +28,7 @@ public class LayersTest {
     }
 
     @Test
-    public void should_handle_way_at_different_level() throws Exception {
+    public void should_handle_way_at_different_level() {
         Map<String, String> tags = ImmutableMap.of("layer:from", "0", "layer:to", "-1");
 
         assertThat(Layers.layer(tags, true, false)).isEqualTo(0);
@@ -36,7 +37,7 @@ public class LayersTest {
     }
 
     @Test
-    public void should_find_layers() throws Exception {
+    public void should_find_layers() {
         assertThat(Layers.layer("-9")).isEqualTo(18);
         assertThat(Layers.layer("-4")).isEqualTo(8);
         assertThat(Layers.layer("-3")).isEqualTo(6);

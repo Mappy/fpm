@@ -25,7 +25,7 @@ public class GenerateFullPbfTest {
     private final GenerateFullPbf generateFullPbf = new GenerateFullPbf(osmMerger, "src/test/resources/generateFullPbf", "target", "Europe.osm.pbf", 1);
 
     @Test(expected = IllegalArgumentException.class)
-    public void should_throw_IllegalArgumentException_when_country_is_unknown() throws Exception {
+    public void should_throw_IllegalArgumentException_when_country_is_unknown() {
         generateFullPbf.run(newArrayList("fakeCountry"));
     }
 

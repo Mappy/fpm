@@ -26,7 +26,7 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void setup() throws Exception {
+    public static void setup() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___a0.shp")).thenReturn("src/test/resources/tomtom/boundaries/a0/andorra______________a0.shp");
@@ -45,7 +45,7 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relations_with_all_tags() throws Exception {
+    public void should_have_relations_with_all_tags() {
         List<Relation> relations = pbfContent.getRelations();
         assertThat(relations).hasSize(1);
 
@@ -62,7 +62,7 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relations_with_ways() throws Exception {
+    public void should_have_relations_with_ways() {
         List<RelationMember> labels = pbfContent.getRelations().stream()//
                 .flatMap(relation -> relation.getMembers().stream())//
                 .filter(relationMember -> relationMember.getRole().equals("outer"))//
@@ -79,7 +79,7 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relation_with_role_label_and_tags() throws Exception {
+    public void should_have_relation_with_role_label_and_tags() {
         List<RelationMember> labels = pbfContent.getRelations().stream()//
                 .flatMap(relation -> relation.getMembers().stream())//
                 .filter(relationMember -> relationMember.getRole().equals("label"))//
@@ -96,7 +96,7 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_not_have_a_null_or_empty_population_on_relation() throws Exception {
+    public void should_not_have_a_null_or_empty_population_on_relation() {
         assertThat(pbfContent.getRelations()).filteredOn(relation -> relation.getTags().hasKey("population")).isEmpty();
     }
 }

@@ -24,7 +24,7 @@ public class RoadTaggerIT {
     private static final PbfContent pbfContent = getGeneratedPbf();
 
     @Test
-    public void should_generate_roads_file() throws Exception {
+    public void should_generate_roads_file() {
         Map<String, List<Way>> waysByName = pbfContent.getWays().stream().collect(groupingBy(w -> "" + w.getTags().get("name")));
 
         Way way = waysByName.get("Carrer de Sant Esteve").get(0);
@@ -34,7 +34,7 @@ public class RoadTaggerIT {
     }
 
     @Test
-    public void should_generate_roads_file_with_parking_aisle() throws Exception {
+    public void should_generate_roads_file_with_parking_aisle() {
         assertThat(pbfContent.getWays().stream())
                 .filteredOn(w -> w.getTags().hasKeyValue("ref:tomtom", "10200000004654"))
                 .filteredOn(w -> w.getTags().hasKeyValue("highway", "service"))
@@ -42,7 +42,7 @@ public class RoadTaggerIT {
     }
 
     @Test
-    public void should_generate_roads_with_speed_profile() throws Exception {
+    public void should_generate_roads_with_speed_profile() {
         Map<String, List<Way>> waysByName = pbfContent.getWays().stream().collect(groupingBy(w -> "" + w.getTags().get("name")));
 
         Way way = waysByName.get("Avinguda del Consell d'Europa").get(0);
@@ -69,7 +69,7 @@ public class RoadTaggerIT {
     }
 
     @Test
-    public void should_generate_restrictions() throws Exception {
+    public void should_generate_restrictions() {
         Map<String, List<Relation>> restrictionsByFromRoadName = pbfContent.getRelations().stream().collect(groupingBy(r -> "" + r.getMembers().get(0).getEntity().getTags().get("name")));
         Relation restrictions = restrictionsByFromRoadName.get("Carrer de Sant Salvador").get(1);
 

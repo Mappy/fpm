@@ -46,7 +46,7 @@ public class GenerateFullPbf {
         executorService = new ThreadPoolExecutor(nbThreads, nbThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), threadFactory);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         checkArgument(args.length == 5, "Usage: GenerateFullPbf <countryList> <inputDirectoryPath> <outputDirectoryPath> <outputFileName> <threadNumber>");
 
         String countryList = args[0];
@@ -63,7 +63,7 @@ public class GenerateFullPbf {
                 parseInt(threadNumber)).run(on(",").trimResults().splitToList(countryList));
     }
 
-    public void run(List<String> countries) throws IOException {
+    public void run(List<String> countries) {
         log.info("Running with countries : {}", countries);
 
         try {

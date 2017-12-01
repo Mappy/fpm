@@ -18,7 +18,7 @@ public class TownTaggerTest extends AbstractTest {
     private TownTagger townTagger;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("sm.shp")).thenReturn("src/test/resources/tomtom/town/Anderlecht___________sm.shp");

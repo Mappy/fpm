@@ -20,7 +20,7 @@ public class RailwayShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void loadPbf() throws Exception {
+    public static void loadPbf() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("rr.shp")).thenReturn("src/test/resources/tomtom/railway/rr.shp");

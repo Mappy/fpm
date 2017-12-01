@@ -25,7 +25,7 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void setup() throws Exception {
+    public static void setup() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___a1.shp")).thenReturn("src/test/resources/tomtom/boundaries/a1/belgium______________a1.shp");
@@ -44,7 +44,7 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_members_with_tags() throws Exception {
+    public void should_have_members_with_tags() {
 
         Relation wallonie = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000851")).findFirst().get();
         assertThat(wallonie.getTags().size()).isEqualTo(7);
@@ -76,7 +76,7 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relation_with_role_label_and_tags() throws Exception {
+    public void should_have_relation_with_role_label_and_tags() {
         List<RelationMember> labels = pbfContent.getRelations().stream()//
                 .flatMap(relation -> relation.getMembers().stream())//
                 .filter(relationMember -> relationMember.getRole().equals("label"))//
@@ -102,13 +102,13 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_inner_boundaries_in_vlaams_gewest() throws Exception {
+    public void should_have_inner_boundaries_in_vlaams_gewest() {
         Relation vlaamsGewest = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000849")).findFirst().get();
         assertThat(vlaamsGewest.getMembers().stream().filter(relationMember -> relationMember.getRole().equals("inner")).collect(toList())).isNotEmpty();
     }
 
     @Test
-    public void should_have_some_outer_boundaries_in_all_3_relations() throws Exception {
+    public void should_have_some_outer_boundaries_in_all_3_relations() {
         Relation wallonie = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000851")).findFirst().get();
         assertThat(wallonie.getMembers().stream().filter(relationMember -> relationMember.getRole().equals("outer")).collect(toList())).isNotEmpty();
 

@@ -15,7 +15,7 @@ public class SpeedRestrictionTaggerTest {
     private final SpeedRestrictionTagger tagger = new SpeedRestrictionTagger(dbf);
 
     @Test
-    public void should_tag_maxspeed() throws Exception {
+    public void should_tag_maxspeed() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(new SpeedRestriction(123, 50, both)));
 
         assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
@@ -23,14 +23,14 @@ public class SpeedRestrictionTaggerTest {
     }
 
     @Test
-    public void should_not_add_maxspeed_if_not_present_in_dbf() throws Exception {
+    public void should_not_add_maxspeed_if_not_present_in_dbf() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList());
 
         assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")))).isEmpty();
     }
 
     @Test
-    public void should_tag_maxspeed_for_each_side() throws Exception {
+    public void should_tag_maxspeed_for_each_side() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
                 new SpeedRestriction(123, 30, positive),
                 new SpeedRestriction(123, 60, negative)));
@@ -41,7 +41,7 @@ public class SpeedRestrictionTaggerTest {
     }
 
     @Test
-    public void should_invert_if_needed() throws Exception {
+    public void should_invert_if_needed() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
                 new SpeedRestriction(123, 30, positive),
                 new SpeedRestriction(123, 60, negative)));
@@ -52,7 +52,7 @@ public class SpeedRestrictionTaggerTest {
     }
 
     @Test
-    public void should_handle_both_side() throws Exception {
+    public void should_handle_both_side() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
                 new SpeedRestriction(123, 80, both)));
 
@@ -61,7 +61,7 @@ public class SpeedRestrictionTaggerTest {
     }
 
     @Test
-    public void should_handle_multiple_speeds() throws Exception {
+    public void should_handle_multiple_speeds() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
                 new SpeedRestriction(123, 80, both),
                 new SpeedRestriction(123, 90, both)));

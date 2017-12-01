@@ -31,7 +31,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
     private static PbfContent pbfContent;
 
     @BeforeClass
-    public static void setup() throws Exception {
+    public static void setup() {
         NameProvider nameProvider = mock(NameProvider.class);
         when(nameProvider.getAlternateCityNames(12500001063055L)).thenReturn(newHashMap(of("name:fr", "Rougnat_fr")));
         when(nameProvider.getAlternateCityNames(12500001060481L)).thenReturn(newHashMap(of("name:fr", "Auzances_fr")));
@@ -92,7 +92,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relations_with_tags_and_role_outer() throws Exception {
+    public void should_have_relations_with_tags_and_role_outer() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())
@@ -106,7 +106,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
     }
 
     @Test
-    public void should_have_relation_with_role_label_and_tag_name() throws Exception {
+    public void should_have_relation_with_role_label_and_tag_name() {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())

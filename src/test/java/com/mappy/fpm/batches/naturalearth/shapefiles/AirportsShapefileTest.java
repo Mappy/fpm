@@ -11,7 +11,7 @@ public class AirportsShapefileTest {
     private final AirportsShapefile shp = new AirportsShapefile(getClass().getResource("/naturalearth").getPath());
 
     @Test
-    public void should_serialize_airports() throws Exception {
+    public void should_serialize_airports() {
         shp.serialize(serializer);
 
         assertThat(serializer.getPoints())

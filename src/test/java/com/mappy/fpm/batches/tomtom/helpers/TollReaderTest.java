@@ -24,7 +24,7 @@ public class TollReaderTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void should_fail_with_malformed_file() throws Exception {
+    public void should_fail_with_malformed_file() {
         when(tomtomFolder.getTollsFile()).thenReturn("src/test/resources/toll/malformed_file.json");
 
         TollReader tollReader = new TollReader(tomtomFolder);
@@ -33,7 +33,7 @@ public class TollReaderTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void should_fail_with_missing_tomtomId_key() throws Exception {
+    public void should_fail_with_missing_tomtomId_key() {
         when(tomtomFolder.getTollsFile()).thenReturn("src/test/resources/toll/without_tomtomId.json");
 
         TollReader tollReader = new TollReader(tomtomFolder);
@@ -51,7 +51,7 @@ public class TollReaderTest {
     }
 
     @Test
-    public void should_return_tolls() throws Exception {
+    public void should_return_tolls() {
         when(tomtomFolder.getTollsFile()).thenReturn("src/test/resources/toll/tolls.json");
 
         TollReader tollReader = new TollReader(tomtomFolder);

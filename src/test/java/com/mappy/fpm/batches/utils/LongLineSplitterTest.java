@@ -14,7 +14,7 @@ public class LongLineSplitterTest {
     private static final GeometryFactory gf = new GeometryFactory();
 
     @Test
-    public void should_split_long_line() throws Exception {
+    public void should_split_long_line() {
         Polygon polygon = polygon(
                 new Coordinate(0.0, 0.0),
                 new Coordinate(1.0, 0.0),
@@ -36,7 +36,7 @@ public class LongLineSplitterTest {
     }
 
     @Test
-    public void should_return_same_geom_if_necessary() throws Exception {
+    public void should_return_same_geom_if_necessary() {
         LineString linestring = linestring(
                 new Coordinate(0.0, 0.0),
                 new Coordinate(1.0, 0.0),
@@ -54,7 +54,7 @@ public class LongLineSplitterTest {
     }
 
     @Test
-    public void should_split_linestring() throws Exception {
+    public void should_split_linestring() {
         LineString linestring = linestring(
                 new Coordinate(0.0, 0.0),
                 new Coordinate(1.0, 0.0),
