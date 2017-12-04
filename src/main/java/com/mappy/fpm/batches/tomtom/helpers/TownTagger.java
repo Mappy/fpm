@@ -93,6 +93,7 @@ public class TownTagger {
                     place = of("village");
                     break;
                 case 1:
+                case 2:
                     place = of(dispclass < 8 ? "city" : "town");
                     break;
                 case 32:
