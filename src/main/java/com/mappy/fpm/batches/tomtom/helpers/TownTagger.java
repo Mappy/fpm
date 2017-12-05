@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -86,7 +85,7 @@ public class TownTagger {
         }
 
         public Optional<String> getPlace() {
-            Optional<String> place = empty();
+            Optional<String> place = of("town");
 
             switch (citytyp) {
                 case 0:
