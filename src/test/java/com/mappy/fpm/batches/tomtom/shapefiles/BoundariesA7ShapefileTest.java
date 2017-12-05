@@ -43,8 +43,8 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
         when(nameProvider.getAlternateNames(10560000000823L)).thenReturn(of("name", "Halle-Vilvoorde", "name:fr", "Halle-Vilvoorde FR", "name:nl", "Halle-Vilvoorde NL"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
-        when(osmLevelGenerator.getOsmLevel("b", "0")).thenReturn("2");
-        when(osmLevelGenerator.getOsmLevel("b", "7")).thenReturn("7");
+        when(osmLevelGenerator.getOsmLevel("b", 0)).thenReturn("2");
+        when(osmLevelGenerator.getOsmLevel("b", 7)).thenReturn("7");
 
         CapitalProvider capitalProvider = mock(CapitalProvider.class);
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.307077, 50.8366041}, 2), new GeometryFactory());

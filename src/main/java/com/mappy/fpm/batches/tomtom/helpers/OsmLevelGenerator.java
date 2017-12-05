@@ -19,22 +19,22 @@ public class OsmLevelGenerator {
 
     protected enum CountryLevel {
 
-        BEL("7", "7"), DEU("9", "10"), GBR("9", "10");
+        BEL(7, "7"), DEU(9, "10"), GBR(9, "10");
 
-        private final String tomtomLevel;
+        private final Integer tomtomLevel;
         private final String osmLevel;
 
-        CountryLevel(String tomtomLevel, String osmLevel) {
+        CountryLevel(Integer tomtomLevel, String osmLevel) {
             this.tomtomLevel = tomtomLevel;
             this.osmLevel = osmLevel;
         }
 
-        public String getOsmLevel(String tomtomLevel, String defaultOsmLevel) {
+        public String getOsmLevel(Integer tomtomLevel, String defaultOsmLevel) {
             return this.tomtomLevel.equals(tomtomLevel) ? osmLevel : defaultOsmLevel;
         }
     }
 
-    public String getOsmLevel(String zone, String tomtomLevel) {
+    public String getOsmLevel(String zone, Integer tomtomLevel) {
 
         String defaultOsmLevel = AdminLevel.valueOf("A" + tomtomLevel).getOsmLevel();
 

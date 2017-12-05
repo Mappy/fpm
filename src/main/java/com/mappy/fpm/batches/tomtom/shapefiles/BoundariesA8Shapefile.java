@@ -51,7 +51,7 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
             cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
             ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
 
-            String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass().toString());
+            String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
             tags.put("capital", "2".equals(capital) ? "yes" : capital);
 
             ofNullable(feature.getLong("POP")).ifPresent(pop -> tags.put("population", String.valueOf(pop)));

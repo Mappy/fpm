@@ -40,7 +40,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         zone = split[split.length - 1].split("_[_2]")[0];
 
         this.osmLevelGenerator = osmLevelGenerator;
-        this.osmLevel = osmLevelGenerator.getOsmLevel(zone, String.valueOf(tomtomLevel));
+        this.osmLevel = osmLevelGenerator.getOsmLevel(zone, tomtomLevel);
         this.tomtomLevel = String.valueOf(tomtomLevel);
         this.nameProvider = nameProvider;
         if (new File(filename).exists()) {

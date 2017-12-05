@@ -41,7 +41,7 @@ public class BoundariesA2ShapefileTest extends AbstractTest {
         when(nameProvider.getAlternateNames(10560000000838L)).thenReturn(of("name", "Leuven"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
-        when(osmLevelGenerator.getOsmLevel("belbe2", "2")).thenReturn("6");
+        when(osmLevelGenerator.getOsmLevel("belbe2", 2)).thenReturn("6");
 
         CapitalProvider capitalProvider = mock(CapitalProvider.class);
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.703077, 50.8756041}, 2), new GeometryFactory());

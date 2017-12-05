@@ -52,7 +52,7 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
             cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
             tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
-            String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass().toString());
+            String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
             tags.put("capital", "2".equals(capital) ? "yes" : capital);
 
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);

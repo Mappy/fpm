@@ -46,7 +46,7 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
         when(nameProvider.getAlternateNames(10200000000008L)).thenReturn(of("name", "Andorra", "name:fr", "Andorre"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
-        when(osmLevelGenerator.getOsmLevel("andorra", "0")).thenReturn("2");
+        when(osmLevelGenerator.getOsmLevel("andorra", 0)).thenReturn("2");
 
         BoundariesA0Shapefile shapefile = new BoundariesA0Shapefile(tomtomFolder, nameProvider, capitalProvider, osmLevelGenerator);
 

@@ -52,7 +52,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
                 .thenReturn(of("name", "Vorst", "name:nl", "VorstCNL", "name:fr", "VorstCFR"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
-        when(osmLevelGenerator.getOsmLevel("Anderlecht", "8")).thenReturn("8");
+        when(osmLevelGenerator.getOsmLevel("Anderlecht", 8)).thenReturn("8");
 
         TownTagger townTagger = mock(TownTagger.class);
         GeometryFactory factory = mock(GeometryFactory.class);

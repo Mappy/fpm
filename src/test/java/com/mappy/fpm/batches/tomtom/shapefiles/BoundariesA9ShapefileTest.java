@@ -56,8 +56,8 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
                 .thenReturn(of("name", "Oelegem", "name:nl", "OelegemCNL", "name:fr", "OelegemCFR"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
-        when(osmLevelGenerator.getOsmLevel("Ranst", "8")).thenReturn("8");
-        when(osmLevelGenerator.getOsmLevel("Ranst", "9")).thenReturn("9");
+        when(osmLevelGenerator.getOsmLevel("Ranst", 8)).thenReturn("8");
+        when(osmLevelGenerator.getOsmLevel("Ranst", 9)).thenReturn("9");
 
         TownTagger townTagger = mock(TownTagger.class);
         GeometryFactory factory = new GeometryFactory();
