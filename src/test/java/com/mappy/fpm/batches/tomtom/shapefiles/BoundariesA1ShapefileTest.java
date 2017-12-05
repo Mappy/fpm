@@ -117,7 +117,7 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
     public void should_have_relation_with_role_admin_center_and_tags() {
         List<RelationMember> adminCenter = pbfContent.getRelations().stream()//
                 .flatMap(relation -> relation.getMembers().stream())//
-                .filter(relationMember -> relationMember.getRole().equals("admin_center"))//
+                .filter(relationMember -> "admin_center".equals(relationMember.getRole()))//
                 .collect(toList());
 
         assertThat(adminCenter).hasSize(1);

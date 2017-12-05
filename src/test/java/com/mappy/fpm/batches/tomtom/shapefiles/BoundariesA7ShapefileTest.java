@@ -64,13 +64,11 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
     public void should_have_members_with_tags() {
 
         Relation brussel = pbfContent.getRelations().stream().filter(member -> member.getTags().hasKeyValue("ref:tomtom", "10560000000808")).findFirst().get();
-        assertThat(brussel.getTags().size()).isEqualTo(11);
+        assertThat(brussel.getTags().size()).isEqualTo(9);
         assertThat(brussel.getTags().get("name")).isEqualTo("Brussel Hoofdstad");
         assertThat(brussel.getTags().get("name:fr")).isEqualTo("Brussel Hoofdstad FR");
         assertThat(brussel.getTags().get("name:nl")).isEqualTo("Brussel Hoofdstad NL");
         assertThat(brussel.getTags().get("boundary")).isEqualTo("administrative");
-        assertThat(brussel.getTags().get("capital")).isEqualTo("yes");
-        assertThat(brussel.getTags().get("place")).isEqualTo("city");
         assertThat(brussel.getTags().get("ref:INSEE")).isEqualTo("21000");
         assertThat(brussel.getTags().get("type")).isEqualTo("boundary");
         assertThat(brussel.getTags().get("admin_level")).isEqualTo("7");
@@ -102,9 +100,9 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
-        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Brussel Hoofdstad", "Halle-Vilvoorde");
-        assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("Brussel Hoofdstad FR", "Halle-Vilvoorde FR");
-        assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("Brussel Hoofdstad NL", "Halle-Vilvoorde NL");
+        assertThat(tags.size()).isEqualTo(2);
+        assertThat(tags.get(0).size()).isEqualTo(3);
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Brussel Hoofdstad", "Halle");
         assertThat(tags).extracting(t -> t.get("capital")).containsOnly("yes", "7");
         assertThat(tags).extracting(t -> t.get("place")).containsOnly("city", "town");
     }

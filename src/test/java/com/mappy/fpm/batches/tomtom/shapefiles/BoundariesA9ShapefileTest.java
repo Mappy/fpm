@@ -128,8 +128,8 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
         assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000077", "10560000000078", "10560000000079", "10560000000090");
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Ranst", "Broechem", "Emblem", "Oelegem");
         assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("RanstFR", "BroechemFR", "EmblemFR", "OelegemFR");
-        assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("11035A", "11035C", "11035D", "11035B");
         assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("RanstNL", "BroechemNL", "EmblemNL", "OelegemNL");
+        assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("11035A", "11035C", "11035D", "11035B");
     }
 
     @Test
@@ -142,10 +142,12 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
                 .collect(toList());
 
         assertThat(tags).hasSize(4);
+        assertThat(tags.get(0).size()).isEqualTo(6);
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Ranst", "Broechem", "Emblem", "Oelegem");
         assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("RanstCFR", "BroechemCFR", "EmblemCFR", "OelegemCFR");
         assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("RanstCNL", "BroechemCNL", "EmblemCNL", "OelegemCNL");
-        assertThat(tags).extracting(t -> t.get("capital")).containsOnly("8", "8", "8");
-        assertThat(tags).extracting(t -> t.get("place")).containsOnly("city", "town", "town");
+        assertThat(tags).extracting(t -> t.get("addr:postcode")).containsOnly("123", "456", "1011", null);
+        assertThat(tags).extracting(t -> t.get("capital")).containsOnly("8");
+        assertThat(tags).extracting(t -> t.get("place")).containsOnly("city", "town");
     }
 }

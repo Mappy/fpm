@@ -58,6 +58,9 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         tags.put("ref:tomtom", String.valueOf(extId));
         order.ifPresent(alpha3 -> tags.put("ref:INSEE", getInseeWithAlpha3(alpha3)));
 
+        Long pop = feature.getLong("POP");
+        if (pop != null && pop > 0) tags.put("population", String.valueOf(pop));
+
         List<RelationMember> members = newArrayList();
         String name = feature.getString("NAME");
         if (name != null) {

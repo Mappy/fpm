@@ -89,7 +89,6 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
         assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtNL", "Sint-GillisNL", "VorstNL");
         assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
         assertThat(tags).extracting(t -> t.get("ref:INSEE")).containsOnly("21001", "21013", "21007");
-        assertThat(tags).extracting(t -> t.get("addr:postcode")).containsOnly("123", "456", null);
         assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("10560000000250", "10560000000267", "10560000000263");
     }
 
@@ -134,10 +133,11 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
+        assertThat(tags.size()).isEqualTo(3);
+        assertThat(tags.get(0).size()).isEqualTo(6);
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
         assertThat(tags).extracting(t -> t.get("name:fr")).containsOnly("AnderlechtCFR", "Sint-GillisCFR", "VorstCFR");
         assertThat(tags).extracting(t -> t.get("name:nl")).containsOnly("AnderlechtCNL", "Sint-GillisCNL", "VorstCNL");
-        assertThat(tags).extracting(t -> t.get("population")).containsOnly("116332", "50472", "55012");
         assertThat(tags).extracting(t -> t.get("capital")).containsOnly("8", "8", "8");
         assertThat(tags).extracting(t -> t.get("place")).containsOnly("city", "town", "town");
     }

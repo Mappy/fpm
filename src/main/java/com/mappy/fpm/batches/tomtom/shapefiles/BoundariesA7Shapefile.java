@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.Maps.newHashMap;
 import static java.util.stream.Collectors.toList;
 
 public class BoundariesA7Shapefile extends BoundariesShapefile {
@@ -41,12 +43,12 @@ public class BoundariesA7Shapefile extends BoundariesShapefile {
 
         List<Centroid> capitals = capitalProvider.get(TOMTOM_LEVEL).stream().filter(c -> feature.getGeometry().contains(c.getPoint())).collect(toList());
         if (!capitals.isEmpty()) {
-
             Centroid cityCenter = capitals.get(0);
-            cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
+            Map<String, String> adminTags = newHashMap(of("name", cityCenter.getName()));
+            cityCenter.getPlace().ifPresent(p -> adminTags.put("place", p));
             String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
-            tags.put("capital", "2".equals(capital) ? "yes" : capital);
-            Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
+            adminTags.put("capital", "2".equals(capital) ? "yes" : capital);
+            Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
             node.ifPresent(adminCenter -> members.add(new RelationMember(adminCenter.getId(), EntityType.Node, "admin_center")));
         }
         serializer.writeRelation(members, tags);
