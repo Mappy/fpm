@@ -5,7 +5,7 @@ import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
-import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
+import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import net.morbz.osmonaut.osm.Entity;

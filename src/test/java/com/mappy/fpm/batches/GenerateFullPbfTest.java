@@ -19,8 +19,6 @@ import static org.mockito.Mockito.verify;
 
 public class GenerateFullPbfTest {
 
-    private static PbfContent pbfContent;
-
     private final OsmMerger osmMerger = Mockito.spy(new OsmMerger());
     private final GenerateFullPbf generateFullPbf = new GenerateFullPbf(osmMerger, "src/test/resources/generateFullPbf", "target", "Europe.osm.pbf", 1);
 
@@ -41,7 +39,7 @@ public class GenerateFullPbfTest {
         verify(osmMerger).merge(anyListOf(String.class), eq("target/Andorre/Andorre.osm.pbf"));
         verify(osmMerger).merge(anyListOf(String.class), eq("target/Europe.osm.pbf"));
 
-        pbfContent = read(new File("target/Europe.osm.pbf"));
+        PbfContent pbfContent = read(new File("target/Europe.osm.pbf"));
 
         List<RelationMember> outer = pbfContent.getRelations().stream()
                 .filter(r -> r.getTags().hasKeyValue("ref:tomtom", "10200000000008"))
@@ -56,5 +54,12 @@ public class GenerateFullPbfTest {
                 .filter(relationMember -> relationMember.getRole().equals("label")) //
                 .collect(toList());
         assertThat(label).isNotEmpty();
+
+        List<RelationMember> adminCenter = pbfContent.getRelations().stream()
+                .filter(r -> r.getTags().hasKeyValue("ref:tomtom", "10200000000008"))
+                .flatMap(relation -> relation.getMembers().stream())//
+                .filter(relationMember -> relationMember.getRole().equals("admin_center")) //
+                .collect(toList());
+        assertThat(adminCenter).isNotEmpty();
     }
 }

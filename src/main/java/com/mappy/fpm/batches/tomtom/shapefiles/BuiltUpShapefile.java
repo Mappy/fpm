@@ -4,7 +4,7 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
-import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
+import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.LongLineSplitter;

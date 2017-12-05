@@ -2,7 +2,6 @@ package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
-import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,8 +42,8 @@ public class TownTaggerTest extends AbstractTest {
     public void should_load_capitals() {
         List<Centroid> capitals = townTagger.getCapital(7);
 
-        assertThat(capitals).extracting(Centroid::getName).containsOnly("Antwerpen", "Brussel", "Halle", "Hasselt", "Leuven", "Maaseik", "Mechelen", "Tongeren", "Turnhout");
-        assertThat(capitals).extracting(Centroid::getAdminclass).containsOnly(0, 2, 7);
+        assertThat(capitals).extracting(com.mappy.fpm.batches.tomtom.helpers.Centroid::getName).containsOnly("Antwerpen", "Brussel", "Halle", "Hasselt", "Leuven", "Maaseik", "Mechelen", "Tongeren", "Turnhout");
+        assertThat(capitals).extracting(com.mappy.fpm.batches.tomtom.helpers.Centroid::getAdminclass).containsOnly(0, 2, 7);
     }
 
     @Test

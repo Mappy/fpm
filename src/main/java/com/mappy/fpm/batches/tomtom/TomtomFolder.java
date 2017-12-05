@@ -2,6 +2,11 @@ package com.mappy.fpm.batches.tomtom;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.File;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public class TomtomFolder {
     private final String inputFolder;
@@ -24,5 +29,11 @@ public class TomtomFolder {
 
     public String getTollsFile() {
         return inputFolder + "tolls.json";
+    }
+
+    public List<String> getSMFiles() {
+        File file = new File(inputFolder);
+
+        return Stream.of(file.listFiles()).filter(f -> f.getName().startsWith(zone) && f.getName().endsWith("sm.shp")).map(f ->inputFolder + f.getName()).collect(toList());
     }
 }

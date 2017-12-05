@@ -3,9 +3,9 @@ package com.mappy.fpm.batches.tomtom.shapefiles;
 import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.helpers.CapitalProvider;
+import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
-import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
-import com.mappy.fpm.batches.tomtom.helpers.TownTagger.Centroid;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
@@ -46,14 +46,14 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
         when(osmLevelGenerator.getOsmLevel("b", "0")).thenReturn("2");
         when(osmLevelGenerator.getOsmLevel("b", "7")).thenReturn("7");
 
-        TownTagger townTagger = mock(TownTagger.class);
+        CapitalProvider capitalProvider = mock(CapitalProvider.class);
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.307077, 50.8366041}, 2), new GeometryFactory());
         Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.232918, 50.737785}, 2), new GeometryFactory());
-        when(townTagger.getCapital(7)).thenReturn(newArrayList(
+        when(capitalProvider.get(7)).thenReturn(newArrayList(
                 new Centroid(10560022000808L, "Brussel Hoofdstad", "21000", 0, 1, 2, point),
                 new Centroid(10560033000808L, "Halle", "23000", 7, 1, 10, point2)));
 
-        BoundariesA7Shapefile shapefile = new BoundariesA7Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
+        BoundariesA7Shapefile shapefile = new BoundariesA7Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, capitalProvider);
 
         shapefile.serialize("target/tests/");
 

@@ -4,6 +4,7 @@ import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -62,16 +63,16 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
         GeometryFactory factory = new GeometryFactory();
 
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.560886, 51.190382}, 2), factory);
-        when(townTagger.get(10560000419571L)).thenReturn(new TownTagger.Centroid(10560000419571L, "Ranst", "123", 8, 1, 7, point));
+        when(townTagger.get(10560000419571L)).thenReturn(new Centroid(10560000419571L, "Ranst", "123", 8, 1, 7, point));
 
         Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.601984, 51.181340}, 2), factory);
-        when(townTagger.get(10560000309610L)).thenReturn(new TownTagger.Centroid(10560000309610L, "Broechem", "456", 8, 1, 8, point2));
+        when(townTagger.get(10560000309610L)).thenReturn(new Centroid(10560000309610L, "Broechem", "456", 8, 1, 8, point2));
 
         Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.606374, 51.162370}, 2), factory);
-        when(townTagger.get(10560000712819L)).thenReturn(new TownTagger.Centroid(10560000712819L, "Emblem", null, 8, 1, 8, point3));
+        when(townTagger.get(10560000712819L)).thenReturn(new Centroid(10560000712819L, "Emblem", null, 8, 1, 8, point3));
 
         Point point4 = new Point(new PackedCoordinateSequence.Double(new double[]{4.596975, 51.210989}, 2), factory);
-        when(townTagger.get(10560000571768L)).thenReturn(new TownTagger.Centroid(10560000571768L, "Oelegem", "1011", 8, 1, 8, point4));
+        when(townTagger.get(10560000571768L)).thenReturn(new Centroid(10560000571768L, "Oelegem", "1011", 8, 1, 8, point4));
 
         BoundariesA9Shapefile shapefile = new BoundariesA9Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
 

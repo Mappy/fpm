@@ -3,6 +3,7 @@ package com.mappy.fpm.batches.tomtom.shapefiles;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.BoundariesShapefile;
+import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import com.mappy.fpm.batches.utils.Feature;
@@ -41,7 +42,7 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
     @Override
     public void finishRelation(GeometrySerializer serializer, Map<String, String> adminTags, List<RelationMember> members, Feature feature) {
 
-        TownTagger.Centroid cityCenter = townTagger.get(feature.getLong("CITYCENTER"));
+        Centroid cityCenter = townTagger.get(feature.getLong("CITYCENTER"));
 
         if (cityCenter != null) {
             Map<String, String> tags = newHashMap();

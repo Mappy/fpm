@@ -3,9 +3,15 @@ package com.mappy.fpm.batches.tomtom.shapefiles;
 import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.helpers.CapitalProvider;
+import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
 import net.morbz.osmonaut.osm.Relation;
 import net.morbz.osmonaut.osm.RelationMember;
+import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -13,6 +19,7 @@ import java.io.File;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.util.stream.Collectors.toList;
@@ -31,12 +38,17 @@ public class BoundariesA2ShapefileTest extends AbstractTest {
         when(tomtomFolder.getFile("___a2.shp")).thenReturn("src/test/resources/tomtom/boundaries/a2/belbe2___________a2.shp");
 
         NameProvider nameProvider = mock(NameProvider.class);
-        when(nameProvider.getAlternateNames(10560000000838L)).thenReturn(of("name", "Limburg"));
+        when(nameProvider.getAlternateNames(10560000000838L)).thenReturn(of("name", "Leuven"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("belbe2", "2")).thenReturn("6");
 
-        BoundariesA2Shapefile shapefile = new BoundariesA2Shapefile(tomtomFolder, nameProvider, osmLevelGenerator);
+        CapitalProvider capitalProvider = mock(CapitalProvider.class);
+        Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.703077, 50.8756041}, 2), new GeometryFactory());
+        Centroid capital = new Centroid(10560000718742L, "Capital Name", "123", 2, 1, 7, point);
+        when(capitalProvider.get(2)).thenReturn(newArrayList(capital));
+
+        BoundariesA2Shapefile shapefile = new BoundariesA2Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, capitalProvider);
 
         shapefile.serialize("target/tests/");
 
@@ -97,6 +109,22 @@ public class BoundariesA2ShapefileTest extends AbstractTest {
         assertThat(vlaams.getEntity().getTags().size()).isEqualTo(3);
         assertThat(vlaams.getEntity().getTags().get("name")).isEqualTo("Vlaams-Brabant");
         assertThat(vlaams.getEntity().getTags().get("ref:INSEE")).isEqualTo("20001");
+    }
+
+    @Test
+    public void should_have_relation_with_role_admin_center_and_tags() {
+        List<RelationMember> adminCenter = pbfContent.getRelations().stream()//
+                .flatMap(relation -> relation.getMembers().stream())//
+                .filter(relationMember -> relationMember.getRole().equals("admin_center"))//
+                .collect(toList());
+
+        assertThat(adminCenter).hasSize(1);
+
+        Tags tags = adminCenter.get(0).getEntity().getTags();
+        assertThat(tags.size()).isEqualTo(3);
+        assertThat(tags.get("name")).isEqualTo("Capital Name");
+        assertThat(tags.get("capital")).isEqualTo("6");
+        assertThat(tags.get("place")).isEqualTo("city");
     }
 
     @Test
