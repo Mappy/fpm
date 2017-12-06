@@ -4,7 +4,9 @@ import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.helpers.CapitalProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
+import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import net.morbz.osmonaut.osm.Entity;
 import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
@@ -37,7 +39,7 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("aquitaine", 6)).thenReturn("7");
 
-        Boundaries0A07Shapefile shapefile = new Boundaries0A07Shapefile(tomtomFolder, nameProvider, osmLevelGenerator);
+        Boundaries0A07Shapefile shapefile = new Boundaries0A07Shapefile(tomtomFolder, mock(CapitalProvider.class), mock(TownTagger.class), nameProvider, osmLevelGenerator);
 
         shapefile.serialize("target/tests/");
 

@@ -6,8 +6,8 @@ import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.LongLineSplitter;
 import com.neovisionaries.i18n.CountryCode;
-import com.vividsolutions.jts.algorithm.Centroid;
 import com.vividsolutions.jts.geom.*;
+import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 
@@ -19,7 +19,9 @@ import java.util.Optional;
 import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.vividsolutions.jts.algorithm.Centroid.getCentroid;
 import static java.lang.String.valueOf;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
@@ -28,20 +30,24 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private final String osmLevel;
-    private final String tomtomLevel;
+    private final Integer tomtomLevel;
 
+    private final CapitalProvider capitalProvider;
+    private final TownTagger townTagger;
+    private final String zone;
     protected final OsmLevelGenerator osmLevelGenerator;
     protected final NameProvider nameProvider;
-    protected final String zone;
 
-    protected BoundariesShapefile(String filename, int tomtomLevel, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
+    protected BoundariesShapefile(String filename, int tomtomLevel, CapitalProvider capitalProvider, TownTagger townTagger, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(filename);
+        this.capitalProvider = capitalProvider;
+        this.townTagger = townTagger;
         String[] split = filename.split("/");
         zone = split[split.length - 1].split("_[_2]")[0];
 
         this.osmLevelGenerator = osmLevelGenerator;
         this.osmLevel = osmLevelGenerator.getOsmLevel(zone, tomtomLevel);
-        this.tomtomLevel = String.valueOf(tomtomLevel);
+        this.tomtomLevel = tomtomLevel;
         this.nameProvider = nameProvider;
         if (new File(filename).exists()) {
             this.nameProvider.loadFromFile("___an.dbf");
@@ -83,7 +89,9 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
 
             putRelationTags(tags, wayTags);
 
-            finishRelation(serializer, tags, members, feature);
+            getAdminCenter(serializer, feature).ifPresent(members::add);
+
+            serializer.writeRelation(members, tags);
         }
     }
 
@@ -105,8 +113,51 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         return CountryCode.getByCode(alpha32) == null ? alpha3 : valueOf(CountryCode.getByCode(alpha32).getNumeric());
     }
 
-    protected void finishRelation(GeometrySerializer serializer, Map<String, String> tags, List<RelationMember> members, Feature feature) {
-        serializer.writeRelation(members, tags);
+    private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, Feature feature) {
+        if (tomtomLevel <= 7) {
+            return getCapital(serializer, feature);
+        } else if(tomtomLevel <= 9){
+            return getTown(serializer, feature);
+        } else {
+            return empty();
+        }
+    }
+
+    private Optional<RelationMember> getCapital(GeometrySerializer serializer, Feature feature) {
+
+        Optional<Centroid> capital = capitalProvider.get(tomtomLevel).stream().filter(c -> feature.getGeometry().contains(c.getPoint())).findFirst();
+        if (capital.isPresent()) {
+            Centroid cityCenter = capital.get();
+            Map<String, String> adminTags = newHashMap(of("name", cityCenter.getName()));
+            cityCenter.getPlace().ifPresent(p -> adminTags.put("place", p));
+            String capitalValue = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
+            adminTags.put("capital", "2".equals(capitalValue) ? "yes" : capitalValue);
+            Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
+            return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_center"));
+        } else {
+            return empty();
+        }
+    }
+    private Optional<RelationMember> getTown(GeometrySerializer serializer, Feature feature) {
+
+        Centroid cityCenter = townTagger.get(feature.getLong("CITYCENTER"));
+
+        if (cityCenter != null) {
+            Map<String, String> tags = newHashMap();
+            tags.put("name", cityCenter.getName());
+            cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
+            ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
+
+            String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
+            tags.put("capital", "2".equals(capital) ? "yes" : capital);
+
+            tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
+
+            Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
+            return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_center"));
+        } else {
+            return empty();
+        }
     }
 
     private void addRelationMember(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString geom, String memberRole) {
@@ -115,8 +166,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
     }
 
     private void addPointWithRoleLabel(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags, MultiPolygon multiPolygon) {
-        Coordinate centPt = Centroid.getCentroid(multiPolygon);
-        Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(centPt), tags);
+        Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(getCentroid(multiPolygon)), tags);
         node.ifPresent(nodeLabel -> members.add(new RelationMember(nodeLabel.getId(), Node, "label")));
     }
 }

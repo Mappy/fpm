@@ -4,6 +4,7 @@ import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.helpers.CapitalProvider;
 import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
 import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
@@ -74,7 +75,7 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
         Point point4 = new Point(new PackedCoordinateSequence.Double(new double[]{4.596975, 51.210989}, 2), factory);
         when(townTagger.get(10560000571768L)).thenReturn(new Centroid(10560000571768L, "Oelegem", "1011", 8, 1, 8, point4));
 
-        BoundariesA9Shapefile shapefile = new BoundariesA9Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, townTagger);
+        BoundariesA9Shapefile shapefile = new BoundariesA9Shapefile(tomtomFolder, mock(CapitalProvider.class), townTagger, nameProvider, osmLevelGenerator);
 
         shapefile.serialize("target/tests/");
 

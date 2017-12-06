@@ -6,6 +6,7 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.CapitalProvider;
 import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
+import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
@@ -53,7 +54,7 @@ public class BoundariesA7ShapefileTest extends AbstractTest {
                 new Centroid(10560022000808L, "Brussel Hoofdstad", "21000", 0, 1, 2, point),
                 new Centroid(10560033000808L, "Halle", "23000", 7, 1, 10, point2)));
 
-        BoundariesA7Shapefile shapefile = new BoundariesA7Shapefile(tomtomFolder, nameProvider, osmLevelGenerator, capitalProvider);
+        BoundariesA7Shapefile shapefile = new BoundariesA7Shapefile(tomtomFolder, capitalProvider, mock(TownTagger.class), nameProvider, osmLevelGenerator);
 
         shapefile.serialize("target/tests/");
 
