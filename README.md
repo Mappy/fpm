@@ -20,6 +20,7 @@ This project use maven in order to compile source file :
 ```bash
 mvn clean install
 
+cp target/fpm-1.1-SNAPSHOT.jar src/main/docker/fpm/
 cd src/main/docker/fpm
 docker build -t mappy/fpm .
 ```
