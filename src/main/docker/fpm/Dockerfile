@@ -1,6 +1,6 @@
 FROM java:8
 
-ADD target/fpm-1.1-SNAPSHOT.jar target/
+ADD fpm-1.1-SNAPSHOT.jar /target/
 
 VOLUME /workspace
 WORKDIR /workspace

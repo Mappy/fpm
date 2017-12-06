@@ -3,7 +3,14 @@
 
 [![GitHub release](https://img.shields.io/github/release/mappy/fpm.svg)]()
 
-# How to install
+# How to install using a Docker environnement
+
+```bash
+cd src/main/docker/global_fpm
+docker build -t mappy/fpm .
+```
+
+# How to install using a local environnement
 
 ## Add third party libs to in the local maven repo
 
@@ -20,6 +27,7 @@ This project use maven in order to compile source file :
 ```bash
 mvn clean install
 
+cp target/fpm-1.1-SNAPSHOT.jar src/main/docker/fpm/
 cd src/main/docker/fpm
 docker build -t mappy/fpm .
 ```
