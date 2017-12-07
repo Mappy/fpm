@@ -5,24 +5,16 @@
 
 # How to install
 
-## Add third party libs to in the local maven repo
-
 In the project root directory :
 
 ```bash
-mvn install:install-file -Dfile=./libs/osmonaut-1.0.2.4.jar -DgroupId=net.morbz -DartifactId=osmonaut -Dversion=1.0.2.4 -Dpackaging=jar
+./build.sh
 ```
 
-## Compile source code
-
-This project use maven in order to compile source file :
-
-```bash
-mvn clean install
-
-cd src/main/docker/fpm
-docker build -t mappy/fpm .
-```
+What this script does :
+- Add a third party lib into the local maven repo : net.morbz.osmonaut
+- Generate a jar, from source code, with maven
+- Generate a docker image with previous jar
 
 # How to use
  
