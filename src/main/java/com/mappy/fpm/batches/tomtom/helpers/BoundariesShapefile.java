@@ -105,12 +105,8 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         tags.put("layer", osmLevel);
     }
 
-    private String getInseeWithAlpha3(String alpha3) {
-        String alpha32 = alpha3;
-        if (CountryCode.getByCode(alpha3) == null) {
-            alpha32 = alpha3.substring(0, alpha3.length() - 1);
-        }
-        return CountryCode.getByCode(alpha32) == null ? alpha3 : valueOf(CountryCode.getByCode(alpha32).getNumeric());
+    protected String getInseeWithAlpha3(String alpha3) {
+        return alpha3;
     }
 
     private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, Feature feature) {

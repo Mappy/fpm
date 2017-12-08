@@ -63,7 +63,7 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
         assertThat(wallonie.getTags().size()).isEqualTo(7);
         assertThat(wallonie.getTags().get("name")).isEqualTo("Région Wallonne");
         assertThat(wallonie.getTags().get("boundary")).isEqualTo("administrative");
-        assertThat(wallonie.getTags().get("ref:INSEE")).isEqualTo("03000");
+        assertThat(wallonie.getTags().get("ref:INSEE")).isEqualTo("AND");
         assertThat(wallonie.getTags().get("type")).isEqualTo("boundary");
         assertThat(wallonie.getTags().get("admin_level")).isEqualTo("4");
         assertThat(wallonie.getTags().get("layer")).isEqualTo("4");
@@ -100,7 +100,7 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
         RelationMember wallonie = labels.stream().filter(member -> member.getEntity().getTags().hasKeyValue("ref:tomtom", "10560000000851")).findFirst().get();
         assertThat(wallonie.getEntity().getTags().size()).isEqualTo(3);
         assertThat(wallonie.getEntity().getTags().get("name")).isEqualTo("Région Wallonne");
-        assertThat(wallonie.getEntity().getTags().get("ref:INSEE")).isEqualTo("03000");
+        assertThat(wallonie.getEntity().getTags().get("ref:INSEE")).isEqualTo("AND");
 
         RelationMember brussel = labels.stream().filter(member -> member.getEntity().getTags().hasKeyValue("ref:tomtom", "10560000000843")).findFirst().get();
         assertThat(brussel.getEntity().getTags().size()).isEqualTo(4);
