@@ -3,6 +3,7 @@ package com.mappy.fpm.batches.utils;
 import com.google.inject.Guice;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openstreetmap.osmosis.osmbinary.Osmformat.HeaderBlock;
 import org.openstreetmap.osmosis.pbf2.v0_6.impl.PbfRawBlob;
@@ -14,6 +15,7 @@ import java.io.FileInputStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTime.now;
 
+@Ignore
 public class OsmosisSerializerIT {
     @Test
     public void should_generate_building_file() throws Exception {
