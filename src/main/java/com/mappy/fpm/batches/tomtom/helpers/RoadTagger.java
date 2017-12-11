@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.helpers.Fow.*;
 import static com.mappy.fpm.batches.tomtom.helpers.Freeway.PART_OF_FREEWAY;
+import static java.util.Optional.ofNullable;
 
 @Singleton
 @Slf4j
@@ -27,10 +28,8 @@ public class RoadTagger {
 
     public static final Integer TUNNEL = 1;
     public static final Integer BRIDGE = 2;
-    private static final String HIGHWAY = "highway";
     private static final String FOOT = "foot";
     private static final String BICYCLE = "bicycle";
-    private static final String SERVICE = "service";
     private static final int ROAD_ELEMENT = 4110;
 
     private final SpeedProfiles speedProfiles;
@@ -148,55 +147,14 @@ public class RoadTagger {
         Integer feattype = feature.getInteger("FEATTYP");
         if (feattype != null && feattype == ROAD_ELEMENT) {
             Integer fow = feature.getInteger("FOW");
-            Integer frc = feature.getInteger("FRC");
-            if (PEDESTRIAN.is(fow)) {
-                tags.put(HIGHWAY, "pedestrian");
-            } else if (STAIRS.is(fow)) {
-                tags.put(HIGHWAY, "steps");
-            } else if (WALKWAY.is(fow)) {
-                tags.put(HIGHWAY, "footway");
-            } else if (PARKING_PLACE.is(fow) || ENTRANCE_EXIT_CAR_PARK.is(fow)) {
-                tags.put(HIGHWAY, "service");
-                tags.put(SERVICE, "parking_aisle");
-            } else if (frc != null) {
-                boolean isFreeway = PART_OF_FREEWAY.is(feature.getInteger("FREEWAY"));
-                tags.put(HIGHWAY, functionalRoadClass(frc, SLIP_ROAD.is(fow), isFreeway));
-                if (frc == 0 || PART_OF_MOTORWAY.is(fow) || isFreeway) {
-                    tags.put(FOOT, "no");
-                    tags.put(BICYCLE, "no");
-                }
-            }
+            Fow.getFow(fow).map(Fow::getTags).ifPresent(tags::putAll);
+
+            ofNullable(feature.getInteger("FRC"))//
+                    .flatMap(f -> Frc.getFrc(f, SLIP_ROAD.is(fow), PART_OF_FREEWAY.is(feature.getInteger("FREEWAY"))))//
+                    .map(Frc::getTags)//
+                    .ifPresent(tags::putAll);
         }
         return tags;
-    }
-
-    private String functionalRoadClass(int frc, boolean link, boolean isFreeway) {
-        switch (Frc.valueOf(frc)) {
-            case MAJOR_ROAD:
-                return link ? "motorway_link" : "motorway";
-
-            case LESS_THAN_MOTORWAY:
-                if (isFreeway) {
-                    return link ? "trunk_link" : "trunk";
-                } else {
-                    return link ? "primary_link" : "primary";
-                }
-
-            case OTHER_MAJOR_ROAD:
-                return link ? "primary_link" : "primary";
-
-            case SECONDARY_ROAD:
-            case LOCAL_CONNECTING_ROAD:
-            case LOCAL_ROAD_OF_HIGH_IMPORTANCE:
-                return link ? "secondary_link" : "secondary";
-
-            case LOCAL_ROAD:
-            case LOCAL_ROAD_OF_MINOR_IMPORTANCE:
-                return link ? "tertiary_link" : "residential";
-
-            default:
-                return link ? "tertiary_link" : "unclassified";
-        }
     }
 
     private static String duration(Feature feature) {
