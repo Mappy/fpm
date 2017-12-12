@@ -73,7 +73,7 @@ public class RoadTagger {
         tags.putAll(tolls.tag(id));
 
         Collection<TimeDomains> timeDomains = tdDbf.getTimeDomains(id);
-        addTagIf("vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
+        addTagIf("motor_vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
         if (timeDomains != null && !timeDomains.isEmpty()){
             try {
                 String openingHours = timeDomainsParser.parse(timeDomains);

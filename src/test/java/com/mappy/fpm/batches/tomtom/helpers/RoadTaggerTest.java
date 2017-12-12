@@ -67,20 +67,22 @@ public class RoadTaggerTest {
     @Test
     public void should_tag_ferries_without_cars() {
         assertThat(tagger.tag(onlyTags(map("FT", "1", "FEATTYP", "4110", "ID", "123", "MINUTES", "10.902", "F_ELEV", "0", "T_ELEV", "0", "FOW", "14", "NAME", "Calais - Douvres", "ONEWAY", "N"))))
-                .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54").containsEntry("vehicle", "no");
+                .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54").containsEntry("motor_vehicle", "no");
     }
 
     @Test
-    public void should_tag_vehicle_no() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).containsEntry("vehicle", "no");
+    public void should_tag_motor_vehicle_no() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))) //
+                .containsEntry("motor_vehicle", "no");
     }
 
     @Test
-    public void should_not_tag_vehicle_no_when_restriction_speed() {
-        List<TimeDomains> timeDomainList = newArrayList();
-        timeDomainList.add(new TimeDomains(1L, null));
+    public void should_not_tag_motor_vehicle_no_when_restriction_speed() {
+        List<TimeDomains> timeDomainList = newArrayList(new TimeDomains(1L, null));
         when(tdDbf.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))).doesNotContainEntry("vehicle", "no");
+
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))) //
+                .doesNotContainEntry("motor_vehicle", "no");
     }
 
     @Test
