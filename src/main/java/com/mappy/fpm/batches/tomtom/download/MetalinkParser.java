@@ -18,6 +18,7 @@ import static com.google.common.base.Charsets.UTF_8;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.mappy.fpm.batches.tomtom.download.MetalinkParser.MetalinkUrl.parseMetalinkUrl;
 import static java.util.stream.Collectors.toList;
 import static org.jsoup.parser.Parser.xmlParser;
 
@@ -41,7 +42,7 @@ public class MetalinkParser {
     }
 
     private static MetalinkUrl tomtomFileDescriptor(Element e) {
-        return MetalinkUrl.parse(e.attr("name"), e.select("resources url").text());
+        return parseMetalinkUrl(e.attr("name"), e.select("resources url").text());
     }
 
     @Data
@@ -78,6 +79,7 @@ public class MetalinkParser {
         private static final Set<String> NEEDED = newHashSet(newArrayList("2dcmnb", "mn", "sp"));
 
         private final String name;
+        private final String prefix;
         private final String country;
         private final String format;
         private final String type;
@@ -92,9 +94,9 @@ public class MetalinkParser {
             return NEEDED.contains(type);
         }
 
-        public static MetalinkUrl parse(String name, String url) {
+        public static MetalinkUrl parseMetalinkUrl(String name, String url) {
             Matcher matcher = PATTERN.matcher(name);
-            return matcher.matches() ? new MetalinkUrl(name, matcher.group(4), matcher.group(2), matcher.group(3), matcher.group(5), url) : null;
+            return matcher.matches() ? new MetalinkUrl(name, matcher.group(1), matcher.group(4), matcher.group(2), matcher.group(3), matcher.group(5), url) : null;
         }
     }
 }
