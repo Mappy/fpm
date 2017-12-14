@@ -5,7 +5,6 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.LongLineSplitter;
-import com.neovisionaries.i18n.CountryCode;
 import com.vividsolutions.jts.geom.*;
 import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
@@ -20,7 +19,6 @@ import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.vividsolutions.jts.algorithm.Centroid.getCentroid;
-import static java.lang.String.valueOf;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
@@ -57,24 +55,23 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
         Long extId = feature.getLong("ID");
-        Optional<String> order = ofNullable(feature.getString("ORDER0" + tomtomLevel));
 
         Map<String, String> tags = newHashMap();
         tags.putAll(nameProvider.getAlternateNames(extId));
         tags.put("ref:tomtom", String.valueOf(extId));
-        order.ifPresent(alpha3 -> tags.put("ref:INSEE", getInseeWithAlpha3(alpha3)));
 
-        Long pop = feature.getLong("POP");
-        if (pop != null && pop > 0) tags.put("population", String.valueOf(pop));
+        ofNullable(feature.getString("ORDER0" + tomtomLevel)).ifPresent(alpha3 -> tags.put("ref:INSEE", getInseeWithAlpha3(alpha3)));
+        ofNullable(feature.getLong("POP")).filter(pop -> pop > 0).ifPresent(pop -> tags.put("population", String.valueOf(pop)));
 
         List<RelationMember> members = newArrayList();
         String name = feature.getString("NAME");
         if (name != null) {
-            Map<String, String> wayTags = putWayTags(name);
+            Map<String, String> wayTags = of("name", name, "boundary", "administrative", "admin_level", osmLevel);
             Map<String, String> pointTags = newHashMap(tags);
             pointTags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();
-            addPointWithRoleLabel(serializer, members, pointTags, multiPolygon);
+            getLabel(serializer, pointTags, multiPolygon).ifPresent(members::add);
+
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
                 for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
@@ -93,10 +90,6 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
 
             serializer.writeRelation(members, tags);
         }
-    }
-
-    private Map<String, String> putWayTags(String name) {
-        return of("name", name, "boundary", "administrative", "admin_level", osmLevel);
     }
 
     private void putRelationTags(Map<String, String> tags, Map<String, String> wayTags) {
@@ -134,6 +127,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
             return empty();
         }
     }
+
     private Optional<RelationMember> getTown(GeometrySerializer serializer, Feature feature) {
 
         Centroid cityCenter = townTagger.get(feature.getLong("CITYCENTER"));
@@ -161,8 +155,8 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         members.add(new RelationMember(wayId, Way, memberRole));
     }
 
-    private void addPointWithRoleLabel(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> tags, MultiPolygon multiPolygon) {
+    private Optional<RelationMember> getLabel(GeometrySerializer serializer, Map<String, String> tags, MultiPolygon multiPolygon) {
         Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(getCentroid(multiPolygon)), tags);
-        node.ifPresent(nodeLabel -> members.add(new RelationMember(nodeLabel.getId(), Node, "label")));
+        return node.map(n -> new RelationMember(n.getId(), Node, "label"));
     }
 }
