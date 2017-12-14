@@ -61,10 +61,19 @@ public class TomtomDownloader {
                 Metalink veryLocal = local.forZone(zone);
                 log.info("Processing area {} in {}", zone, country.getLabel());
                 checkState("ax".equals(zone) ? veryLocal.size() == 1 : veryLocal.types().contains("mn"));
+
+                boolean isMixed = isMixed(veryLocal);
                 for (MetalinkUrl url : veryLocal.getUrls()) {
-                    shpDownloader.download(country, url);
+                    if (!isMixed || url.getPrefix().startsWith("eur")) {
+                        shpDownloader.download(country, url);
+                    }
                 }
             }
         });
+    }
+
+    private boolean isMixed(Metalink veryLocal) {
+        long nbEur = veryLocal.getUrls().stream().filter(u -> u.getPrefix().startsWith("eur")).count();
+        return nbEur != 0 && nbEur != veryLocal.getUrls().size();
     }
 }
