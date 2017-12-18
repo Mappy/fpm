@@ -1,4 +1,4 @@
-FROM java:8
+FROM openjdk:8-alpine
 
 ADD target/fpm-1.1-SNAPSHOT.jar target/
 
