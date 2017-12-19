@@ -7,7 +7,6 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.CapitalProvider;
 import com.mappy.fpm.batches.tomtom.helpers.Centroid;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
-import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.impl.PackedCoordinateSequence;
@@ -49,7 +48,7 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("andorra", 0)).thenReturn("2");
 
-        BoundariesA0Shapefile shapefile = new BoundariesA0Shapefile(tomtomFolder, capitalProvider, mock(TownTagger.class), nameProvider, osmLevelGenerator);
+        BoundariesA0Shapefile shapefile = new BoundariesA0Shapefile(tomtomFolder, capitalProvider, nameProvider, osmLevelGenerator);
 
         shapefile.serialize("target/tests/");
 
