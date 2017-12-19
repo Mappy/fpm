@@ -6,7 +6,6 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.CapitalProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
-import com.mappy.fpm.batches.tomtom.helpers.TownTagger;
 import net.morbz.osmonaut.osm.Entity;
 import net.morbz.osmonaut.osm.Tags;
 import org.junit.BeforeClass;
@@ -32,14 +31,13 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("___oa07.shp")).thenReturn("src/test/resources/tomtom/boundaries/oa07/aquitaine___________oa07.shp");
 
-
         NameProvider nameProvider = mock(NameProvider.class);
         when(nameProvider.getAlternateNames(12500007163496L)).thenReturn(of("name", "Poitiers", "name:en", "Potter"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
         when(osmLevelGenerator.getOsmLevel("aquitaine", 6)).thenReturn("7");
 
-        Boundaries0A07Shapefile shapefile = new Boundaries0A07Shapefile(tomtomFolder, mock(CapitalProvider.class), mock(TownTagger.class), nameProvider, osmLevelGenerator);
+        Boundaries0A07Shapefile shapefile = new Boundaries0A07Shapefile(tomtomFolder, mock(CapitalProvider.class), nameProvider, osmLevelGenerator);
 
         shapefile.serialize("target/tests/");
 

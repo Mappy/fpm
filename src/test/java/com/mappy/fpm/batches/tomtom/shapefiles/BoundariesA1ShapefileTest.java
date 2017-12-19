@@ -49,7 +49,7 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
         Centroid capital = new Centroid(10560000718742L, "Capital Name", "123", 1, 1, 7, point);
         when(capitalProvider.get(1)).thenReturn(newArrayList(capital));
 
-        BoundariesA1Shapefile shapefile = new BoundariesA1Shapefile(tomtomFolder, capitalProvider, mock(TownTagger.class), nameProvider, osmLevelGenerator);
+        BoundariesA1Shapefile shapefile = new BoundariesA1Shapefile(tomtomFolder, capitalProvider, nameProvider, osmLevelGenerator);
 
         shapefile.serialize("target/tests/");
 
