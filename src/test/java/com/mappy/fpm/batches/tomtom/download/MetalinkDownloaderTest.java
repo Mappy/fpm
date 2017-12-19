@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class MetalinkDownloaderTest {
 
     private final CloseableHttpClient client = mock(CloseableHttpClient.class);
-    private final MetalinkDownloader metalinkDownloader = new MetalinkDownloader("login", "password", "tomtomVersion", client);
+    private final MetalinkDownloader metalinkDownloader = new MetalinkDownloader("login", "password", "tomtomVersion", "/tmp", client);
 
     @Test
     public void should_download() throws Exception {
