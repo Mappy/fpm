@@ -38,7 +38,10 @@ public class TomtomDownloader {
         File outputDirectory = new File(args[0]);
         outputDirectory.mkdirs();
         HttpClient httpClient = HttpClientBuilder.create().setMaxConnPerRoute(10).setConnectionReuseStrategy(INSTANCE).build();
-        new TomtomDownloader(new MetalinkDownloader(args[2], args[3], args[1], HttpClientBuilder.create().build()), new ShapefileDownloader(outputDirectory, httpClient), null).run();
+        MetalinkDownloader metalinkDownloader = new MetalinkDownloader(args[2], args[3], args[1], outputDirectory.getAbsolutePath(), HttpClientBuilder.create().build());
+        ShapefileDownloader shapefileDownloader = new ShapefileDownloader(outputDirectory, httpClient);
+
+        new TomtomDownloader(metalinkDownloader, shapefileDownloader, null).run();
     }
 
     public void run() throws IOException {
