@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 public class GenerateFullPbfTest {
 
     private final OsmMerger osmMerger = Mockito.spy(new OsmMerger());
-    private final GenerateFullPbf generateFullPbf = new GenerateFullPbf(osmMerger, "src/test/resources/generateFullPbf", "target", "Europe.osm.pbf", 1);
+    private final GenerateFullPbf generateFullPbf = new GenerateFullPbf(osmMerger, "src/test/resources/generateFullPbf", "target/tests", "Europe.osm.pbf", 1);
 
     @Test(expected = IllegalArgumentException.class)
     public void should_throw_IllegalArgumentException_when_country_is_unknown() {
@@ -32,14 +32,14 @@ public class GenerateFullPbfTest {
 
         generateFullPbf.run(newArrayList("Andorre"));
 
-        assertThat(new File("target/Andorre/pbfFiles/and.osm.pbf").exists()).isTrue();
-        assertThat(new File("target/Andorre/pbfFiles/andand.osm.pbf").exists()).isTrue();
-        assertThat(new File("target/Andorre/Andorre.osm.pbf").exists()).isTrue();
+        assertThat(new File("target/tests/Andorre/pbfFiles/and.osm.pbf").exists()).isTrue();
+        assertThat(new File("target/tests/Andorre/pbfFiles/andand.osm.pbf").exists()).isTrue();
+        assertThat(new File("target/tests/Andorre/Andorre.osm.pbf").exists()).isTrue();
 
-        verify(osmMerger).merge(anyListOf(String.class), eq("target/Andorre/Andorre.osm.pbf"));
-        verify(osmMerger).merge(anyListOf(String.class), eq("target/Europe.osm.pbf"));
+        verify(osmMerger).merge(anyListOf(String.class), eq("target/tests/Andorre/Andorre.osm.pbf"));
+        verify(osmMerger).merge(anyListOf(String.class), eq("target/tests/Europe.osm.pbf"));
 
-        PbfContent pbfContent = read(new File("target/Europe.osm.pbf"));
+        PbfContent pbfContent = read(new File("target/tests/Europe.osm.pbf"));
 
         List<RelationMember> outer = pbfContent.getRelations().stream()
                 .filter(r -> r.getTags().hasKeyValue("ref:tomtom", "10200000000008"))

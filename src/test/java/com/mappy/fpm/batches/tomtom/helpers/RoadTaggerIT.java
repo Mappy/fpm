@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.inject.Guice;
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
@@ -22,15 +23,15 @@ import static com.mappy.fpm.batches.utils.CollectionUtils.streamIterator;
 import static java.util.stream.Collectors.groupingBy;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RoadTaggerIT {
+public class RoadTaggerIT extends AbstractTest {
 
     private static PbfContent pbfContent;
 
     @BeforeClass
     public static void getGeneratedPbf() throws IOException {
-        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "andand")).getInstance(Tomtom2Osm.class);
+        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target/tests", "target/tests/splitter", "andand")).getInstance(Tomtom2Osm.class);
         launcher.run();
-        pbfContent = read(new File("target/andand.osm.pbf"));
+        pbfContent = read(new File("target/tests/andand.osm.pbf"));
     }
 
     @Test
