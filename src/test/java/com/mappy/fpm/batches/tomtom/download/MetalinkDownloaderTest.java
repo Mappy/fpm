@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 public class MetalinkDownloaderTest {
 
     private final CloseableHttpClient client = mock(CloseableHttpClient.class);
-    private final MetalinkDownloader metalinkDownloader = new MetalinkDownloader("login", "password", "tomtomVersion", client);
+    private final MetalinkDownloader metalinkDownloader = new MetalinkDownloader("login", "password", "tomtomVersion", "/tmp", client);
 
     @Test
     public void should_download() throws Exception {
@@ -34,8 +34,8 @@ public class MetalinkDownloaderTest {
         Metalink download = metalinkDownloader.download();
 
         assertThat(download.getUrls()).isEqualTo(newArrayList(
-                new MetalinkParser.MetalinkUrl("test-shpd-mn-and-and.7z.001", "and", "d", "mn", "and", "http://test.com/and.7z.001"),
-                new MetalinkParser.MetalinkUrl("test-shpd-mn-and-ax.7z.001", "and", "d", "mn", "ax", "http://test.com/ax.7z.001")
+                new MetalinkParser.MetalinkUrl("test-shpd-mn-and-and.7z.001", "test", "and", "d", "mn", "and", "http://test.com/and.7z.001"),
+                new MetalinkParser.MetalinkUrl("test-shpd-mn-and-ax.7z.001", "test", "and", "d", "mn", "ax", "http://test.com/ax.7z.001")
         ));
     }
 }

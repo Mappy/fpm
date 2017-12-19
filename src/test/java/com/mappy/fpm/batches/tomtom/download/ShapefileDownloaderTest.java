@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.io.File;
 import java.util.stream.Stream;
 
+import static com.mappy.fpm.batches.tomtom.download.MetalinkParser.MetalinkUrl.parseMetalinkUrl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -45,7 +46,7 @@ public class ShapefileDownloaderTest {
         assertThat(folder.exists()).isFalse();
 
         TomtomCountry country = new TomtomCountry("AND", "Andorre");
-        MetalinkUrl metalinkUrl = MetalinkUrl.parse("eur2016_09-shpd-sp-and-ax.7z.001", "http://url1");
+        MetalinkUrl metalinkUrl = parseMetalinkUrl("eur2016_09-shpd-sp-and-ax.7z.001", "http://url1");
 
         shapefileDownloader.download(country, metalinkUrl);
 
