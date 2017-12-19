@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
-import com.google.common.base.Throwables;
 import com.google.inject.Guice;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
@@ -8,11 +7,14 @@ import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import net.morbz.osmonaut.osm.Relation;
 import net.morbz.osmonaut.osm.RelationMember;
 import net.morbz.osmonaut.osm.Way;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
@@ -21,7 +23,15 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RoadTaggerIT {
-    private static final PbfContent pbfContent = getGeneratedPbf();
+
+    private static PbfContent pbfContent;
+
+    @BeforeClass
+    public static void getGeneratedPbf() throws IOException {
+        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "andand")).getInstance(Tomtom2Osm.class);
+        launcher.run();
+        pbfContent = read(new File("target/andand.osm.pbf"));
+    }
 
     @Test
     public void should_generate_roads_file() {
@@ -35,10 +45,10 @@ public class RoadTaggerIT {
 
     @Test
     public void should_generate_roads_file_with_parking_aisle() {
-        assertThat(pbfContent.getWays().stream())
-                .filteredOn(w -> w.getTags().hasKeyValue("ref:tomtom", "10200000004654"))
-                .filteredOn(w -> w.getTags().hasKeyValue("highway", "service"))
-                .filteredOn(w -> w.getTags().hasKeyValue("service", "parking_aisle")).isNotEmpty();
+        Optional<Way> way = pbfContent.getWays().stream().filter(w -> w.getTags().hasKeyValue("ref:tomtom", "10200000004654")).findFirst();
+
+        assertThat(way.isPresent()).isTrue();
+        assertThat(way.get().getTags().get("service")).isEqualTo("parking_aisle");
     }
 
     @Test
@@ -103,15 +113,5 @@ public class RoadTaggerIT {
         assertThat(pbfContent.getWays().stream()) //
                 .filteredOn(way -> way.getTags().hasKeyValue("ref:tomtom", "10200000002148")) //
                 .isNotEmpty();
-    }
-
-    private static PbfContent getGeneratedPbf() {
-        try {
-            Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "andand")).getInstance(Tomtom2Osm.class);
-            launcher.run();
-            return read(new File("target/andand.osm.pbf"));
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
     }
 }
