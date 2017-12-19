@@ -25,7 +25,7 @@ public class WaterAreaShapefile extends TomtomShapefile {
         super(folder.getFile("wa.shp"));
         this.nameProvider = nameProvider;
         if(new File(folder.getFile("wa.shp")).exists()) {
-            this.nameProvider.loadFromFile("wxnm.dbf");
+            this.nameProvider.loadAlternateNames("wxnm.dbf");
         }
     }
 

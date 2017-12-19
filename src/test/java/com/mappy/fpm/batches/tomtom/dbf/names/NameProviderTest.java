@@ -23,7 +23,7 @@ public class NameProviderTest {
 
     @Test
     public void should_add_alternative_names() {
-        nameProvider.loadFromFile("an.dbf");
+        nameProvider.loadAlternateNames("an.dbf");
         Map<String, String> tags = nameProvider.getAlternateNames(10200000000008L);
         assertThat(tags).hasSize(7);
         assertThat(tags.get("name:ca")).isEqualTo("Andorra_cat");

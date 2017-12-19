@@ -16,7 +16,7 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
     public BoundariesA8Shapefile(TomtomFolder folder, CapitalProvider capitalProvider, TownTagger townTagger, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(folder.getFile("a8.shp"), 8, capitalProvider, townTagger, nameProvider, osmLevelGenerator);
         if(new File(folder.getFile("a8.shp")).exists()) {
-            nameProvider.loadFromCityFile("smnm.dbf");
+            nameProvider.loadAlternateCityNames("smnm.dbf");
         }
     }
 

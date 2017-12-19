@@ -21,7 +21,7 @@ public class TownShapefile extends TomtomShapefile {
         super(folder.getFile("sm.shp"));
         this.nameProvider = nameProvider;
         if (new File(folder.getFile("sm.shp")).exists()) {
-            nameProvider.loadFromCityFile("smnm.shp");
+            nameProvider.loadAlternateCityNames("smnm.shp");
         }
     }
 
