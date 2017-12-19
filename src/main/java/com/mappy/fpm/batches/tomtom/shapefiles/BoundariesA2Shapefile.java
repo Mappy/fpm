@@ -11,12 +11,9 @@ import javax.inject.Inject;
 
 public class BoundariesA2Shapefile extends BoundariesShapefile {
 
-    private final CapitalProvider capitalProvider;
-
     @Inject
     public BoundariesA2Shapefile(TomtomFolder folder, CapitalProvider capitalProvider, TownTagger townTagger, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(folder.getFile("___a2.shp"), 2, capitalProvider, townTagger, nameProvider, osmLevelGenerator);
-        this.capitalProvider = capitalProvider;
     }
 
     @Override

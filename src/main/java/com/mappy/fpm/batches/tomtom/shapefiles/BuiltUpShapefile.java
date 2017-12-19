@@ -42,7 +42,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
         this.townTagger = townTagger;
 
         if (new File(folder.getFile("bu.shp")).exists()) {
-            nameProvider.loadFromCityFile("smnm.dbf");
+            nameProvider.loadAlternateCityNames("smnm.dbf");
         }
     }
 
