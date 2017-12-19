@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTime.now;
 
 public class OsmosisSerializerIT {
+
     @Test
     public void should_generate_building_file() throws Exception {
         Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "rennes")).getInstance(Tomtom2Osm.class);
