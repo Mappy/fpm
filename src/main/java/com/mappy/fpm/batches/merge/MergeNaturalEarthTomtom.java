@@ -13,22 +13,19 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+import lombok.extern.slf4j.Slf4j;
+import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
+import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import javax.inject.Inject;
-
-import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
-import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import static com.google.inject.Guice.createInjector;
 import static com.mappy.fpm.batches.merge.PolygonsUtils.polygons;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MergeNaturalEarthTomtom {
@@ -50,6 +47,10 @@ public class MergeNaturalEarthTomtom {
         this.naturalEarthFactory = naturalEarthFactory;
         this.injector = injector;
         this.poly = poly;
+    }
+
+    public static void main(String[] args) throws IOException {
+        createInjector(new MergeNaturalEarthTomtomModule()).getInstance(MergeNaturalEarthTomtom.class).run();
     }
 
     public void run() throws IOException {
@@ -93,9 +94,5 @@ public class MergeNaturalEarthTomtom {
         new Oceans().generate(new File("/workspace/lands.shp"));
 
         log.info("Time: {}s", stopwatch.elapsed(SECONDS));
-    }
-
-    public static void main(String[] args) throws IOException {
-        createInjector(new MergeNaturalEarthTomtomModule()).getInstance(MergeNaturalEarthTomtom.class).run();
     }
 }
