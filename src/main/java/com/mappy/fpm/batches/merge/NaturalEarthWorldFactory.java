@@ -32,7 +32,7 @@ public class NaturalEarthWorldFactory {
         List<Geometry> errors = newArrayList();
         try (ShapefileIterator iterator = new ShapefileIterator(Paths.get(input, "ne_10m_admin_0_countries.shp"))) {
             iterator.forEachRemaining(next -> {
-                String name = next.getString("name");
+                String name = next.getString("NAME");
                 log.info("Processing: {}", name);
                 List<Geometry> polygons = newArrayList();
                 for (Polygon polygon : polygons(next.getGeometry())) {

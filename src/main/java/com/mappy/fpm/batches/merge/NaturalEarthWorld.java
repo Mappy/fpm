@@ -1,17 +1,18 @@
 package com.mappy.fpm.batches.merge;
 
-import com.google.common.collect.Lists;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
 public class NaturalEarthWorld {
-    private final List<Country> countries = Lists.newArrayList();
+
+    private final List<Country> countries = newArrayList();
     private final STRtree index = new STRtree();
 
     public void insert(Country feature) {
@@ -25,7 +26,7 @@ public class NaturalEarthWorld {
     }
 
     public List<Country> getCountries() {
-        log.info("Retrieve countries without artefacts due to union");
+        log.info("Retrieve countries without artifacts due to union");
         return countries.stream().map(g -> new Country(g.getGeometry().buffer(0.0000001).buffer(-0.0000001), g.getName())).collect(toList());
     }
 }

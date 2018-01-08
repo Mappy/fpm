@@ -32,7 +32,7 @@ public class LcShapefileTest extends AbstractTest {
 
         LcShapefile shapefile = new LcShapefile(tomtomFolder, nameProvider);
 
-        verify(nameProvider).loadFromFile("lxnm.dbf");
+        verify(nameProvider).loadAlternateNames("lxnm.dbf");
 
         shapefile.serialize("target/tests/");
 

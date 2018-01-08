@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.*;
 import static org.assertj.core.api.Assertions.*;
 
 public class MetalinkParserTest {
+
     @Test
     public void should_parse_metalink() {
         Metalink metalink = MetalinkParser.parse(getClass().getResourceAsStream("/tomtom/download/Europe.metalink.xml"));

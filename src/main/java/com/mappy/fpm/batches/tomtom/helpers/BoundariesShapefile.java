@@ -48,7 +48,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         this.tomtomLevel = tomtomLevel;
         this.nameProvider = nameProvider;
         if (new File(filename).exists()) {
-            this.nameProvider.loadFromFile("___an.dbf");
+            this.nameProvider.loadAlternateNames("an.dbf");
         }
     }
 
@@ -56,39 +56,40 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
     public void serialize(GeometrySerializer serializer, Feature feature) {
         Long extId = feature.getLong("ID");
 
-        Map<String, String> tags = newHashMap();
-        tags.putAll(nameProvider.getAlternateNames(extId));
-        tags.put("ref:tomtom", String.valueOf(extId));
+        Map<String, String> relationTags = newHashMap();
+        relationTags.putAll(nameProvider.getAlternateNames(extId));
+        relationTags.put("ref:tomtom", String.valueOf(extId));
 
-        ofNullable(feature.getString("ORDER0" + tomtomLevel)).ifPresent(alpha3 -> tags.put("ref:INSEE", getInseeWithAlpha3(alpha3)));
-        ofNullable(feature.getLong("POP")).filter(pop -> pop > 0).ifPresent(pop -> tags.put("population", String.valueOf(pop)));
+        ofNullable(feature.getString("ORDER0" + tomtomLevel)).ifPresent(alpha3 -> relationTags.put("ref:INSEE", getInseeWithAlpha3(alpha3)));
+        ofNullable(feature.getLong("POP")).filter(pop -> pop > 0).ifPresent(pop -> relationTags.put("population", String.valueOf(pop)));
 
         List<RelationMember> members = newArrayList();
         String name = feature.getString("NAME");
         if (name != null) {
-            Map<String, String> wayTags = of("name", name, "boundary", "administrative", "admin_level", osmLevel);
-            Map<String, String> pointTags = newHashMap(tags);
-            pointTags.put("name", name);
+            Map<String, String> labelTags = newHashMap(relationTags);
+            labelTags.put("name", name);
             MultiPolygon multiPolygon = feature.getMultiPolygon();
-            getLabel(serializer, pointTags, multiPolygon).ifPresent(members::add);
 
+            getLabel(serializer, labelTags, multiPolygon).ifPresent(members::add);
+
+            Map<String, String> wayTags = of("name", name, "boundary", "administrative", "admin_level", osmLevel);
             for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
                 for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
                     for (Geometry geom : LongLineSplitter.split(polygon.getInteriorRingN(j), 100)) {
-                        addRelationMember(serializer, members, wayTags, (LineString) geom, "inner");
+                        members.add(addRelationMember(serializer, wayTags, (LineString) geom, "inner"));
                     }
                 }
                 for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
-                    addRelationMember(serializer, members, wayTags, (LineString) geom, "outer");
+                    members.add(addRelationMember(serializer, wayTags, (LineString) geom, "outer"));
                 }
             }
 
-            putRelationTags(tags, wayTags);
+            putRelationTags(relationTags, wayTags);
 
             getAdminCenter(serializer, feature).ifPresent(members::add);
 
-            serializer.writeRelation(members, tags);
+            serializer.writeRelation(members, relationTags);
         }
     }
 
@@ -150,9 +151,9 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         }
     }
 
-    private void addRelationMember(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString geom, String memberRole) {
+    private RelationMember addRelationMember(GeometrySerializer serializer, Map<String, String> wayTags, LineString geom, String memberRole) {
         Long wayId = serializer.writeBoundary(geom, wayTags);
-        members.add(new RelationMember(wayId, Way, memberRole));
+        return new RelationMember(wayId, Way, memberRole);
     }
 
     private Optional<RelationMember> getLabel(GeometrySerializer serializer, Map<String, String> tags, MultiPolygon multiPolygon) {

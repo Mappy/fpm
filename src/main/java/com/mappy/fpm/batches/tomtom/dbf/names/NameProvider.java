@@ -29,11 +29,11 @@ public class NameProvider {
         this.folder = folder;
     }
 
-    public void loadFromFile(String filename) {
+    public void loadAlternateNames(String filename) {
         alternateNames.putAll(readFile(filename, "gc.dbf".equals(filename) ? "FULLNAME" : "NAME", "gc.dbf".equals(filename)));
     }
 
-    public void loadFromCityFile(String filename) {
+    public void loadAlternateCityNames(String filename) {
         alternateCityNames.putAll(readFile(filename, "NAME", false));
     }
 

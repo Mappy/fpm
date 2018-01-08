@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.download;
 
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.download.MetalinkParser.Metalink;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -16,10 +17,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MetalinkDownloaderTest {
+public class MetalinkDownloaderTest extends AbstractTest {
 
     private final CloseableHttpClient client = mock(CloseableHttpClient.class);
-    private final MetalinkDownloader metalinkDownloader = new MetalinkDownloader("login", "password", "tomtomVersion", "/tmp", client);
+    private final MetalinkDownloader metalinkDownloader = new MetalinkDownloader("login", "password", "tomtomVersion", "target/tests", client);
 
     @Test
     public void should_download() throws Exception {

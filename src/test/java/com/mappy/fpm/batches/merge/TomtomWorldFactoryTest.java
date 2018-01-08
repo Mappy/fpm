@@ -10,7 +10,7 @@ public class TomtomWorldFactoryTest {
 
     @Test
     public void should_load_tomtom_countries() throws Exception {
-        factory = new TomtomWorldFactory("src/test/resources/merge/tomtomfiles");
+        factory = new TomtomWorldFactory("src/test/resources/merge/tomtomfiles", MergeNaturalEarthTomtomModule.cuttingPolygon());
 
         TomtomWorld tomtomWorld = factory.loadTomtom();
 

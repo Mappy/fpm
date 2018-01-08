@@ -17,6 +17,8 @@ public class RiversShapefile extends NaturalEarthShapefile {
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
-        serializer.write(feature.getMultiLineString(), ImmutableMap.of("natural", "water", "stream", "waterway"));
+        if (feature.getMultiLineString() != null) {
+            serializer.write(feature.getMultiLineString(), ImmutableMap.of("natural", "water", "stream", "waterway"));
+        }
     }
 }

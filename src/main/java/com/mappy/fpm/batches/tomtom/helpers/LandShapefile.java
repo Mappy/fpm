@@ -18,7 +18,7 @@ public abstract class LandShapefile extends TomtomShapefile {
         super(filename);
         this.nameProvider = nameProvider;
         if (new File(filename).exists()) {
-            this.nameProvider.loadFromFile("lxnm.dbf");
+            this.nameProvider.loadAlternateNames("lxnm.dbf");
         }
     }
 

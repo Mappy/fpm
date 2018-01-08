@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches.utils;
 
 import com.google.inject.Guice;
+import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import org.junit.Ignore;
@@ -15,15 +16,15 @@ import java.io.FileInputStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTime.now;
 
-@Ignore
-public class OsmosisSerializerIT {
+
+public class OsmosisSerializerIT extends AbstractTest {
 
     @Test
     public void should_generate_building_file() throws Exception {
-        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target", "target", "rennes")).getInstance(Tomtom2Osm.class);
+        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target/tests", "target/tests/splitter", "rennes")).getInstance(Tomtom2Osm.class);
         launcher.run();
 
-        PbfStreamSplitter splitter = new PbfStreamSplitter(new DataInputStream(new FileInputStream("target/rennes.osm.pbf")));
+        PbfStreamSplitter splitter = new PbfStreamSplitter(new DataInputStream(new FileInputStream("target/tests/rennes.osm.pbf")));
         assertOSMHeader(splitter);
         assertOSMData(splitter);
     }
