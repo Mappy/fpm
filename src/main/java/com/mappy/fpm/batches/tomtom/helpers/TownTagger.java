@@ -33,13 +33,18 @@ public class TownTagger {
                     Centroid centroid = from(feature);
 
                     Long id = feature.getLong("ID");
+
                     centroidsCity.put(id, centroid.withId(id));
 
-                    ofNullable(feature.getLong("BUAID")).ifPresent(aLong -> centroidsHamlet.put(aLong, centroid.withId(aLong)));
+                    ofNullable(feature.getString("BUANAME")).ifPresent(buaname -> {
+                        if (buaname.equals(feature.getString("NAME"))) {
+                            ofNullable(feature.getLong("BUAID")).ifPresent(buaid -> centroidsHamlet.put(buaid, centroid.withId(buaid)));
+                        }
+                    });
+
                 }
             }
-        }
-        else {
+        } else {
             log.info("File not found: {}", file.getAbsolutePath());
         }
     }
