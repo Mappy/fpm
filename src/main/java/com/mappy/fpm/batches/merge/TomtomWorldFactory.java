@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.merge;
 
-import com.mappy.fpm.batches.naturalearth.discarded.CoastLinesShapefile;
 import com.mappy.fpm.batches.utils.ShapefileIterator;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -15,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.mappy.fpm.batches.merge.NaturalEarthWorld.world;
 import static com.mappy.fpm.batches.merge.PolygonsUtils.polygons;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -40,7 +40,7 @@ public class TomtomWorldFactory {
                     String name = next.getString("NAME");
                     if (isNotBlank(name)) {
                         log.info("Processing: {}", name);
-                        Geometry highres = next.getGeometry().intersection(CoastLinesShapefile.world());
+                        Geometry highres = next.getGeometry().intersection(world());
                         for (Polygon polygon : polygons(highres)) {
                             if (cuttingPolygon.contains(polygon)) {
                                 log.debug("Polygon inside the cutting polygon. Inserting.");

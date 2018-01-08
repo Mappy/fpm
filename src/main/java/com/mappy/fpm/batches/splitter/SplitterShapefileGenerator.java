@@ -1,7 +1,6 @@
 package com.mappy.fpm.batches.splitter;
 
 import com.google.common.collect.Lists;
-import com.mappy.fpm.batches.naturalearth.discarded.CoastLinesShapefile;
 import com.mappy.fpm.batches.utils.ShapefileWriter;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.index.strtree.STRtree;
@@ -24,6 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Throwables.propagate;
+import static com.mappy.fpm.batches.merge.NaturalEarthWorld.world;
 
 @Slf4j
 public class SplitterShapefileGenerator {
@@ -31,7 +31,7 @@ public class SplitterShapefileGenerator {
     private static final GeometryFactory gf = new GeometryFactory();
 
     public static void main(String[] args) {
-        ShapefileWriter.write(new File("/tmp/split.shp"), subdivide(CoastLinesShapefile.world(), 0, "/tmp/Europe.osm.pbf"), MultiPolygon.class);
+        ShapefileWriter.write(new File("/tmp/split.shp"), subdivide(world(), 0, "/tmp/Europe.osm.pbf"), MultiPolygon.class);
     }
 
     @Data
