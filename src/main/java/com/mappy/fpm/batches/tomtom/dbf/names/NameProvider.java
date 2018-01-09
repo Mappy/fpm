@@ -1,16 +1,23 @@
 package com.mappy.fpm.batches.tomtom.dbf.names;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableList;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -47,6 +54,7 @@ public class NameProvider {
                 DbfRow row;
                 Stopwatch stopwatch = Stopwatch.createStarted();
                 int counter = 0;
+
                 while ((row = reader.nextRow()) != null) {
                     AlternativeName altName = AlternativeName.fromDbf(row, alternativeParamName, hasSideName);
                     List<AlternativeName> altNames = alternates.containsKey(altName.getId()) ? alternates.get(altName.getId()) : newArrayList();
@@ -76,20 +84,19 @@ public class NameProvider {
     }
 
     private Map<String, String> getNames(Long tomtomId, Map<Long, List<AlternativeName>> alternateNames) {
-        Map<String, String> tags = newHashMap();
-        List<AlternativeName> an = alternateNames.get(tomtomId);
-        if (an != null) {
-            an.forEach(alternativeName -> {
-                try {
-                    String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
-                    tags.put(keyPrefix + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
-                }
-                catch (IllegalArgumentException e) {
-                    tags.put("alt_name", alternativeName.getName());
-                }
-            });
+        return Optional.ofNullable(alternateNames.get(tomtomId))
+                .orElse(ImmutableList.of())
+                .stream()
+                .collect(Collectors.toMap(this::getNameKey, AlternativeName::getName));
+    }
+
+    private String getNameKey(AlternativeName alternativeName) {
+        try {
+            String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
+            return keyPrefix + Language.valueOf(alternativeName.getLanguage()).getValue();
+        } catch (IllegalArgumentException e) {
+            return "alt_name";
         }
-        return tags;
     }
 
     public Map<String, String> getSideNames(Long tomtomId, Integer sol) {
