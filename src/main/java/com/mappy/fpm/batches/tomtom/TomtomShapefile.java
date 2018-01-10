@@ -23,7 +23,7 @@ public abstract class TomtomShapefile {
     private final File file;
     private String outputFile;
 
-    protected TomtomShapefile(String filename) {
+    protected   TomtomShapefile(String filename) {
         file = new File(filename);
     }
 

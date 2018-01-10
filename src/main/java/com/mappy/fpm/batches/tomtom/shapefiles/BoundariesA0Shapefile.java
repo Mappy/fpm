@@ -15,7 +15,7 @@ public class BoundariesA0Shapefile extends BoundariesShapefile {
 
     @Inject
     public BoundariesA0Shapefile(TomtomFolder folder, CapitalProvider capitalProvider, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
-        super(folder.getFile("___a0.shp"), 0, capitalProvider, null, nameProvider, osmLevelGenerator);
+        super(folder.getFile("a0.shp"), 0, capitalProvider, null, nameProvider, osmLevelGenerator);
     }
 
     @Override

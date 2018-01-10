@@ -3,6 +3,7 @@ package com.mappy.fpm.batches;
 import com.mappy.fpm.batches.merge.pbf.OsmMerger;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import net.morbz.osmonaut.osm.RelationMember;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -32,7 +33,7 @@ public class GenerateFullPbfTest {
 
         generateFullPbf.run(newArrayList("Andorre"));
 
-        assertThat(new File("target/tests/Andorre/pbfFiles/and.osm.pbf").exists()).isTrue();
+        assertThat(new File("target/tests/Andorre/pbfFiles/and___.osm.pbf").exists()).isTrue();
         assertThat(new File("target/tests/Andorre/pbfFiles/andand.osm.pbf").exists()).isTrue();
         assertThat(new File("target/tests/Andorre/Andorre.osm.pbf").exists()).isTrue();
 

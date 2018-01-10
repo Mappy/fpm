@@ -27,7 +27,7 @@ import static java.util.stream.Stream.of;
 public class GenerateFullPbf {
     public static final String OSM_SUFFIX = ".osm.pbf";
     private static final String TOWN_SUFFIX = "_2dbd.shp";
-    private static final String COUNTRY_SUFFIX = "______________a0.shp";
+    private static final String COUNTRY_SUFFIX = "___________a0.shp";
     private static final String FERRY_SUFFIX = "___________fe.shp";
     private static final String ROAD_SUFFIX = "___________nw.shp";
 
