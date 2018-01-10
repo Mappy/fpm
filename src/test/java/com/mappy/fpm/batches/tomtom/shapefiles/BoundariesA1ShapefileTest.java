@@ -36,7 +36,7 @@ public class BoundariesA1ShapefileTest extends AbstractTest {
     public static void setup() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
-        when(tomtomFolder.getFile("___a1.shp")).thenReturn("src/test/resources/tomtom/boundaries/a1/belgium______________a1.shp");
+        when(tomtomFolder.getFile("a1.shp")).thenReturn("src/test/resources/tomtom/boundaries/a1/belgium______________a1.shp");
 
         NameProvider nameProvider = mock(NameProvider.class);
         when(nameProvider.getAlternateNames(10560000000843L)).thenReturn(of("name", "Brussel", "name:fr", "Bruxelles"));

@@ -35,7 +35,7 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
     public static void setup() {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
-        when(tomtomFolder.getFile("___a0.shp")).thenReturn("src/test/resources/tomtom/boundaries/a0/andorra______________a0.shp");
+        when(tomtomFolder.getFile("a0.shp")).thenReturn("src/test/resources/tomtom/boundaries/a0/andorra______________a0.shp");
 
         CapitalProvider capitalProvider = mock(CapitalProvider.class);
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{1.52185, 42.50760}, 2), new GeometryFactory());

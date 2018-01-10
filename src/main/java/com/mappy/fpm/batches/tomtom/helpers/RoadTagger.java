@@ -90,7 +90,7 @@ public class RoadTagger {
             tags.putAll(highwayType(feature));
             tags.putAll(lanes.lanesFor(feature));
             tags.putAll(nameProvider.getAlternateNames(id));
-            tags.putAll(nameProvider.getSideNames(id, feature.getInteger("SOL")));
+            tags.putAll(nameProvider.getAlternateRoadSideNames(id, feature.getInteger("SOL")));
 
             addTagIf("tunnel", "yes", TUNNEL.equals(feature.getInteger("PARTSTRUC")), tags);
             addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);
