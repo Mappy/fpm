@@ -6,18 +6,15 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
-import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -44,6 +41,64 @@ public class NameProvider {
         alternateCityNames.putAll(readFile(filename, "NAME", false));
     }
 
+    public Map<String, String> getAlternateNames(Long tomtomId) {
+        return getAlternateNames(tomtomId, alternateNames);
+    }
+
+    public Map<String, String> getAlternateCityNames(Long tomtomId) {
+        return getAlternateNames(tomtomId, alternateCityNames);
+    }
+
+    public Map<String, String> getAlternateRoadSideNames(Long tomtomId, Integer sol) {
+        return getAlternateRoadNames(tomtomId, sol);
+    }
+
+    private Map<String, String> getAlternateNames(Long tomtomId, Map<Long, List<AlternativeName>> alternateNames) {
+        return Optional.ofNullable(alternateNames.get(tomtomId))
+                .orElse(ImmutableList.of())
+                .stream()
+                .collect(Collectors.toMap(this::getKeyAlternativeName, AlternativeName::getName, mergeIntoMap()));
+    }
+
+    private String getKeyAlternativeName(AlternativeName alternativeName) {
+        try {
+            String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
+            return keyPrefix + Language.valueOf(alternativeName.getLanguage()).getValue();
+        } catch (IllegalArgumentException e) {
+            return "alt_name";
+        }
+    }
+
+    private BinaryOperator<String> mergeIntoMap() {
+        return (key1, key2) -> key2;
+    }
+
+    private Map<String, String> getAlternateRoadNames(Long tomtomId, Integer sol) {
+        Map<String, String> tags = newHashMap();
+        if (sol != null && sol != 0) {
+            List<AlternativeName> alternativeNames = alternateNames.get(tomtomId);
+            if (alternativeNames != null) {
+                alternativeNames.forEach(alternativeName -> {
+                    if (alternativeName.getSideOfLine() != null) {
+                        if (alternativeName.getSideOfLine() == 1) {
+                            tags.put("name:left", alternativeName.getName());
+                            try {
+                                tags.put("name:left:" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
+                            } catch (IllegalArgumentException ignored) {}
+                        }
+                        else if (alternativeName.getSideOfLine() == 2) {
+                            tags.put("name:right", alternativeName.getName());
+                            try {
+                                tags.put("name:right:" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
+                            } catch (IllegalArgumentException ignored) {}
+                        }
+                    }
+                });
+            }
+        }
+        return tags;
+    }
+
     private Map<Long, List<AlternativeName>> readFile(String filename, String alternativeParamName, boolean hasSideName) {
         Map<Long, List<AlternativeName>> alternates = newHashMap();
 
@@ -67,63 +122,11 @@ public class NameProvider {
                 stopwatch.stop();
                 log.info("Added {} object(s){}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
             }
-        }
-        else {
+
+        } else {
             log.info("File not found : {}", file.getAbsolutePath());
         }
 
         return alternates;
-    }
-
-    public Map<String, String> getAlternateNames(Long tomtomId) {
-        return getNames(tomtomId, alternateNames);
-    }
-
-    public Map<String, String> getAlternateCityNames(Long tomtomId) {
-        return getNames(tomtomId, alternateCityNames);
-    }
-
-    private Map<String, String> getNames(Long tomtomId, Map<Long, List<AlternativeName>> alternateNames) {
-        return Optional.ofNullable(alternateNames.get(tomtomId))
-                .orElse(ImmutableList.of())
-                .stream()
-                .collect(Collectors.toMap(this::getNameKey, AlternativeName::getName));
-    }
-
-    private String getNameKey(AlternativeName alternativeName) {
-        try {
-            String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
-            return keyPrefix + Language.valueOf(alternativeName.getLanguage()).getValue();
-        } catch (IllegalArgumentException e) {
-            return "alt_name";
-        }
-    }
-
-    public Map<String, String> getSideNames(Long tomtomId, Integer sol) {
-        Map<String, String> tags = newHashMap();
-        if (sol != null && sol != 0) {
-            List<AlternativeName> alternativeNames = alternateNames.get(tomtomId);
-            if (alternativeNames != null) {
-                alternativeNames.forEach(alternativeName -> {
-                    if (alternativeName.getSideOfLine() != null) {
-                        if (alternativeName.getSideOfLine() == 1) {
-                            tags.put("name:left", alternativeName.getName());
-                            try {
-                                tags.put("name:left:" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
-                            }
-                            catch (IllegalArgumentException e) {}
-                        }
-                        else if (alternativeName.getSideOfLine() == 2) {
-                            tags.put("name:right", alternativeName.getName());
-                            try {
-                                tags.put("name:right:" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
-                            }
-                            catch (IllegalArgumentException e) {}
-                        }
-                    }
-                });
-            }
-        }
-        return tags;
     }
 }
