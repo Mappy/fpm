@@ -79,24 +79,28 @@ public class NameProvider {
             List<AlternativeName> alternativeNames = alternateNames.get(tomtomId);
             if (alternativeNames != null) {
                 alternativeNames.forEach(alternativeName -> {
-                    if (alternativeName.getSideOfLine() != null) {
-                        if (alternativeName.getSideOfLine() == 1) {
-                            tags.put("name:left", alternativeName.getName());
-                            try {
-                                tags.put("name:left:" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
-                            } catch (IllegalArgumentException ignored) {}
-                        }
-                        else if (alternativeName.getSideOfLine() == 2) {
-                            tags.put("name:right", alternativeName.getName());
-                            try {
-                                tags.put("name:right:" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
-                            } catch (IllegalArgumentException ignored) {}
-                        }
+                    Optional<String> side = getSideOfLine(alternativeName.getSideOfLine());
+                    if(side.isPresent())
+                    {
+                        tags.put("name:" + side.get(), alternativeName.getName());
+                        try {
+                            tags.put("name:" + side.get() + ":" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
+                        } catch (IllegalArgumentException ignored) {}
                     }
                 });
             }
         }
         return tags;
+    }
+
+    private Optional<String> getSideOfLine(Long side) {
+        if (side == 1) {
+            return Optional.of("left");
+        }
+        else if(side == 2) {
+            return Optional.of("right");
+        }
+        return Optional.empty();
     }
 
     private Map<Long, List<AlternativeName>> readFile(String filename, String alternativeParamName, boolean hasSideName) {
