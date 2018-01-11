@@ -6,6 +6,7 @@ import com.mappy.fpm.batches.utils.ShapefileIterator;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
+@Singleton
 public class TownTagger {
 
     private final Map<Long, Centroid> centroidsCity = newHashMap();
