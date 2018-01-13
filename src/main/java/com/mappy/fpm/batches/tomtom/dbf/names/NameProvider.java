@@ -75,7 +75,7 @@ public class NameProvider {
 
     private Map<String, String> getAlternateRoadNames(Long tomtomId, Integer sol) {
         Map<String, String> tags = newHashMap();
-        if (sol != null && sol != 0) {
+        if (sol != 0) {
             List<AlternativeName> alternativeNames = alternateNames.get(tomtomId);
             if (alternativeNames != null) {
                 alternativeNames.forEach(alternativeName -> {
