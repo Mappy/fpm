@@ -93,8 +93,8 @@ public class RoadTagger {
             addTagIf("tunnel", "yes", TUNNEL.equals(feature.getInteger("PARTSTRUC")), tags);
             addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);
             addTagIf("junction", "roundabout", ROUNDABOUT.is(feature.getInteger("FOW")), tags);
-            addTagIf("access", "private", of(feature.getInteger("PRIVATERD")).isPresent() && feature.getInteger("PRIVATERD") > 0, tags);
-            addTagIf("mappy_length", () -> valueOf(feature.getDouble("METERS")), of(feature.getDouble("METERS")).isPresent(), tags);
+            addTagIf("access", "private", ofNullable(feature.getInteger("PRIVATERD")).isPresent() && feature.getInteger("PRIVATERD") > 0, tags);
+            addTagIf("mappy_length", () -> valueOf(feature.getDouble("METERS")), ofNullable(feature.getDouble("METERS")).isPresent(), tags);
 
             tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
         }
@@ -151,7 +151,7 @@ public class RoadTagger {
 
     private Map<String, String> highwayType(Feature feature) {
         Map<String, String> tags = newHashMap();
-        Optional<Integer> feattype = of(feature.getInteger("FEATTYP"));
+        Optional<Integer> feattype = ofNullable(feature.getInteger("FEATTYP"));
         if (feattype.isPresent() && feattype.get() == ROAD_ELEMENT) {
             Integer fow = feature.getInteger("FOW");
             Fow.getFow(fow).map(Fow::getTags).ifPresent(tags::putAll);
