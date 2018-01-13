@@ -10,6 +10,7 @@ import org.jamel.dbf.structure.DbfRow;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +19,10 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Slf4j
@@ -54,7 +59,7 @@ public class NameProvider {
     }
 
     private Map<String, String> getAlternateNames(Long tomtomId, Map<Long, List<AlternativeName>> alternateNames) {
-        return Optional.ofNullable(alternateNames.get(tomtomId))
+        return ofNullable(alternateNames.get(tomtomId))
                 .orElse(ImmutableList.of())
                 .stream()
                 .collect(Collectors.toMap(this::getKeyAlternativeName, AlternativeName::getName, mergeIntoMap()));
@@ -65,6 +70,7 @@ public class NameProvider {
             String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
             return keyPrefix + Language.valueOf(alternativeName.getLanguage()).getValue();
         } catch (IllegalArgumentException e) {
+            log.info("Language not found : {}", e.getMessage());
             return "alt_name";
         }
     }
@@ -74,33 +80,36 @@ public class NameProvider {
     }
 
     private Map<String, String> getAlternateRoadNames(Long tomtomId, Integer sol) {
-        Map<String, String> tags = newHashMap();
-        if (sol != 0) {
-            List<AlternativeName> alternativeNames = alternateNames.get(tomtomId);
-            if (alternativeNames != null) {
-                alternativeNames.forEach(alternativeName -> {
-                    Optional<String> side = getSideOfLine(alternativeName.getSideOfLine());
-                    if(side.isPresent())
-                    {
-                        tags.put("name:" + side.get(), alternativeName.getName());
-                        try {
-                            tags.put("name:" + side.get() + ":" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
-                        } catch (IllegalArgumentException ignored) {}
-                    }
-                });
-            }
+        if (sol == 0) {
+            return emptyMap();
         }
+        Optional<List<AlternativeName>> alternativeNames = ofNullable(alternateNames.get(tomtomId));
+        Map<String, String> tags = newHashMap();
+        alternativeNames.ifPresent(alternativeNames1 -> alternativeNames1.forEach(alternativeName -> {
+            Optional<String> side = getSideOfLine(alternativeName.getSideOfLine());
+            side.ifPresent(s -> {
+                tags.put("name:" + side.get(), alternativeName.getName());
+                tagRoadNameWithLanguageOrNothing(tags, alternativeName, side.get());
+            });
+        }));
         return tags;
+    }
+
+    private void tagRoadNameWithLanguageOrNothing(Map<String, String> tags, AlternativeName alternativeName, String side) {
+        try {
+            tags.put("name:" + side + ":" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
+        } catch (IllegalArgumentException e) {
+            log.info("Language not found : {}", e.getMessage());
+        }
     }
 
     private Optional<String> getSideOfLine(Long side) {
         if (side == 1) {
-            return Optional.of("left");
+            return of("left");
+        } else if (side == 2) {
+            return of("right");
         }
-        else if(side == 2) {
-            return Optional.of("right");
-        }
-        return Optional.empty();
+        return empty();
     }
 
     private Map<Long, List<AlternativeName>> readFile(String filename, String alternativeParamName, boolean hasSideName) {
@@ -117,7 +126,6 @@ public class NameProvider {
                 while ((row = reader.nextRow()) != null) {
                     AlternativeName altName = AlternativeName.fromDbf(row, alternativeParamName, hasSideName);
                     List<AlternativeName> altNames = alternates.containsKey(altName.getId()) ? alternates.get(altName.getId()) : newArrayList();
-
                     altNames.add(altName);
                     alternates.put(altName.getId(), altNames);
                     counter++;
