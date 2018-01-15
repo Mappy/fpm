@@ -80,7 +80,8 @@ public class ShapefileExtractor {
                     "_a9.",
                     "_an.", // alternate names
                     "_bu.", // built-up area
-                    "_td." // time domains
+                    "_td.",  // time domains
+                    "_lxnm." // land use and land cover alternate names
             );
         }
         else if ("sp".equals(type)) {
