@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.dbf.names;
 
+import com.google.common.base.Enums;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
@@ -10,7 +11,6 @@ import org.jamel.dbf.structure.DbfRow;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,9 +20,7 @@ import java.util.stream.Collectors;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
+import static java.util.Optional.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Slf4j
@@ -66,13 +64,9 @@ public class NameProvider {
     }
 
     private String getKeyAlternativeName(AlternativeName alternativeName) {
-        try {
-            String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
-            return keyPrefix + Language.valueOf(alternativeName.getLanguage()).getValue();
-        } catch (IllegalArgumentException e) {
-            log.info("Language not found : {}", e.getMessage());
-            return "alt_name";
-        }
+        String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
+        Optional<Language> language = ofNullable(Enums.getIfPresent(Language.class, alternativeName.getLanguage()).orNull());
+        return language.map(language1 -> keyPrefix + language1.getValue()).orElse("alt_name");
     }
 
     private BinaryOperator<String> mergeIntoMap() {
@@ -96,11 +90,8 @@ public class NameProvider {
     }
 
     private void tagRoadNameWithLanguageOrNothing(Map<String, String> tags, AlternativeName alternativeName, String side) {
-        try {
-            tags.put("name:" + side + ":" + Language.valueOf(alternativeName.getLanguage()).getValue(), alternativeName.getName());
-        } catch (IllegalArgumentException e) {
-            log.info("Language not found : {}", e.getMessage());
-        }
+        Optional<Language> language = ofNullable(Enums.getIfPresent(Language.class, alternativeName.getLanguage()).orNull());
+        language.ifPresent(language1 -> tags.put("name:" + side + ":" + language1.getValue(), alternativeName.getName()));
     }
 
     private Optional<String> getSideOfLine(Long side) {

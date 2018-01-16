@@ -22,7 +22,7 @@ public class ShapefileExtractor {
     public static void decompress(File outputDirectory, File file, boolean outerworld, String type) {
         try {
             SevenZFile archive = new SevenZFile(file);
-            SevenZArchiveEntry entry = null;
+            SevenZArchiveEntry entry;
             while ((entry = archive.getNextEntry()) != null) {
                 String filename = Paths.get(entry.getName()).getFileName().toString();
 
@@ -39,8 +39,8 @@ public class ShapefileExtractor {
             archive.close();
         }
         catch (IOException e) {
-            throw propagate(e);
-        }
+        throw propagate(e);
+    }
     }
 
     private static List<String> tablesNeeded(boolean outerworld, String type) {
