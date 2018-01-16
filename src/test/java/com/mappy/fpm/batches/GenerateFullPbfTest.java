@@ -3,12 +3,12 @@ package com.mappy.fpm.batches;
 import com.mappy.fpm.batches.merge.pbf.OsmMerger;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.PbfContent;
 import net.morbz.osmonaut.osm.RelationMember;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
@@ -33,7 +33,7 @@ public class GenerateFullPbfTest {
 
         generateFullPbf.run(newArrayList("Andorre"));
 
-        assertThat(new File("target/tests/Andorre/pbfFiles/and___.osm.pbf").exists()).isTrue();
+        assertThat(new File("target/tests/Andorre/pbfFiles/and.osm.pbf").exists()).isTrue();
         assertThat(new File("target/tests/Andorre/pbfFiles/andand.osm.pbf").exists()).isTrue();
         assertThat(new File("target/tests/Andorre/Andorre.osm.pbf").exists()).isTrue();
 
@@ -42,24 +42,31 @@ public class GenerateFullPbfTest {
 
         PbfContent pbfContent = read(new File("target/tests/Europe.osm.pbf"));
 
-        List<RelationMember> outer = pbfContent.getRelations().stream()
-                .filter(r -> r.getTags().hasKeyValue("ref:tomtom", "10200000000008"))
-                .flatMap(relation -> relation.getMembers().stream())//
-                .filter(relationMember -> relationMember.getRole().equals("outer")) //
-                .collect(toList());
-        assertThat(outer).isNotEmpty();
+        assertAdminLevelWithNameFrIsPresent(pbfContent, "2");
 
-        List<RelationMember> label = pbfContent.getRelations().stream()
-                .filter(r -> r.getTags().hasKeyValue("ref:tomtom", "10200000000008"))
-                .flatMap(relation -> relation.getMembers().stream())//
-                .filter(relationMember -> relationMember.getRole().equals("label")) //
-                .collect(toList());
-        assertThat(label).isNotEmpty();
+        assertAdminLevelWithNameFrIsPresent(pbfContent, "8");
 
+        assertRelationsWithRoleIsNotEmpty(pbfContent, "outer");
+
+        assertRelationsWithRoleIsNotEmpty(pbfContent, "label");
+
+        assertRelationsWithRoleIsNotEmpty(pbfContent, "admin_center");
+    }
+
+    private void assertAdminLevelWithNameFrIsPresent(PbfContent pbfContent, String level) {
+        Optional<RelationMember> admin_level = pbfContent.getRelations().stream()
+                .filter(r -> r.getTags().hasKeyValue("admin_level", level))
+                .flatMap(r -> r.getMembers().stream())
+                .filter(r -> r.getEntity().getTags().hasKey("name:fr")).findFirst();
+
+        assertThat(admin_level.isPresent()).isTrue();
+    }
+
+    private void assertRelationsWithRoleIsNotEmpty(PbfContent pbfContent, String admin_center) {
         List<RelationMember> adminCenter = pbfContent.getRelations().stream()
                 .filter(r -> r.getTags().hasKeyValue("ref:tomtom", "10200000000008"))
                 .flatMap(relation -> relation.getMembers().stream())//
-                .filter(relationMember -> relationMember.getRole().equals("admin_center")) //
+                .filter(relationMember -> relationMember.getRole().equals(admin_center)) //
                 .collect(toList());
         assertThat(adminCenter).isNotEmpty();
     }

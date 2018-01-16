@@ -1,7 +1,7 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
-import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
+import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import com.mappy.fpm.batches.utils.LongLineSplitter;
@@ -14,6 +14,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
@@ -36,19 +38,20 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
     protected final OsmLevelGenerator osmLevelGenerator;
     protected final NameProvider nameProvider;
 
+
     protected BoundariesShapefile(String filename, int tomtomLevel, CapitalProvider capitalProvider, TownTagger townTagger, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(filename);
         this.capitalProvider = capitalProvider;
         this.townTagger = townTagger;
-        String[] split = filename.split("/");
-        zone = split[split.length - 1].split("_[_2]")[0];
+        String[] fileNameSplited = getFileNameSplited(filename);
+        zone = fileNameSplited[0];
 
         this.osmLevelGenerator = osmLevelGenerator;
         this.osmLevel = osmLevelGenerator.getOsmLevel(zone, tomtomLevel);
         this.tomtomLevel = tomtomLevel;
         this.nameProvider = nameProvider;
         if (new File(filename).exists()) {
-            this.nameProvider.loadAlternateNames("an.dbf");
+            this.nameProvider.loadAlternateNames(getPrefixFileName(fileNameSplited) + "an.dbf");
         }
     }
 
@@ -106,7 +109,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
     private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, Feature feature) {
         if (tomtomLevel <= 7) {
             return getCapital(serializer, feature);
-        } else if(tomtomLevel <= 9){
+        } else if (tomtomLevel <= 9) {
             return getTown(serializer, feature);
         } else {
             return empty();
@@ -159,5 +162,15 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
     private Optional<RelationMember> getLabel(GeometrySerializer serializer, Map<String, String> tags, MultiPolygon multiPolygon) {
         Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(getCentroid(multiPolygon)), tags);
         return node.map(n -> new RelationMember(n.getId(), Node, "label"));
+    }
+
+    private String getPrefixFileName(String[] split1) {
+        int NUMBER_OF_UNDERSCORE_IN_FILE = 12;
+        return IntStream.range(0, split1.length - NUMBER_OF_UNDERSCORE_IN_FILE).mapToObj(value -> "_").collect(Collectors.joining());
+    }
+
+    private String[] getFileNameSplited(String filename) {
+        String[] split = filename.split("/");
+        return split[split.length - 1].split("_");
     }
 }
