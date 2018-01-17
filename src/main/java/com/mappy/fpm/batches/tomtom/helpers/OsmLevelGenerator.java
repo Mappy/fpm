@@ -38,7 +38,7 @@ public class OsmLevelGenerator {
 
         String defaultOsmLevel = AdminLevel.valueOf("A" + tomtomLevel).getOsmLevel();
 
-        if(zone != null) {
+        if(zone != null && zone.length() > 2) {
             String key = zone.toUpperCase().substring(0, 3);
 
             return of(CountryLevel.values()).map(Enum::name).anyMatch(name -> name.equals(key)) //
