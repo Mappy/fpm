@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.helpers.Centroid.from;
@@ -38,12 +39,7 @@ public class TownTagger {
 
                     centroidsCity.put(id, centroid.withId(id));
 
-                    ofNullable(feature.getString("BUANAME")).ifPresent(buaname -> {
-                        if (buaname.equals(feature.getString("NAME"))) {
-                            ofNullable(feature.getLong("BUAID")).ifPresent(buaid -> centroidsHamlet.put(buaid, centroid.withId(buaid)));
-                        }
-                    });
-
+                    putCentroidHamlet(feature, centroid);
                 }
             }
         } else {
@@ -61,5 +57,17 @@ public class TownTagger {
 
     public List<Centroid> getCapital(int tomtomLevel) {
         return centroidsCity.values().stream().filter(centroid -> centroid.getAdminclass() <= tomtomLevel).collect(toList());
+    }
+
+    private void putCentroidHamlet(Feature feature, Centroid centroid) {
+        ofNullable(feature.getString("BUANAME")).ifPresent(buaname -> {
+
+            Optional<String> axname = ofNullable(feature.getString("AXNAME"));
+            String name = feature.getString("NAME");
+
+            if((!axname.isPresent() || !axname.get().equals(name)) && buaname.equals(name)) {
+                ofNullable(feature.getLong("BUAID")).ifPresent(buaid -> centroidsHamlet.put(buaid, centroid.withId(buaid)));
+            }
+        });
     }
 }
