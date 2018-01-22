@@ -34,7 +34,7 @@ public class EntityMergeResultTest {
     }
 
     @Test
-    public void should_not_merge_tags_on_nodes_with_same_ids() {
+    public void should_not_merge_tags_on_nodes_with_different_ids() {
         EntityMergeResult result = new EntityMergeResult(node(20170200, new Tag("k1", "v1")), node(20170201, new Tag("k2", "v2")), null, false).merge();
 
         assertThat(toMap(result.getResult().getEntity().getTags())).contains(entry("k1", "v1"));
@@ -42,7 +42,7 @@ public class EntityMergeResultTest {
     }
 
     private Map<String, String> toMap(Collection<Tag> tags) {
-        return tags.stream().collect(Collectors.toMap(t -> t.getKey(), t -> t.getValue()));
+        return tags.stream().collect(Collectors.toMap(Tag::getKey, Tag::getValue));
     }
 
     private EntityContainer header(int id, Tag... tags) {

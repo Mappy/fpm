@@ -49,7 +49,7 @@ public class TownTaggerTest extends AbstractTest {
         Centroid hamlet = townTagger.getHamlet(10560001000335L);
         assertThat(hamlet).isNull();
     }
-    
+
     @Test
     public void should_load_capitals() {
         List<Centroid> capitals = townTagger.getCapital(7);

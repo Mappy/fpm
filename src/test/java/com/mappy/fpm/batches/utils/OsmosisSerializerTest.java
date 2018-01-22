@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -177,6 +178,31 @@ public class OsmosisSerializerTest {
 
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Node).hasSize(3);
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Way).hasSize(1);
+    }
+
+    @Test
+    public void should_avoid_to_have_boundary_and_ways_with_similar_ids_for_same_geometry() {
+        serializer.writeBoundary(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        serializer.write(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        List<Long> twoWays = sink.getEntities()
+                .stream()
+                .filter(entity -> entity instanceof Way)
+                .map(Entity::getId)
+                .collect(Collectors.toList());
+
+        assertThat(twoWays.get(0) - twoWays.get(1)).isGreaterThan(1);
     }
 
     @Test

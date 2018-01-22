@@ -76,17 +76,14 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
             getLabel(serializer, labelTags, multiPolygon).ifPresent(members::add);
 
             Map<String, String> wayTags = of("name", name, "boundary", "administrative", "admin_level", osmLevel);
-            for (int i = 0; i < multiPolygon.getNumGeometries(); i++) {
+
+            IntStream.range(0, multiPolygon.getNumGeometries()).forEach(i -> {
                 Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
-                for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
-                    for (Geometry geom : LongLineSplitter.split(polygon.getInteriorRingN(j), 100)) {
-                        members.add(addRelationMember(serializer, wayTags, (LineString) geom, "inner"));
-                    }
-                }
-                for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
-                    members.add(addRelationMember(serializer, wayTags, (LineString) geom, "outer"));
-                }
-            }
+
+                IntStream.range(0, polygon.getNumInteriorRing()).forEach(j -> addPolygonRelations(serializer, members, wayTags, polygon.getInteriorRingN(j), "inner"));
+
+                addPolygonRelations(serializer, members, wayTags, polygon.getExteriorRing(), "outer");
+            });
 
             putRelationTags(relationTags, wayTags);
 
@@ -94,6 +91,11 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
 
             serializer.writeRelation(members, relationTags);
         }
+    }
+
+    private static void addPolygonRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString exteriorRing, String memberRole) {
+        LongLineSplitter.split(exteriorRing, 100)
+                .forEach(geom -> addRelationMember(serializer, wayTags, geom, memberRole).ifPresent(members::add));
     }
 
     private void putRelationTags(Map<String, String> tags, Map<String, String> wayTags) {
@@ -154,22 +156,22 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         }
     }
 
-    private RelationMember addRelationMember(GeometrySerializer serializer, Map<String, String> wayTags, LineString geom, String memberRole) {
-        Long wayId = serializer.writeBoundary(geom, wayTags);
-        return new RelationMember(wayId, Way, memberRole);
+    private static Optional<RelationMember> addRelationMember(GeometrySerializer serializer, Map<String, String> wayTags, LineString geom, String memberRole) {
+        Optional<Long> wayId = serializer.writeBoundary(geom, wayTags);
+        return wayId.map(aLong -> new RelationMember(aLong, Way, memberRole));
     }
 
-    private Optional<RelationMember> getLabel(GeometrySerializer serializer, Map<String, String> tags, MultiPolygon multiPolygon) {
+    private static Optional<RelationMember> getLabel(GeometrySerializer serializer, Map<String, String> tags, MultiPolygon multiPolygon) {
         Optional<Node> node = serializer.writePoint(GEOMETRY_FACTORY.createPoint(getCentroid(multiPolygon)), tags);
         return node.map(n -> new RelationMember(n.getId(), Node, "label"));
     }
 
-    private String getPrefixFileName(String[] split1) {
+    private static String getPrefixFileName(String[] split1) {
         int NUMBER_OF_UNDERSCORE_IN_FILE = 12;
         return IntStream.range(0, split1.length - NUMBER_OF_UNDERSCORE_IN_FILE).mapToObj(value -> "_").collect(Collectors.joining());
     }
 
-    private String[] getFileNameSplited(String filename) {
+    private static String[] getFileNameSplited(String filename) {
         String[] split = filename.split("/");
         return split[split.length - 1].split("_");
     }
