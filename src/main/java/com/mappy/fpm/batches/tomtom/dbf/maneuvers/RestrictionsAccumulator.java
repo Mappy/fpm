@@ -55,7 +55,7 @@ public class RestrictionsAccumulator {
         int ignored = 0;
         for (Restriction restriction : maneuvers.getRestrictions()) {
             try {
-                serializer.writeRelation(members(restriction), tomtomMembers(restriction));
+                serializer.write(members(restriction), tomtomMembers(restriction));
             }
             catch (IllegalArgumentException e) {
                 log.error(e.getMessage());

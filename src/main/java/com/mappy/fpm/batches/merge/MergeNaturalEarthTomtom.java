@@ -70,7 +70,7 @@ public class MergeNaturalEarthTomtom {
                     members.add(new RelationMember(way.getId(), Way, "outer"));
                 }
             }
-            serializer.writeRelation(members, ImmutableMap.of( //
+            serializer.write(members, ImmutableMap.of( //
                     "type", "boundary", //
                     "boundary", "administrative", //
                     "admin_level", "2", //

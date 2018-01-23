@@ -33,8 +33,8 @@ public class FilteredGeometrySerializer implements GeometrySerializer {
     }
 
     @Override
-    public long writeRelation(List<RelationMember> members, Map<String, String> tags) {
-        return serializer.writeRelation(members, tags);
+    public long write(List<RelationMember> members, Map<String, String> tags) {
+        return serializer.write(members, tags);
     }
 
     @Override

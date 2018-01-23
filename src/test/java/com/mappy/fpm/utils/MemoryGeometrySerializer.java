@@ -56,7 +56,7 @@ public class MemoryGeometrySerializer implements GeometrySerializer {
     }
 
     @Override
-    public long writeRelation(List<RelationMember> members, Map<String, String> tags) {
+    public long write(List<RelationMember> members, Map<String, String> tags) {
         relations.add(tags);
         return 0;
     }

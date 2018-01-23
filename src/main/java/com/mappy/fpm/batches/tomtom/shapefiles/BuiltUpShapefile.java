@@ -72,7 +72,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
             members.addAll(addPolygons(serializer, name, multiPolygon, cityCenter));
 
             tags.putAll(of("type", "multipolygon", "landuse", "residential", "layer", "10"));
-            serializer.writeRelation(members, tags);
+            serializer.write(members, tags);
         }
     }
 

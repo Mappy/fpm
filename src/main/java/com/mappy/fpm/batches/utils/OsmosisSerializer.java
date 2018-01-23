@@ -113,7 +113,7 @@ public class OsmosisSerializer implements GeometrySerializer {
     }
 
     @Override
-    public long writeRelation(List<RelationMember> members, Map<String, String> tags) {
+    public long write(List<RelationMember> members, Map<String, String> tags) {
         for (RelationMember member : members) {
             if (member.getMemberType() == Node) {
                 checkState(pointTracker.contains(member.getMemberId()), "Adding relation on missing node");

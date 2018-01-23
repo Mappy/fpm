@@ -29,9 +29,9 @@ public interface GeometrySerializer extends Closeable {
 
     void write(MultiLineString polygon, Map<String, String> tags);
 
+    long write(List<RelationMember> members, Map<String, String> tags);
+
     Way write(LineString line, Map<String, String> tags);
 
     Optional<Long> writeBoundary(LineString line, Map<String, String> tags);
-
-    long writeRelation(List<RelationMember> members, Map<String, String> tags);
 }
