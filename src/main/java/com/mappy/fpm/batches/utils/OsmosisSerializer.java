@@ -21,6 +21,8 @@ import java.util.stream.IntStream;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
@@ -62,13 +64,30 @@ public class OsmosisSerializer implements GeometrySerializer {
 
         if (pointTracker.contains(id)) {
             log.warn("Rejecting point {} with tags {} because id already present.", id, tags);
-            return Optional.empty();
+            return empty();
         }
 
         pointTracker.add(id);
         Node node = new Node(ced(id, tags), point.getY(), point.getX());
         sink.process(new NodeContainer(node));
-        return Optional.of(node);
+
+        return of(node);
+    }
+
+    @Override
+    public Optional<Long> writeBoundary(LineString line, Map<String, String> tags) {
+        Long id = geohash(7, line.getCentroid().getCoordinate());
+
+        if (wayTracker.contains(id)) {
+            log.warn("Rejecting boundary {} with tags {} because id already present.", id, tags);
+            return empty();
+        }
+
+        wayTracker.add(id);
+        Way way = new Way(ced(id, tags), getWayNodes(line, tags));
+        sink.process(new WayContainer(way));
+
+        return of(id);
     }
 
     @Override
@@ -77,19 +96,6 @@ public class OsmosisSerializer implements GeometrySerializer {
         Way way = new Way(ced(wayId(line), tags), wayNodes);
         sink.process(new WayContainer(way));
         return way;
-    }
-
-    @Override
-    public Optional<Long> writeBoundary(LineString line, Map<String, String> tags) {
-        Long id = geohash(7, line.getCentroid().getCoordinate());
-        if (!wayTracker.contains(id)) {
-            wayTracker.add(id);
-            List<WayNode> wayNodes = getWayNodes(line, tags);
-            Way way = new Way(ced(id, tags), wayNodes);
-            sink.process(new WayContainer(way));
-            return Optional.of(id);
-        }
-        return Optional.empty();
     }
 
 
