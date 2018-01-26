@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.merge;
 
-import com.mappy.fpm.batches.naturalearth.discarded.CoastLinesShapefile;
 import com.mappy.fpm.batches.utils.ShapefileIterator;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
@@ -13,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.mappy.fpm.batches.merge.NaturalEarthWorld.world;
 import static com.mappy.fpm.batches.merge.PolygonsUtils.*;
 import static com.vividsolutions.jts.operation.union.CascadedPolygonUnion.union;
 
@@ -50,7 +50,7 @@ public class NaturalEarthWorldFactory {
                     }
                 }
                 if (!polygons.isEmpty()) {
-                    naturalEarth.insert(new Country(union(polygons).intersection(CoastLinesShapefile.world()), name));
+                    naturalEarth.insert(new Country(union(polygons).intersection(world()), name));
                 }
             });
         }

@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -89,10 +90,10 @@ public class OsmosisSerializerTest {
     @Test
     public void should_generate_relation_id() {
         writeWays();
-        serializer.writeRelation(newArrayList(
+        serializer.write(newArrayList(
                 new RelationMember(1525972802595572L, Way, "from"),
                 new RelationMember(1525972802595573L, Way, "to")), newHashMap());
-        serializer.writeRelation(newArrayList(
+        serializer.write(newArrayList(
                 new RelationMember(1525972802595573L, Way, "to"),
                 new RelationMember(1525972802595572L, Way, "from")), newHashMap());
 
@@ -104,9 +105,9 @@ public class OsmosisSerializerTest {
     @Test
     public void should_generate_relation_id_with_same_way() {
         writeWays();
-        serializer.writeRelation(newArrayList(
+        serializer.write(newArrayList(
                 new RelationMember(1525972802595572L, Way, "from")), newHashMap());
-        serializer.writeRelation(newArrayList(
+        serializer.write(newArrayList(
                 new RelationMember(1525972802595573L, Way, "to")), newHashMap());
 
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).containsExactly(
@@ -117,9 +118,9 @@ public class OsmosisSerializerTest {
     @Test
     public void should_not_generate_same_relation_id_with_layer() {
         writeWays();
-        serializer.writeRelation(newArrayList(
+        serializer.write(newArrayList(
                 new RelationMember(1525972802595572L, Way, "from")), ImmutableMap.of("layer", "0"));
-        serializer.writeRelation(newArrayList(
+        serializer.write(newArrayList(
                 new RelationMember(1525972802595572L, Way, "to")), ImmutableMap.of("layer", "2"));
 
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).containsExactly(
@@ -177,6 +178,31 @@ public class OsmosisSerializerTest {
 
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Node).hasSize(3);
         assertThat(sink.getEntities()).filteredOn(e -> e instanceof Way).hasSize(1);
+    }
+
+    @Test
+    public void should_avoid_to_have_boundary_and_ways_with_similar_ids_for_same_geometry() {
+        serializer.writeBoundary(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        serializer.write(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        List<Long> twoWays = sink.getEntities()
+                .stream()
+                .filter(entity -> entity instanceof Way)
+                .map(Entity::getId)
+                .collect(Collectors.toList());
+
+        assertThat(twoWays.get(0) - twoWays.get(1)).isGreaterThan(1);
     }
 
     @Test

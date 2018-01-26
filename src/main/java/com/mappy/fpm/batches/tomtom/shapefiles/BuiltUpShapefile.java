@@ -72,7 +72,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
             members.addAll(addPolygons(serializer, name, multiPolygon, cityCenter));
 
             tags.putAll(of("type", "multipolygon", "landuse", "residential", "layer", "10"));
-            serializer.writeRelation(members, tags);
+            serializer.write(members, tags);
         }
     }
 
@@ -112,13 +112,13 @@ public class BuiltUpShapefile extends TomtomShapefile {
             Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
             for (int j = 0; j < polygon.getNumInteriorRing(); j++) {
                 for (Geometry geom : LongLineSplitter.split(polygon.getInteriorRingN(j), 100)) {
-                    Long wayId = serializer.writeBoundary((LineString) geom, wayTags);
-                    result.add(new RelationMember(wayId, Way, "inner"));
+                    Optional<Long> wayId = serializer.writeBoundary((LineString) geom, wayTags);
+                    wayId.ifPresent(aLong -> result.add(new RelationMember(aLong, Way, "inner")));
                 }
             }
             for (Geometry geom : LongLineSplitter.split(polygon.getExteriorRing(), 100)) {
-                Long wayId = serializer.writeBoundary((LineString) geom, wayTags);
-                result.add(new RelationMember(wayId, Way, "outer"));
+                Optional<Long> wayId = serializer.writeBoundary((LineString) geom, wayTags);
+                wayId.ifPresent(aLong -> result.add(new RelationMember(aLong, Way, "outer")));
             }
         }
 

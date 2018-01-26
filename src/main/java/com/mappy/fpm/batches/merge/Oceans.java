@@ -1,6 +1,5 @@
 package com.mappy.fpm.batches.merge;
 
-import com.mappy.fpm.batches.naturalearth.discarded.CoastLinesShapefile;
 import com.mappy.fpm.batches.utils.LargePolygonSplitter;
 import com.mappy.fpm.batches.utils.ShapefileIterator;
 import com.mappy.fpm.batches.utils.ShapefileWriter;
@@ -22,6 +21,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Throwables.propagate;
+import static com.mappy.fpm.batches.merge.NaturalEarthWorld.world;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
@@ -58,7 +58,7 @@ public class Oceans {
 
     @SuppressWarnings("unchecked")
     private static List<Geometry> splittedWorld(STRtree tree) {
-        return LargePolygonSplitter.split(CoastLinesShapefile.world(), 5, g -> {
+        return LargePolygonSplitter.split(world(), 5, g -> {
             List<Geometry> query = tree.query(g.getEnvelopeInternal());
             return query.stream().mapToInt(Geometry::getNumPoints).sum() < 2000;
         });

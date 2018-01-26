@@ -15,11 +15,14 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.helpers.Fow.*;
 import static com.mappy.fpm.batches.tomtom.helpers.Freeway.PART_OF_FREEWAY;
+import static java.lang.String.valueOf;
+import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 @Singleton
@@ -28,8 +31,6 @@ public class RoadTagger {
 
     public static final Integer TUNNEL = 1;
     public static final Integer BRIDGE = 2;
-    private static final String FOOT = "foot";
-    private static final String BICYCLE = "bicycle";
     private static final int ROAD_ELEMENT = 4110;
 
     private final SpeedProfiles speedProfiles;
@@ -60,13 +61,13 @@ public class RoadTagger {
         Map<String, String> tags = newHashMap();
 
         Long id = feature.getLong("ID");
-        tags.put("ref:tomtom", String.valueOf(id));
-        tags.put("from:tomtom", String.valueOf(feature.getLong("F_JNCTID")));
-        tags.put("to:tomtom", String.valueOf(feature.getLong("T_JNCTID")));
+        tags.put("ref:tomtom", valueOf(id));
+        tags.put("from:tomtom", valueOf(feature.getLong("F_JNCTID")));
+        tags.put("to:tomtom", valueOf(feature.getLong("T_JNCTID")));
         tags.putAll(level(feature));
 
-        addTagIf("name", feature.getString("NAME"), feature.getString("NAME") != null, tags);
-        addTagIf("ref", feature.getString("SHIELDNUM"), feature.getString("SHIELDNUM") != null, tags);
+        addTagIf("name", feature.getString("NAME"), ofNullable(feature.getString("NAME")).isPresent(), tags);
+        addTagIf("ref", feature.getString("SHIELDNUM"), ofNullable(feature.getString("SHIELDNUM")).isPresent(), tags);
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("oneway", "yes", isOneway(feature), tags);
 
@@ -75,12 +76,7 @@ public class RoadTagger {
         Collection<TimeDomains> timeDomains = tdDbf.getTimeDomains(id);
         addTagIf("motor_vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
         if (timeDomains != null && !timeDomains.isEmpty()){
-            try {
-                String openingHours = timeDomainsParser.parse(timeDomains);
-                addTagIf("opening_hours", openingHours, !"".equals(openingHours), tags);
-            } catch (IllegalArgumentException iae) {
-                log.warn("Unable to parse opening hours from " + timeDomains);
-            }
+            tagsTimeDomains(tags, timeDomains);
         }
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
@@ -90,17 +86,28 @@ public class RoadTagger {
             tags.putAll(highwayType(feature));
             tags.putAll(lanes.lanesFor(feature));
             tags.putAll(nameProvider.getAlternateNames(id));
-            tags.putAll(nameProvider.getSideNames(id, feature.getInteger("SOL")));
+
+            Integer sol = ofNullable(feature.getInteger("SOL")).orElse(0);
+            tags.putAll(nameProvider.getAlternateRoadSideNames(id, sol));
 
             addTagIf("tunnel", "yes", TUNNEL.equals(feature.getInteger("PARTSTRUC")), tags);
             addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);
             addTagIf("junction", "roundabout", ROUNDABOUT.is(feature.getInteger("FOW")), tags);
-            addTagIf("access", "private", feature.getInteger("PRIVATERD") != null && feature.getInteger("PRIVATERD") > 0, tags);
-            addTagIf("mappy_length", () -> String.valueOf(feature.getDouble("METERS")), feature.getDouble("METERS") != null, tags);
+            addTagIf("access", "private", ofNullable(feature.getInteger("PRIVATERD")).isPresent() && feature.getInteger("PRIVATERD") > 0, tags);
+            addTagIf("mappy_length", () -> valueOf(feature.getDouble("METERS")), ofNullable(feature.getDouble("METERS")).isPresent(), tags);
 
             tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
         }
         return tags;
+    }
+
+    private void tagsTimeDomains(Map<String, String> tags, Collection<TimeDomains> timeDomains) {
+        try {
+            String openingHours = timeDomainsParser.parse(timeDomains);
+            addTagIf("opening_hours", openingHours, !"".equals(openingHours), tags);
+        } catch (IllegalArgumentException iae) {
+            log.warn("Unable to parse opening hours from " + timeDomains);
+        }
     }
 
     private boolean isOneway(Feature feature) {
@@ -125,14 +132,14 @@ public class RoadTagger {
         Integer tElev = feature.getInteger("T_ELEV");
 
         if (fElev.equals(tElev)) {
-            tags.put("layer", String.valueOf(fElev));
+            tags.put("layer", valueOf(fElev));
         } else {
             if (isReversed(feature)) {
-                tags.put("layer:from", String.valueOf(tElev));
-                tags.put("layer:to", String.valueOf(fElev));
+                tags.put("layer:from", valueOf(tElev));
+                tags.put("layer:to", valueOf(fElev));
             } else {
-                tags.put("layer:from", String.valueOf(fElev));
-                tags.put("layer:to", String.valueOf(tElev));
+                tags.put("layer:from", valueOf(fElev));
+                tags.put("layer:to", valueOf(tElev));
             }
         }
         return tags;
@@ -144,8 +151,8 @@ public class RoadTagger {
 
     private Map<String, String> highwayType(Feature feature) {
         Map<String, String> tags = newHashMap();
-        Integer feattype = feature.getInteger("FEATTYP");
-        if (feattype != null && feattype == ROAD_ELEMENT) {
+        Optional<Integer> feattype = ofNullable(feature.getInteger("FEATTYP"));
+        if (feattype.isPresent() && feattype.get() == ROAD_ELEMENT) {
             Integer fow = feature.getInteger("FOW");
             Fow.getFow(fow).map(Fow::getTags).ifPresent(tags::putAll);
 

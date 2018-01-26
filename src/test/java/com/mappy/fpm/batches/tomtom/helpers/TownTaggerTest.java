@@ -39,6 +39,18 @@ public class TownTaggerTest extends AbstractTest {
     }
 
     @Test
+    public void should_load_centroids_when_secondary_sherdemaal_city_hamlet() {
+        Centroid hamlet = townTagger.getHamlet(10560001000188L);
+        assertCentroid(hamlet, 10560001000188L, "Scherdemaal", 10, 12, 64, new Double[]{4.2895269, 50.8310562});
+    }
+
+    @Test
+    public void should_not_load_centroids_when_name_equals_axename_leuven_city_hamlet() {
+        Centroid hamlet = townTagger.getHamlet(10560001000335L);
+        assertThat(hamlet).isNull();
+    }
+
+    @Test
     public void should_load_capitals() {
         List<Centroid> capitals = townTagger.getCapital(7);
 
@@ -82,10 +94,14 @@ public class TownTaggerTest extends AbstractTest {
     }
 
     private void assertCentroid(Centroid centroid, Long id, String name, Integer adminClass, Integer dispClass, Double[] point) {
+        assertCentroid(centroid, id, name, adminClass, dispClass, 1, point);
+    }
+
+    private void assertCentroid(Centroid centroid, Long id, String name, Integer adminClass, Integer dispClass, Integer cityType, Double[] point) {
         assertThat(centroid.getId()).isEqualTo(id);
         assertThat(centroid.getName()).isEqualTo(name);
         assertThat(centroid.getAdminclass()).isEqualTo(adminClass);
-        assertThat(centroid.getCitytyp()).isEqualTo(1);
+        assertThat(centroid.getCitytyp()).isEqualTo(cityType);
         assertThat(centroid.getDispclass()).isEqualTo(dispClass);
         assertThat(centroid.getPoint().getX()).isEqualTo(point[0]);
         assertThat(centroid.getPoint().getY()).isEqualTo(point[1]);

@@ -9,6 +9,13 @@ public class OsmLevelGeneratorTest {
     private final OsmLevelGenerator osmLevelGenerator = new OsmLevelGenerator();
 
     @Test
+    public void should_return_default_osm_level_for_unknown_zone() {
+        String osmLevel = osmLevelGenerator.getOsmLevel("UN", 0);
+
+        assertThat(osmLevel).isEqualTo("2");
+    }
+
+    @Test
     public void should_return_osm_level_2_for_all_tomtom_level_0() {
         String osmLevel = osmLevelGenerator.getOsmLevel("belbe2", 0);
 

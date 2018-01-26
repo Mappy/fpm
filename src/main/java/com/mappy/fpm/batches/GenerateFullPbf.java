@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -102,8 +103,10 @@ public class GenerateFullPbf {
 
             Future<?> zoneFuture = executorService.submit(() -> {
                 try {
-                    zonePbfFiles.add(instance.run());
+                    Optional<String> OSMZone = instance.run();
+                    OSMZone.ifPresent(zonePbfFiles::add);
                 } catch (IOException e) {
+                    log.info("Error when generating zone: {}", zone, e);
                     propagate(e);
                 }
             });

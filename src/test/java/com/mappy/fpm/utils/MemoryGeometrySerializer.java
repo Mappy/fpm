@@ -9,6 +9,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class MemoryGeometrySerializer implements GeometrySerializer {
     @Getter
@@ -55,14 +56,14 @@ public class MemoryGeometrySerializer implements GeometrySerializer {
     }
 
     @Override
-    public long writeRelation(List<RelationMember> members, Map<String, String> tags) {
+    public long write(List<RelationMember> members, Map<String, String> tags) {
         relations.add(tags);
         return 0;
     }
 
     @Override
-    public long writeBoundary(LineString line, Map<String, String> tags) {
+    public Optional<Long> writeBoundary(LineString line, Map<String, String> tags) {
         linetrings.add(tags);
-        return 0;
+        return Optional.of(0L);
     }
 }

@@ -10,6 +10,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class FilteredGeometrySerializer implements GeometrySerializer {
     private final STRtree tree;
@@ -32,8 +33,8 @@ public class FilteredGeometrySerializer implements GeometrySerializer {
     }
 
     @Override
-    public long writeRelation(List<RelationMember> members, Map<String, String> tags) {
-        return serializer.writeRelation(members, tags);
+    public long write(List<RelationMember> members, Map<String, String> tags) {
+        return serializer.write(members, tags);
     }
 
     @Override
@@ -43,9 +44,9 @@ public class FilteredGeometrySerializer implements GeometrySerializer {
     }
 
     @Override
-    public long writeBoundary(LineString line, Map<String, String> tags) {
+    public Optional<Long> writeBoundary(LineString line, Map<String, String> tags) {
         delegate(line, tags);
-        return 0;
+        return Optional.of(0L);
     }
 
     @Override
