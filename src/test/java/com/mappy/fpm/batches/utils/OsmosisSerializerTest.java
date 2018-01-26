@@ -181,6 +181,25 @@ public class OsmosisSerializerTest {
     }
 
     @Test
+    public void should_not_write_same_boundary_but_return_same_id_of_way() {
+        Optional<Long> boundaryId1 = serializer.writeBoundary(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        Optional<Long> boundaryId2 = serializer.writeBoundary(linestring(
+                new Coordinate[]{
+                        new Coordinate(0.0, 0.0),
+                        new Coordinate(1.0, 0.0),
+                        new Coordinate(2.0, 0.0)}),
+                Maps.newHashMap());
+
+        assertThat(boundaryId1).isEqualTo(boundaryId2);
+    }
+
+    @Test
     public void should_avoid_to_have_boundary_and_ways_with_similar_ids_for_same_geometry() {
         serializer.writeBoundary(linestring(
                 new Coordinate[]{
