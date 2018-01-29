@@ -55,10 +55,6 @@ public class TownTagger {
         return centroidsHamlet.get(centroidId);
     }
 
-    public List<Centroid> getCapital(int tomtomLevel) {
-        return centroidsCity.values().stream().filter(centroid -> centroid.getAdminclass() <= tomtomLevel).collect(toList());
-    }
-
     private void putCentroidHamlet(Feature feature, Centroid centroid) {
         ofNullable(feature.getString("BUANAME")).ifPresent(buaname -> {
 
