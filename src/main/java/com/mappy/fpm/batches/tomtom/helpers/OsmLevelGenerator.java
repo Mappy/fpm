@@ -19,7 +19,7 @@ public class OsmLevelGenerator {
 
     protected enum CountryLevel {
 
-        BEL(7, "7"), DEU(9, "10"), GBR(9, "10");
+        BEL(7, "7"), DEU(9, "10"), GBR(9, "10"), RUS(7, "7");
 
         private final Integer tomtomLevel;
         private final String osmLevel;
