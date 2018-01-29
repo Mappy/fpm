@@ -9,7 +9,7 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.stream;
 
 @Getter
-public enum Frc {
+public enum FunctionalRoadClass {
 
     NOT_APPLICABLE(-1, false, false, of("highway", "unclassified")),
 
@@ -43,18 +43,20 @@ public enum Frc {
     OTHER_ROAD(8, false, null, of("highway", "unclassified"));
 
     private final int value;
-    private final boolean isSlip;
+    private final Boolean isSlip;
     private final Boolean isFreeway;
     private final Map<String, String> tags;
 
-    Frc(int value, boolean isSlip, Boolean isFreeway, Map<String, String> tags) {
+    FunctionalRoadClass(int value, Boolean isSlip, Boolean isFreeway, Map<String, String> tags) {
         this.value = value;
         this.isSlip = isSlip;
         this.isFreeway = isFreeway;
         this.tags = tags;
     }
 
-    public static Optional<Frc> getFrc(int value, boolean isSlip, boolean isFreeway){
-        return stream(Frc.values()).filter(frc -> frc.value == value && frc.isSlip == isSlip && (frc.isFreeway == null || frc.isFreeway == isFreeway)).findFirst();
+    public static Optional<FunctionalRoadClass> getFonctionalRoadClass(int value, Boolean isSlip, Boolean isFreeway){
+        return stream(FunctionalRoadClass.values())
+                .filter(functionalRoadClass -> functionalRoadClass.value == value && functionalRoadClass.isSlip == isSlip && (functionalRoadClass.isFreeway == null || functionalRoadClass.isFreeway == isFreeway))
+                .findFirst();
     }
 }

@@ -12,12 +12,12 @@ import java.util.Collection;
 import static org.jamel.dbf.processor.DbfProcessor.processDbf;
 
 @Slf4j
-public class TdDbf {
+public class TimeDomainsData {
 
     private final Multimap<Long, TimeDomains> timeDomainsMap;
 
     @Inject
-    public TdDbf(TomtomFolder folder) {
+    public TimeDomainsData(TomtomFolder folder) {
         timeDomainsMap = loadTimeDomains(folder.getFile("td.dbf"));
     }
 

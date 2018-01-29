@@ -6,7 +6,7 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
-import com.mappy.fpm.batches.tomtom.dbf.timedomains.TdDbf;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsData;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
 import com.mappy.fpm.utils.MemoryFeature;
@@ -32,10 +32,10 @@ public class RoadTaggerTest {
     private final NameProvider names = mock(NameProvider.class);
     private final SignPosts signPosts = mock(SignPosts.class);
     private final LaneTagger lanes = mock(LaneTagger.class);
-    private final TdDbf tdDbf = mock(TdDbf.class);
+    private final TimeDomainsData timeDomainsData = mock(TimeDomainsData.class);
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
     private final TollTagger tollTagger = mock(TollTagger.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, names, signPosts, lanes, speedRestrictionTagger, tollTagger, tdDbf, timeDomainsParser);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, names, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser);
 
     @Before
     public void setup() {
@@ -79,7 +79,7 @@ public class RoadTaggerTest {
     @Test
     public void should_not_tag_motor_vehicle_no_when_restriction_speed() {
         List<TimeDomains> timeDomainList = newArrayList(new TimeDomains(1L, null));
-        when(tdDbf.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
+        when(timeDomainsData.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
 
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))) //
                 .doesNotContainEntry("motor_vehicle", "no");
@@ -163,7 +163,7 @@ public class RoadTaggerTest {
         TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
         TimeDomains domainTomtom2 = new TimeDomains(789, "domainetomtom2");
         List<TimeDomains> timeDomains = newArrayList(domainTomtom, domainTomtom2);
-        when(tdDbf.getTimeDomains(123)).thenReturn(timeDomains);
+        when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenReturn("10:00-14:00 off, 22:00-06:00 off");
         MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
 
@@ -176,7 +176,7 @@ public class RoadTaggerTest {
     public void should_ignore_non_meaning_time_domain() {
         TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
         List<TimeDomains> timeDomains = newArrayList(domainTomtom);
-        when(tdDbf.getTimeDomains(123)).thenReturn(timeDomains);
+        when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenReturn("");
         MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
 
@@ -188,12 +188,18 @@ public class RoadTaggerTest {
     public void should_ignore_non_parsable_time_domain() {
         TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
         List<TimeDomains> timeDomains = newArrayList(domainTomtom);
-        when(tdDbf.getTimeDomains(123)).thenReturn(timeDomains);
+        when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenThrow(new IllegalArgumentException("Test exception"));
         MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
 
         Map<String, String> tags = tagger.tag(feature);
 
         assertThat(tags).doesNotContainKeys("opening_hours");
+    }
+
+    @Test
+    public void should_tag_a_highway_service() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
+                .containsEntry("highway", "service");
     }
 }

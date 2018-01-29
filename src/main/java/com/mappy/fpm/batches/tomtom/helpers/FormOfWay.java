@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import static com.google.common.collect.ImmutableMap.of;
 
 @Getter
-public enum Fow {
+public enum FormOfWay {
     PART_OF_MOTORWAY(1, of("foot", "no", "bicycle", "no")),
     PART_OF_MULTI_CARRIAGEWAY(2, of()),
     PART_OF_SINGLE_CARRIAGEWAY(3, of()),
@@ -32,12 +32,12 @@ public enum Fow {
     private final int value;
     private final Map<String, String> tags;
 
-    Fow(int value, Map<String, String> tags) {
+    FormOfWay(int value, Map<String, String> tags) {
         this.value = value;
         this.tags = tags;
     }
 
-    public static Optional<Fow> getFow(Integer value) {
+    public static Optional<FormOfWay> getFormOfWay(Integer value) {
         return Stream.of(values()).filter(f -> f.value == value).findFirst();
     }
 

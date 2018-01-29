@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.mappy.fpm.batches.tomtom.helpers.Fow.PARKING_GARAGE_BUILDING;
+import static com.mappy.fpm.batches.tomtom.helpers.FormOfWay.PARKING_GARAGE_BUILDING;
 import static com.mappy.fpm.batches.tomtom.helpers.RoadTagger.isReversed;
 
 public class RoadShapefile extends TomtomShapefile {
