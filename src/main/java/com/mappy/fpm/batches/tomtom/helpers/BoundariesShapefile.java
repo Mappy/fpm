@@ -115,14 +115,8 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         return alpha3;
     }
 
-    private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, Feature feature) {
-        if (tomtomLevel <= 7) {
-            return getCapital(serializer, feature);
-        } else if (tomtomLevel <= 9) {
-            return getTown(serializer, feature);
-        }
-
-        return empty();
+    protected Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, Feature feature) {
+        return getCapital(serializer, feature);
     }
 
     private Optional<RelationMember> getCapital(GeometrySerializer serializer, Feature feature) {
@@ -142,7 +136,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         return empty();
     }
 
-    private Optional<RelationMember> getTown(GeometrySerializer serializer, Feature feature) {
+    protected Optional<RelationMember> getTown(GeometrySerializer serializer, Feature feature) {
 
         Centroid cityCenter = townTagger.get(feature.getLong("CITYCENTER"));
 
