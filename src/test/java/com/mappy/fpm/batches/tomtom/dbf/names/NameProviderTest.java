@@ -42,9 +42,9 @@ public class NameProviderTest {
         nameProvider.loadAlternateNames("gc.dbf");
         Map<String, String> tags = nameProvider.getAlternateRoadNames(10200000000008L);
         assertThat(tags).hasSize(7);
-        assertThat(tags.get("name:ca")).isEqualTo("Andorra_cat");
+        assertThat(tags.get("name:left")).isEqualTo("Andorra_aaa_left");
         assertThat(tags.get("name:fr")).isEqualTo("Principauté d'andorre");
-        assertThat(tags.get("name:de")).isEqualTo("Andorra_ger");
+        assertThat(tags.get("name:ca")).isEqualTo("Andorra_cat");
         assertThat(tags.get("name:left:en")).isEqualTo("Andorra_eng");
         assertThat(tags.get("name:right:fr")).isEqualTo("Andorre");
         assertThat(tags.get("name:es")).isEqualTo("Andorra_spa");

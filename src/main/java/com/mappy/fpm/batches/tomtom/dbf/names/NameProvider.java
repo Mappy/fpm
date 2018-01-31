@@ -70,7 +70,7 @@ public class NameProvider {
     private String getKeyAlternativeNameWithSide(AlternativeName alternativeName) {
         Optional<String> side = getSideOfLine(alternativeName.getSideOfLine());
         Optional<Language> language = ofNullable(Enums.getIfPresent(Language.class, alternativeName.getLanguage()).orNull());
-        return language.map(language1 -> "name:" + side.map(s -> s + ":").orElse("") + language1.getValue()).orElse("name" + side.map(s -> ":" + s).orElse(""));
+        return "name" + language.map(language1 -> ":" + side.map(s -> s + ":").orElse("") + language1.getValue()).orElse(side.map(s -> ":" + s).orElse(""));
     }
 
     private Map<String, String> getAlternateNames(Long tomtomId, Map<Long, List<AlternativeName>> alternateNames) {
