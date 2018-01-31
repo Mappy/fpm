@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static java.util.Collections.emptyMap;
 import static java.util.Optional.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -44,16 +43,34 @@ public class NameProvider {
         alternateCityNames.putAll(readFile(filename, "NAME", false));
     }
 
-    public Map<String, String> getAlternateNames(Long tomtomId) {
-        return getAlternateNames(tomtomId, alternateNames);
-    }
-
     public Map<String, String> getAlternateCityNames(Long tomtomId) {
         return getAlternateNames(tomtomId, alternateCityNames);
     }
 
-    public Map<String, String> getAlternateRoadSideNames(Long tomtomId, Integer sol) {
-        return getAlternateRoadNames(tomtomId, sol);
+    public Map<String, String> getAlternateNames(Long tomtomId) {
+        return getAlternateNames(tomtomId, alternateNames);
+    }
+
+    public Map<String, String> getAlternateRoadNames(Long tomtomId) {
+        return ofNullable(alternateNames.get(tomtomId))
+                .orElse(ImmutableList.of())
+                .stream()
+                .collect(Collectors.toMap(this::getKeyAlternativeNameWithSide, AlternativeName::getName, mergeIntoMap()));
+    }
+
+    private Optional<String> getSideOfLine(Long side) {
+        if (side == 1) {
+            return of("left");
+        } else if (side == 2) {
+            return of("right");
+        }
+        return empty();
+    }
+
+    private String getKeyAlternativeNameWithSide(AlternativeName alternativeName) {
+        Optional<String> side = getSideOfLine(alternativeName.getSideOfLine());
+        Optional<Language> language = ofNullable(Enums.getIfPresent(Language.class, alternativeName.getLanguage()).orNull());
+        return language.map(language1 -> "name:" + side.map(s -> s + ":").orElse("") + language1.getValue()).orElse("name" + side.map(s -> ":" + s).orElse(""));
     }
 
     private Map<String, String> getAlternateNames(Long tomtomId, Map<Long, List<AlternativeName>> alternateNames) {
@@ -66,41 +83,11 @@ public class NameProvider {
     private String getKeyAlternativeName(AlternativeName alternativeName) {
         String keyPrefix = "ON".equals(alternativeName.getType()) ? "name:" : "alt_name:";
         Optional<Language> language = ofNullable(Enums.getIfPresent(Language.class, alternativeName.getLanguage()).orNull());
-        return language.map(language1 -> keyPrefix + language1.getValue()).orElse("alt_name");
+        return language.map(language1 -> keyPrefix + language1.getValue()).orElse("int_name");
     }
 
     private BinaryOperator<String> mergeIntoMap() {
         return (key1, key2) -> key2;
-    }
-
-    private Map<String, String> getAlternateRoadNames(Long tomtomId, Integer sol) {
-        if (sol == 0) {
-            return emptyMap();
-        }
-        Optional<List<AlternativeName>> alternativeNames = ofNullable(alternateNames.get(tomtomId));
-        Map<String, String> tags = newHashMap();
-        alternativeNames.ifPresent(alternativeNames1 -> alternativeNames1.forEach(alternativeName -> {
-            Optional<String> side = getSideOfLine(alternativeName.getSideOfLine());
-            side.ifPresent(s -> {
-                tags.put("name:" + side.get(), alternativeName.getName());
-                tagRoadNameWithLanguageOrNothing(tags, alternativeName, side.get());
-            });
-        }));
-        return tags;
-    }
-
-    private void tagRoadNameWithLanguageOrNothing(Map<String, String> tags, AlternativeName alternativeName, String side) {
-        Optional<Language> language = ofNullable(Enums.getIfPresent(Language.class, alternativeName.getLanguage()).orNull());
-        language.ifPresent(language1 -> tags.put("name:" + side + ":" + language1.getValue(), alternativeName.getName()));
-    }
-
-    private Optional<String> getSideOfLine(Long side) {
-        if (side == 1) {
-            return of("left");
-        } else if (side == 2) {
-            return of("right");
-        }
-        return empty();
     }
 
     private Map<Long, List<AlternativeName>> readFile(String filename, String alternativeParamName, boolean hasSideName) {

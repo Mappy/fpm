@@ -88,6 +88,8 @@ public class RoadTagger {
 
         tagRoute(feature, tags, id);
 
+        tagNames(tags, id);
+
         return tags;
     }
 
@@ -125,10 +127,6 @@ public class RoadTagger {
         tags.putAll(speedRestriction.tag(feature));
         tags.putAll(highwayType(feature));
         tags.putAll(lanes.lanesFor(feature));
-        tags.putAll(nameProvider.getAlternateNames(id));
-
-        Integer sol = ofNullable(feature.getInteger("SOL")).orElse(0);
-        tags.putAll(nameProvider.getAlternateRoadSideNames(id, sol));
 
         addTagIf("tunnel", "yes", TUNNEL.equals(feature.getInteger("PARTSTRUC")), tags);
         addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);
@@ -137,6 +135,10 @@ public class RoadTagger {
         addTagIf("mappy_length", () -> valueOf(feature.getDouble("METERS")), ofNullable(feature.getDouble("METERS")).isPresent(), tags);
 
         tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
+    }
+
+    private void tagNames(Map<String, String> tags, Long id) {
+        tags.putAll(nameProvider.getAlternateRoadNames(id));
     }
 
     private void tagTomtomSpecial(Feature feature, Map<String, String> tags, Long id) {
