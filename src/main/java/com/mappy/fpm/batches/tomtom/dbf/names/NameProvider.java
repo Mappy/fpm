@@ -51,10 +51,11 @@ public class NameProvider {
         return getAlternateNames(tomtomId, alternateNames);
     }
 
-    public Map<String, String> getAlternateRoadNames(Long tomtomId) {
+    public Map<String, String> getAlternateRoadNamesWithSide(Long tomtomId) {
         return ofNullable(alternateNames.get(tomtomId))
                 .orElse(ImmutableList.of())
                 .stream()
+                .filter(alternativeName -> ofNullable(alternativeName.getSideOfLine()).isPresent())
                 .collect(Collectors.toMap(this::getKeyAlternativeNameWithSide, AlternativeName::getName, mergeIntoMap()));
     }
 

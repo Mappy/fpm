@@ -40,7 +40,7 @@ public class NameProviderTest {
     @Test
     public void should_add_alternative_road_names() {
         nameProvider.loadAlternateNames("gc.dbf");
-        Map<String, String> tags = nameProvider.getAlternateRoadNames(10200000000008L);
+        Map<String, String> tags = nameProvider.getAlternateRoadNamesWithSide(10200000000008L);
         assertThat(tags).hasSize(7);
         assertThat(tags.get("name:left")).isEqualTo("Andorra_aaa_left");
         assertThat(tags.get("name:fr")).isEqualTo("Principauté d'andorre");
@@ -63,6 +63,13 @@ public class NameProviderTest {
         assertThat(tags.get("name:en")).isEqualTo("Andorra_airport");
         assertThat(tags.get("name:es")).isEqualTo("Andorra_aeropurto");
         assertThat(tags.get("int_name")).isEqualTo("Andorra_aaa");
+    }
+
+    @Test
+    public void should_not_add_alternative_road_names_when_load_an_field() {
+        nameProvider.loadAlternateNames("an.dbf");
+        Map<String, String> tags = nameProvider.getAlternateRoadNamesWithSide(10200000000008L);
+        assertThat(tags).hasSize(0);
     }
 
 }

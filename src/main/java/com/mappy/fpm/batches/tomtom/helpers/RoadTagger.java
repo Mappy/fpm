@@ -138,7 +138,7 @@ public class RoadTagger {
     }
 
     private void tagNames(Map<String, String> tags, Long id) {
-        tags.putAll(nameProvider.getAlternateRoadNames(id));
+        tags.putAll(nameProvider.getAlternateRoadNamesWithSide(id));
     }
 
     private void tagTomtomSpecial(Feature feature, Map<String, String> tags, Long id) {
