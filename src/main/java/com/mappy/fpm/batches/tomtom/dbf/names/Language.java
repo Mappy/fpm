@@ -6,6 +6,7 @@ public enum Language {
     ALB("sq"),
     ARA("ar"),
     BAQ("eu"),
+    BEL("be"),
     BOS("bs"),
     BUL("bg"),
     CAT("ca"),
@@ -20,7 +21,7 @@ public enum Language {
     GER("de"),
     GLE("ga"),
     GLG("gl"),
-    GRL("el"),
+    GRE("el"),
     HUN("hu"),
     ICE("is"),
     ITA("it"),
@@ -35,12 +36,15 @@ public enum Language {
     ROH("rm"),
     RUM("ro"),
     RUS("ru"),
+    SCC("sr-Latn"),
+    SCY("sr"),
     SLO("sk"),
     SLV("sl"),
+    SMC("sh"),
     SPA("es"),
     SWE("sv"),
     TUR("tr"),
-    UKL("uk"),
+    UKR("uk"),
     WEL("cy");
 
 
