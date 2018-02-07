@@ -1,8 +1,8 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.ImmutableMap;
+import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
-import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
@@ -29,7 +29,7 @@ public class RoadTaggerTest {
 
     private final SpeedProfiles speedProfiles = mock(SpeedProfiles.class);
     private final SpeedRestrictionTagger speedRestrictionTagger = mock(SpeedRestrictionTagger.class);
-    private final NameProvider names = mock(NameProvider.class);
+    private final GeocodeProvider names = mock(GeocodeProvider.class);
     private final SignPosts signPosts = mock(SignPosts.class);
     private final LaneTagger lanes = mock(LaneTagger.class);
     private final TimeDomainsData timeDomainsData = mock(TimeDomainsData.class);

@@ -36,11 +36,11 @@ public class NameProvider {
     }
 
     public void loadAlternateNames(String filename) {
-        alternateNames.putAll(readFile(filename, "gc.dbf".equals(filename) ? "FULLNAME" : "NAME", "gc.dbf".equals(filename)));
+        alternateNames.putAll(readFile(filename));
     }
 
     public void loadAlternateCityNames(String filename) {
-        alternateCityNames.putAll(readFile(filename, "NAME", false));
+        alternateCityNames.putAll(readFile(filename));
     }
 
     public Map<String, String> getAlternateCityNames(Long tomtomId) {
@@ -49,29 +49,6 @@ public class NameProvider {
 
     public Map<String, String> getAlternateNames(Long tomtomId) {
         return getAlternateNames(tomtomId, alternateNames);
-    }
-
-    public Map<String, String> getAlternateRoadNamesWithSide(Long tomtomId) {
-        return ofNullable(alternateNames.get(tomtomId))
-                .orElse(ImmutableList.of())
-                .stream()
-                .filter(alternativeName -> ofNullable(alternativeName.getSideOfLine()).isPresent())
-                .collect(Collectors.toMap(this::getKeyAlternativeNameWithSide, AlternativeName::getName, mergeIntoMap()));
-    }
-
-    private Optional<String> getSideOfLine(Long side) {
-        if (side == 1) {
-            return of("left");
-        } else if (side == 2) {
-            return of("right");
-        }
-        return empty();
-    }
-
-    private String getKeyAlternativeNameWithSide(AlternativeName alternativeName) {
-        Optional<String> side = getSideOfLine(alternativeName.getSideOfLine());
-        Optional<Language> language = ofNullable(Enums.getIfPresent(Language.class, alternativeName.getLanguage()).orNull());
-        return "name" + language.map(language1 -> ":" + side.map(s -> s + ":").orElse("") + language1.getValue()).orElse(side.map(s -> ":" + s).orElse(""));
     }
 
     private Map<String, String> getAlternateNames(Long tomtomId, Map<Long, List<AlternativeName>> alternateNames) {
@@ -91,7 +68,7 @@ public class NameProvider {
         return (key1, key2) -> key2;
     }
 
-    private Map<Long, List<AlternativeName>> readFile(String filename, String alternativeParamName, boolean hasSideName) {
+    private Map<Long, List<AlternativeName>> readFile(String filename) {
         Map<Long, List<AlternativeName>> alternates = newHashMap();
 
         File file = new File(folder.getFile(filename));
@@ -103,7 +80,7 @@ public class NameProvider {
                 int counter = 0;
 
                 while ((row = reader.nextRow()) != null) {
-                    AlternativeName altName = AlternativeName.fromDbf(row, alternativeParamName, hasSideName);
+                    AlternativeName altName = AlternativeName.fromDbf(row);
                     List<AlternativeName> altNames = alternates.containsKey(altName.getId()) ? alternates.get(altName.getId()) : newArrayList();
                     altNames.add(altName);
                     alternates.put(altName.getId(), altNames);

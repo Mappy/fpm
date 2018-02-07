@@ -1,7 +1,7 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
+import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
-import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
@@ -34,7 +34,7 @@ public class RoadTagger {
     private static final int ROAD_ELEMENT = 4110;
 
     private final SpeedProfiles speedProfiles;
-    private final NameProvider nameProvider;
+    private final GeocodeProvider nameProvider;
     private final SignPosts signPosts;
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
@@ -43,7 +43,7 @@ public class RoadTagger {
     private final TimeDomainsParser timeDomainsParser;
 
     @Inject
-    public RoadTagger(SpeedProfiles speedProfiles, NameProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
+    public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
                       SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsData timeDomainsData, TimeDomainsParser timeDomainsParser
     ) {
         this.speedProfiles = speedProfiles;
@@ -54,7 +54,7 @@ public class RoadTagger {
         this.tolls = tolls;
         this.timeDomainsData = timeDomainsData;
         this.timeDomainsParser = timeDomainsParser;
-        this.nameProvider.loadAlternateNames("gc.dbf");
+        this.nameProvider.loadGeocodingAttributes("gc.dbf");
     }
 
     public Map<String, String> tag(Feature feature) {
