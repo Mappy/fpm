@@ -6,8 +6,8 @@ import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
-import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsData;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsData;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
 import com.mappy.fpm.utils.MemoryFeature;
 import org.junit.Before;
@@ -15,11 +15,13 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.utils.CollectionUtils.map;
 import static com.mappy.fpm.utils.MemoryFeature.onlyTags;
+import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -29,17 +31,18 @@ public class RoadTaggerTest {
 
     private final SpeedProfiles speedProfiles = mock(SpeedProfiles.class);
     private final SpeedRestrictionTagger speedRestrictionTagger = mock(SpeedRestrictionTagger.class);
-    private final GeocodeProvider names = mock(GeocodeProvider.class);
+    private final GeocodeProvider geocoding = mock(GeocodeProvider.class);
     private final SignPosts signPosts = mock(SignPosts.class);
     private final LaneTagger lanes = mock(LaneTagger.class);
     private final TimeDomainsData timeDomainsData = mock(TimeDomainsData.class);
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
     private final TollTagger tollTagger = mock(TollTagger.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, names, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser);
 
     @Before
     public void setup() {
         when(speedProfiles.getTags(any(MemoryFeature.class))).thenReturn(newHashMap());
+        when(geocoding.getPostalCodes(any(Long.class))).thenReturn(of("9120"));
     }
 
     @Test
@@ -184,6 +187,7 @@ public class RoadTaggerTest {
 
         assertThat(tags).doesNotContainKeys("opening_hours");
     }
+
     @Test
     public void should_ignore_non_parsable_time_domain() {
         TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
@@ -201,5 +205,11 @@ public class RoadTaggerTest {
     public void should_tag_a_highway_service() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
                 .containsEntry("highway", "service");
+    }
+
+    @Test
+    public void should_tag_is_in() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
+                .containsEntry("is_in", "9120");
     }
 }

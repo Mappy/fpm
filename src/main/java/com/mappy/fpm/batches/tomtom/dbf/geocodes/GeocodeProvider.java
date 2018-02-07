@@ -4,7 +4,6 @@ import com.google.common.base.Enums;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
-import com.mappy.fpm.batches.tomtom.dbf.names.AlternativeName;
 import com.mappy.fpm.batches.tomtom.dbf.names.Language;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
@@ -30,7 +29,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 @Singleton
 public class GeocodeProvider {
 
-    private final Map<Long, List<Geocode>> alternateNames = newHashMap();
+    private final Map<Long, List<Geocode>> geocodings = newHashMap();
     private final TomtomFolder folder;
 
     @Inject
@@ -39,11 +38,34 @@ public class GeocodeProvider {
     }
 
     public void loadGeocodingAttributes(String filename) {
-        alternateNames.putAll(readFile(filename));
+        geocodings.putAll(readFile(filename));
+    }
+
+    public Optional<String> getPostalCodes(Long tomtomId) {
+        return ofNullable(geocodings.get(tomtomId))
+                .orElse(ImmutableList.of())
+                .stream()
+                .filter(this::hasLeftOrRightPostalCode)
+                .map(this::getPostalCodes)
+                .findFirst();
+    }
+
+    private boolean hasLeftOrRightPostalCode(Geocode geocode) {
+        return ofNullable(geocode.getLeftPostalCode()).isPresent() || ofNullable(geocode.getRightPostalCode()).isPresent();
+    }
+
+    private String getPostalCodes(Geocode geocode) {
+        String leftPostalCode = of(geocode.getLeftPostalCode()).orElse("");
+        String rightPostalCode = of(geocode.getRightPostalCode()).orElse("");
+        if (leftPostalCode.isEmpty() || rightPostalCode.isEmpty()) {
+            return leftPostalCode.isEmpty() ? rightPostalCode : leftPostalCode;
+        }
+        return leftPostalCode.equals(rightPostalCode) ? leftPostalCode : leftPostalCode + ";" + rightPostalCode;
+
     }
 
     public Map<String, String> getAlternateRoadNamesWithSide(Long tomtomId) {
-        return ofNullable(alternateNames.get(tomtomId))
+        return ofNullable(geocodings.get(tomtomId))
                 .orElse(ImmutableList.of())
                 .stream()
                 .filter(alternativeName -> ofNullable(alternativeName.getSideOfLine()).isPresent())

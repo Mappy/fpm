@@ -34,7 +34,7 @@ public class RoadTagger {
     private static final int ROAD_ELEMENT = 4110;
 
     private final SpeedProfiles speedProfiles;
-    private final GeocodeProvider nameProvider;
+    private final GeocodeProvider geocodeProvider;
     private final SignPosts signPosts;
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
@@ -43,18 +43,18 @@ public class RoadTagger {
     private final TimeDomainsParser timeDomainsParser;
 
     @Inject
-    public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider nameProvider, SignPosts signPosts, LaneTagger lanes,
+    public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
                       SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsData timeDomainsData, TimeDomainsParser timeDomainsParser
     ) {
         this.speedProfiles = speedProfiles;
-        this.nameProvider = nameProvider;
+        this.geocodeProvider = geocodeProvider;
         this.signPosts = signPosts;
         this.lanes = lanes;
         this.speedRestriction = speedRestriction;
         this.tolls = tolls;
         this.timeDomainsData = timeDomainsData;
         this.timeDomainsParser = timeDomainsParser;
-        this.nameProvider.loadGeocodingAttributes("gc.dbf");
+        this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
     }
 
     public Map<String, String> tag(Feature feature) {
@@ -89,6 +89,8 @@ public class RoadTagger {
         tagRoute(feature, tags, id);
 
         tagNames(tags, id);
+
+        geocodeProvider.getPostalCodes(id).ifPresent(postcodes -> tags.put("is_in", postcodes));
 
         return tags;
     }
@@ -138,7 +140,7 @@ public class RoadTagger {
     }
 
     private void tagNames(Map<String, String> tags, Long id) {
-        tags.putAll(nameProvider.getAlternateRoadNamesWithSide(id));
+        tags.putAll(geocodeProvider.getAlternateRoadNamesWithSide(id));
     }
 
     private void tagTomtomSpecial(Feature feature, Map<String, String> tags, Long id) {

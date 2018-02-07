@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -57,5 +58,29 @@ public class GeocodeProviderTest {
         Map<String, String> tags = geocodeProvider.getAlternateRoadNamesWithSide(10200000001935L);
         assertThat(tags).hasSize(1);
         assertThat(tags.get("name")).isEqualTo("Carrer Maria Pla");
+    }
+
+    @Test
+    public void should_add_a_postal_code() {
+        Optional<String> postcodes = geocodeProvider.getPostalCodes(10200000000143L);
+        assertThat(postcodes.get()).isEqualTo("AD700");
+    }
+
+    @Test
+    public void should_add_a_postal_code_if_left_is_null() {
+        Optional<String> postcodes = geocodeProvider.getPostalCodes(10200000000176L);
+        assertThat(postcodes.get()).isEqualTo("AD700");
+    }
+
+    @Test
+    public void should_add_a_postal_code_if_right_is_null() {
+        Optional<String> postcodes = geocodeProvider.getPostalCodes(10200000001935L);
+        assertThat(postcodes.get()).isEqualTo("AD500");
+    }
+
+    @Test
+    public void should_add_postal_code_on_left_and_right() {
+        Optional<String> postcodes = geocodeProvider.getPostalCodes(10200000003341L);
+        assertThat(postcodes.get()).isEqualTo("AD700;AD500");
     }
 }
