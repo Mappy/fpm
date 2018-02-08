@@ -13,6 +13,8 @@ public class Geocode {
     private final String language;
     private final String leftPostalCode;
     private final String rightPostalCode;
+    private final Integer leftStructuration;
+    private final Integer rightStructuration;
     private final Long sideOfLine;
 
     public static Geocode fromDbf(DbfRow entry) {
@@ -23,6 +25,8 @@ public class Geocode {
                 entry.getString("NAMELC", UTF_8),
                 entry.getString("L_PC", UTF_8),
                 entry.getString("R_PC", UTF_8),
+                entry.getInt("L_STRUCT"),
+                entry.getInt("R_STRUCT"),
                 entry.getLong("SOL"));
     }
 }
