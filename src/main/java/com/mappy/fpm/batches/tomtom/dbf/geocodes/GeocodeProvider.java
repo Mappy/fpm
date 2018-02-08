@@ -64,6 +64,27 @@ public class GeocodeProvider {
 
     }
 
+    public Optional<String> getInterpolations(Long tomtomId) {
+        return ofNullable(geocodings.get(tomtomId))
+                .orElse(ImmutableList.of())
+                .stream()
+                .filter(this::hasLeftOrRightInterpolation)
+                .map(this::getInterpolations)
+                .findFirst();
+    }
+
+    private String getInterpolations(Geocode geocode) {
+        return Interpolation.getOsmValue(geocode.getLeftStructuration()).orElse("") + ";" + Interpolation.getOsmValue(geocode.getRightStructuration()).orElse("");
+    }
+
+    private boolean hasLeftOrRightInterpolation(Geocode geocode) {
+        return ofNullable(geocode.getLeftStructuration()).filter(this::isInterpolate).isPresent() || ofNullable(geocode.getRightStructuration()).filter(this::isInterpolate).isPresent();
+    }
+
+    private boolean isInterpolate(Integer integer) {
+        return integer >= 1 && integer <= 6;
+    }
+
     public Map<String, String> getAlternateRoadNamesWithSide(Long tomtomId) {
         return ofNullable(geocodings.get(tomtomId))
                 .orElse(ImmutableList.of())
