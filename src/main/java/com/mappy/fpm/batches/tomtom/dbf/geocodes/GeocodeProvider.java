@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -42,12 +44,7 @@ public class GeocodeProvider {
     }
 
     public Optional<String> getPostalCodes(Long tomtomId) {
-        return ofNullable(geocodings.get(tomtomId))
-                .orElse(ImmutableList.of())
-                .stream()
-                .filter(this::hasLeftOrRightPostalCode)
-                .map(this::getPostalCodes)
-                .findFirst();
+        return getFirstGeocodingElement(tomtomId, this::hasLeftOrRightPostalCode, this::getPostalCodes);
     }
 
     private boolean hasLeftOrRightPostalCode(Geocode geocode) {
@@ -65,11 +62,15 @@ public class GeocodeProvider {
     }
 
     public Optional<String> getInterpolations(Long tomtomId) {
+        return getFirstGeocodingElement(tomtomId, this::hasLeftOrRightInterpolation, this::getInterpolations);
+    }
+
+    private Optional<String> getFirstGeocodingElement(Long tomtomId, Predicate<Geocode> filterPredicate, Function<Geocode, String> mapFunction) {
         return ofNullable(geocodings.get(tomtomId))
                 .orElse(ImmutableList.of())
                 .stream()
-                .filter(this::hasLeftOrRightInterpolation)
-                .map(this::getInterpolations)
+                .filter(filterPredicate)
+                .map(mapFunction)
                 .findFirst();
     }
 
