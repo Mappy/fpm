@@ -88,7 +88,7 @@ public class RoadTagger {
 
         tagRoute(feature, tags, id);
 
-        tagNames(tags, id);
+        tags.putAll(geocodeProvider.getAlternateRoadNamesWithSide(id));
 
         geocodeProvider.getPostalCodes(id).ifPresent(postcodes -> tags.put("is_in", postcodes));
         geocodeProvider.getInterpolations(id).ifPresent(interpolations -> tags.put("addr:interpolation", interpolations));
@@ -135,13 +135,10 @@ public class RoadTagger {
         addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);
         addTagIf("junction", "roundabout", ROUNDABOUT.is(feature.getInteger("FOW")), tags);
         addTagIf("access", "private", ofNullable(feature.getInteger("PRIVATERD")).isPresent() && feature.getInteger("PRIVATERD") > 0, tags);
+
         addTagIf("mappy_length", () -> valueOf(feature.getDouble("METERS")), ofNullable(feature.getDouble("METERS")).isPresent(), tags);
 
         tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
-    }
-
-    private void tagNames(Map<String, String> tags, Long id) {
-        tags.putAll(geocodeProvider.getAlternateRoadNamesWithSide(id));
     }
 
     private void tagTomtomSpecial(Feature feature, Map<String, String> tags, Long id) {
@@ -149,6 +146,7 @@ public class RoadTagger {
         tags.put("from:tomtom", valueOf(feature.getLong("F_JNCTID")));
         tags.put("to:tomtom", valueOf(feature.getLong("T_JNCTID")));
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
+        addTagIf("global_importance:tomtom", valueOf(feature.getInteger("NET2CLASS")), ofNullable(feature.getInteger("NET2CLASS")).isPresent(), tags);
     }
 
     private void tagsTimeDomains(Map<String, String> tags, Collection<TimeDomains> timeDomains) {
