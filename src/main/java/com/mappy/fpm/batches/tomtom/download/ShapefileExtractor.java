@@ -19,14 +19,14 @@ import static com.google.common.collect.Lists.newArrayList;
 @Slf4j
 public class ShapefileExtractor {
 
-    public static void decompress(File outputDirectory, File file, boolean outerworld, String type) {
+    public static void decompress(File outputDirectory, File file, String type) {
         try {
             SevenZFile archive = new SevenZFile(file);
             SevenZArchiveEntry entry;
             while ((entry = archive.getNextEntry()) != null) {
                 String filename = Paths.get(entry.getName()).getFileName().toString();
 
-                if (tablesNeeded(outerworld, type).stream().anyMatch(filename::contains)) {
+                if (tablesNeeded(type).stream().anyMatch(filename::contains)) {
                     log.info("Extracting {}", filename);
                     byte[] content = new byte[(int) entry.getSize()];
                     archive.read(content, 0, content.length);
@@ -42,11 +42,7 @@ public class ShapefileExtractor {
         }
     }
 
-    private static List<String> tablesNeeded(boolean outerworld, String type) {
-        if (outerworld) {
-            return newArrayList("nw.");
-        }
-
+    private static List<String> tablesNeeded(String type) {
         List<String> allTomtomFiles = TomtomFile.allTomtomFiles(type);
 
         if (allTomtomFiles.isEmpty()) {

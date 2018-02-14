@@ -38,13 +38,15 @@ public enum TomtomFile {
     BUILT_UP_AREA("mn", "_bu."),
     TIME_DOMAIN("mn", "_td."),
     LAND_USE_AND_LAND_COVER_ALTERNATE_NAMES("mn", "_lxnm."),
-    TRANSPORTATION_ELEMENT_BELONGING_TO_AREA("mn", "_at."),
+    TRANSPORTATION_ELEMENT_BELONGING_TO_AREA("mn", "_ta."),
 
     NETWORK_PROFILE_LINK("sp", "_hsnp."),
     HISTORICAL_SPEED_PROFILES("sp", "_hspr."),
 
     HIGH_QUALITY_LANDUSE("2dcmnb", "_2dtb."),
-    BUILDING("2dcmnb", "_2dtb.");
+    BUILDING("2dcmnb", "_2dtb."),
+
+    OUTERWORLD("outerworld", "nw.");
 
 
     @Getter

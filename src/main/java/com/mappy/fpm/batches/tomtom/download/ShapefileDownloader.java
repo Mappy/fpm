@@ -48,7 +48,7 @@ public class ShapefileDownloader {
                 try (InputStream content = client.execute(get).getEntity().getContent(); FileOutputStream fos = new FileOutputStream(downloaded)) {
                     IOUtils.copyLarge(content, fos);
                 }
-                ShapefileExtractor.decompress(countryDirectory, downloaded, country.isOuterworld(), component.getType());
+                ShapefileExtractor.decompress(countryDirectory, downloaded, getComponentType(country, component));
                 downloaded.delete();
                 return;
             }
@@ -57,6 +57,10 @@ public class ShapefileDownloader {
             }
         }
         throw new RuntimeException("Too many retry");
+    }
+
+    private String getComponentType(TomtomCountry country, MetalinkUrl component) {
+        return country.isOuterworld() ? "outerworld" : component.getType();
     }
 
     private static String replaceSpecialLetters(String text) {
