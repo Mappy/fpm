@@ -8,6 +8,7 @@ import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsData;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
+import com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationAreaProvider;
 import com.mappy.fpm.batches.utils.Feature;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,11 +42,12 @@ public class RoadTagger {
     private final TollTagger tolls;
     private final TimeDomainsData timeDomainsData;
     private final TimeDomainsParser timeDomainsParser;
+    private final TransportationAreaProvider transportationAreaProvider;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsData timeDomainsData, TimeDomainsParser timeDomainsParser
-    ) {
+                      SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsData timeDomainsData, TimeDomainsParser timeDomainsParser,
+                      TransportationAreaProvider transportationAreaProvider) {
         this.speedProfiles = speedProfiles;
         this.geocodeProvider = geocodeProvider;
         this.signPosts = signPosts;
@@ -54,6 +56,7 @@ public class RoadTagger {
         this.tolls = tolls;
         this.timeDomainsData = timeDomainsData;
         this.timeDomainsParser = timeDomainsParser;
+        this.transportationAreaProvider = transportationAreaProvider;
         this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
     }
 
@@ -147,6 +150,8 @@ public class RoadTagger {
         tags.put("to:tomtom", valueOf(feature.getLong("T_JNCTID")));
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("global_importance:tomtom", valueOf(feature.getInteger("NET2CLASS")), ofNullable(feature.getInteger("NET2CLASS")).isPresent(), tags);
+        transportationAreaProvider.getSmallestAreas(id).ifPresent(ids -> tags.put("admin:tomtom", ids));
+        transportationAreaProvider.getBuiltUp(id).ifPresent(ids -> tags.put("bua:tomtom", ids));
     }
 
     private void tagsTimeDomains(Map<String, String> tags, Collection<TimeDomains> timeDomains) {

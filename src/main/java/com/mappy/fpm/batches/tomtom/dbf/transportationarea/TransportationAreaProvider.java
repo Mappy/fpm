@@ -7,22 +7,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.asMap;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationArea.AreaType.isTheMinimumAreaType;
 import static com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationArea.TransportationElementType.isARoadElement;
+import static java.util.Comparator.comparing;
+import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.stream.Collectors.joining;
 
 @Slf4j
 @Singleton
@@ -31,6 +32,7 @@ public class TransportationAreaProvider {
     private final TomtomFolder folder;
 
 
+    @Inject
     public TransportationAreaProvider(TomtomFolder folder) {
         this.folder = folder;
     }
@@ -39,18 +41,42 @@ public class TransportationAreaProvider {
         transportationAreas.putAll(readFile(filename));
     }
 
-    public String getAreas(Long tomtomId) {
+    public Optional<String> getBuiltUp(Long tomtomId) {
+        return ofNullable(ofNullable(transportationAreas.get(tomtomId))
+                .orElse(ImmutableList.of())
+                .stream()
+                .filter(getTransportationAreaPredicate(true))
+                .sorted(comparing(TransportationArea::getSideOfLine))
+                .map(t -> t.getAreaId().toString())
+                .collect(joining(";")));
+    }
+
+    public Optional<String> getSmallestAreas(Long tomtomId) {
+
+        Optional<TransportationArea> min = getMaxAreaType(tomtomId);
+
+        if (min.isPresent()) {
+            return ofNullable(ofNullable(transportationAreas.get(tomtomId))
+                    .orElse(ImmutableList.of())
+                    .stream()
+                    .filter(transportationArea -> transportationArea.getAreaType().equals(min.get().getAreaType()))
+                    .sorted(comparing(TransportationArea::getSideOfLine))
+                    .map(t -> t.getAreaId().toString())
+                    .collect(joining(";")));
+        }
+        return empty();
+    }
+
+    private Optional<TransportationArea> getMaxAreaType(Long tomtomId) {
         return ofNullable(transportationAreas.get(tomtomId))
                 .orElse(ImmutableList.of())
                 .stream()
-                .filter(getTransportationAreaPredicate())
-                .sorted(Comparator.comparing(TransportationArea::getSideOfLine))
-                .map(t -> t.getAreaId().toString())
-                .collect(Collectors.joining(";"));
+                .filter(getTransportationAreaPredicate(false))
+                .max(comparing(TransportationArea::getAreaType));
     }
 
-    private Predicate<TransportationArea> getTransportationAreaPredicate() {
-        return transportationArea -> isARoadElement(transportationArea.getType()) && TransportationArea.AreaType.isTheMinimumAreaType(transportationArea.getAreaType());
+    private Predicate<TransportationArea> getTransportationAreaPredicate(Boolean needBuiltUp) {
+        return transportationArea -> isARoadElement(transportationArea.getType()) && isTheMinimumAreaType(transportationArea.getAreaType(), needBuiltUp);
     }
 
 

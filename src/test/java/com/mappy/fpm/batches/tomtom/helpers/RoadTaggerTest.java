@@ -9,6 +9,7 @@ import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsData;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
+import com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationAreaProvider;
 import com.mappy.fpm.utils.MemoryFeature;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,18 +31,21 @@ public class RoadTaggerTest {
     private final SpeedProfiles speedProfiles = mock(SpeedProfiles.class);
     private final SpeedRestrictionTagger speedRestrictionTagger = mock(SpeedRestrictionTagger.class);
     private final GeocodeProvider geocoding = mock(GeocodeProvider.class);
+    private final TransportationAreaProvider transportationAreaProvider = mock(TransportationAreaProvider.class);
     private final SignPosts signPosts = mock(SignPosts.class);
     private final LaneTagger lanes = mock(LaneTagger.class);
     private final TimeDomainsData timeDomainsData = mock(TimeDomainsData.class);
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
     private final TollTagger tollTagger = mock(TollTagger.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider);
 
     @Before
     public void setup() {
         when(speedProfiles.getTags(any(MemoryFeature.class))).thenReturn(newHashMap());
         when(geocoding.getPostalCodes(any(Long.class))).thenReturn(of("9120"));
         when(geocoding.getInterpolations(any(Long.class))).thenReturn(of("even;odd"));
+        when(transportationAreaProvider.getBuiltUp(any(Long.class))).thenReturn(of("123;456"));
+        when(transportationAreaProvider.getSmallestAreas(any(Long.class))).thenReturn(of("789;112"));
     }
 
     @Test
@@ -231,5 +235,17 @@ public class RoadTaggerTest {
     public void should_have_a_global_importance() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
                 .containsEntry("global_importance:tomtom", "6");
+    }
+
+    @Test
+    public void should_have_built_up_ids() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
+                .containsEntry("bua:tomtom", "123;456");
+    }
+
+    @Test
+    public void should_have_areas_ids() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
+                .containsEntry("admin:tomtom", "789;112");
     }
 }
