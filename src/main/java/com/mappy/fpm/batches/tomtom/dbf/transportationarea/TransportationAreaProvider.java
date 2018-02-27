@@ -6,16 +6,19 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
-import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Singleton;
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.asMap;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationArea.TransportationElementType.isARoadElement;
 import static java.util.Optional.ofNullable;
@@ -36,24 +39,20 @@ public class TransportationAreaProvider {
         transportationAreas.putAll(readFile(filename));
     }
 
-    public Optional<String> getAreas(Long tomtomId) {
+    public String getAreas(Long tomtomId) {
         return ofNullable(transportationAreas.get(tomtomId))
                 .orElse(ImmutableList.of())
                 .stream()
-                .filter(transportationArea -> isARoadElement(transportationArea.getType()))
-                .map(getTransportationAreaStringFunction())
-                .findFirst();
+                .filter(getTransportationAreaPredicate())
+                .sorted(Comparator.comparing(TransportationArea::getSideOfLine))
+                .map(t -> t.getAreaId().toString())
+                .collect(Collectors.joining(";"));
     }
 
-    private Function<TransportationArea, String> getTransportationAreaStringFunction() {
-        return t -> {
-            if(t.getSideOfLine() == 0)
-            {
-                return t.getAreaId().toString() + ";" + t.getAreaId().toString();
-            }
-            return "";
-        };
+    private Predicate<TransportationArea> getTransportationAreaPredicate() {
+        return transportationArea -> isARoadElement(transportationArea.getType()) && TransportationArea.AreaType.isTheMinimumAreaType(transportationArea.getAreaType());
     }
+
 
     private Map<Long, List<TransportationArea>> readFile(String filename) {
         Map<Long, List<TransportationArea>> transportations = newHashMap();

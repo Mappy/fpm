@@ -11,7 +11,7 @@ public class TransportationArea {
     private final Integer type;
     private final Long areaId;
     private final Integer areaType;
-    private final Long sideOfLine;
+    private final Integer sideOfLine;
 
     public static TransportationArea fromDbf(DbfRow entry) {
         return new TransportationArea(
@@ -19,20 +19,26 @@ public class TransportationArea {
                 entry.getInt("TRPELTYP"),
                 entry.getLong("AREID"),
                 entry.getInt("ARETYP"),
-                entry.getLong("SOL"));
+                entry.getInt("SOL"));
     }
 
     public enum TransportationElementType {
-        ROAD_ELEMENT(4110), FERRY_CONNECTION_ELEMENT(4130), ADDRESS_AREA_BOUNDARY_ELEMENT(4165);
+        ROAD_ELEMENT(4110, true),
+        FERRY_CONNECTION_ELEMENT(4130, false),
+        ADDRESS_AREA_BOUNDARY_ELEMENT(4165, false);
 
         public final Integer code;
+        public final Boolean isARoad;
 
-        public static Boolean isARoadElement(Integer code){
-            return Stream.of(values()).anyMatch(transportationElementType -> code.equals(transportationElementType.code));
+        public static Boolean isARoadElement(Integer code) {
+            return Stream.of(values())
+                    .filter(transportationElementType -> transportationElementType.isARoad)
+                    .anyMatch(transportationElementType -> code.equals(transportationElementType.code));
         }
 
-        TransportationElementType(Integer code) {
+        TransportationElementType(Integer code, Boolean isARoad) {
             this.code = code;
+            this.isARoad = isARoad;
         }
     }
 
@@ -42,6 +48,10 @@ public class TransportationArea {
         BUILT_UP_AREA(3110);
 
         public final Integer code;
+
+        public static Boolean isTheMinimumAreaType(Integer code) {
+            return Stream.of(values()).anyMatch(areaType1 -> code.equals(areaType1.code));
+        }
 
         AreaType(Integer code) {
             this.code = code;
