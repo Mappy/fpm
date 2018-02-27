@@ -31,7 +31,6 @@ public class TransportationAreaProvider {
     private final Map<Long, List<TransportationArea>> transportationAreas = newHashMap();
     private final TomtomFolder folder;
 
-
     @Inject
     public TransportationAreaProvider(TomtomFolder folder) {
         this.folder = folder;
@@ -42,29 +41,26 @@ public class TransportationAreaProvider {
     }
 
     public Optional<String> getBuiltUp(Long tomtomId) {
-        return ofNullable(ofNullable(transportationAreas.get(tomtomId))
-                .orElse(ImmutableList.of())
-                .stream()
-                .filter(getTransportationAreaPredicate(true))
-                .sorted(comparing(TransportationArea::getSideOfLine))
-                .map(t -> t.getAreaId().toString())
-                .collect(joining(";")));
+        return getTransportationAreas(tomtomId, getTransportationAreaPredicate(true));
     }
 
     public Optional<String> getSmallestAreas(Long tomtomId) {
-
         Optional<TransportationArea> min = getMaxAreaType(tomtomId);
 
         if (min.isPresent()) {
-            return ofNullable(ofNullable(transportationAreas.get(tomtomId))
-                    .orElse(ImmutableList.of())
-                    .stream()
-                    .filter(transportationArea -> transportationArea.getAreaType().equals(min.get().getAreaType()))
-                    .sorted(comparing(TransportationArea::getSideOfLine))
-                    .map(t -> t.getAreaId().toString())
-                    .collect(joining(";")));
+            return getTransportationAreas(tomtomId, transportationArea -> transportationArea.getAreaType().equals(min.get().getAreaType()));
         }
         return empty();
+    }
+
+    private Optional<String> getTransportationAreas(Long tomtomId, Predicate<TransportationArea> transportationAreaPredicate) {
+        return ofNullable(ofNullable(transportationAreas.get(tomtomId))
+                .orElse(ImmutableList.of())
+                .stream()
+                .filter(transportationAreaPredicate)
+                .sorted(comparing(TransportationArea::getSideOfLine))
+                .map(t -> t.getAreaId().toString())
+                .collect(joining(";")));
     }
 
     private Optional<TransportationArea> getMaxAreaType(Long tomtomId) {
