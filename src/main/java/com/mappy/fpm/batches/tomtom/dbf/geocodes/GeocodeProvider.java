@@ -43,22 +43,16 @@ public class GeocodeProvider {
         geocodings.putAll(readFile(filename));
     }
 
-    public Optional<String> getPostalCodes(Long tomtomId) {
-        return getFirstGeocodingElement(tomtomId, this::hasLeftOrRightPostalCode, this::getPostalCodes);
+    public Optional<String> getLeftAndRightPostalCode(Long tomtomId) {
+        return getFirstGeocodingElement(tomtomId, this::hasLeftOrRightPostalCode, this::getLeftAndRightPostalCode);
     }
 
     private boolean hasLeftOrRightPostalCode(Geocode geocode) {
         return ofNullable(geocode.getLeftPostalCode()).isPresent() || ofNullable(geocode.getRightPostalCode()).isPresent();
     }
 
-    private String getPostalCodes(Geocode geocode) {
-        String leftPostalCode = of(geocode.getLeftPostalCode()).orElse("");
-        String rightPostalCode = of(geocode.getRightPostalCode()).orElse("");
-        if (leftPostalCode.isEmpty() || rightPostalCode.isEmpty()) {
-            return leftPostalCode.isEmpty() ? rightPostalCode : leftPostalCode;
-        }
-        return leftPostalCode.equals(rightPostalCode) ? leftPostalCode : leftPostalCode + ";" + rightPostalCode;
-
+    private String getLeftAndRightPostalCode(Geocode geocode) {
+        return of(geocode.getLeftPostalCode()).orElse("") +  ";" + of(geocode.getRightPostalCode()).orElse("");
     }
 
     public Optional<String> getInterpolations(Long tomtomId) {

@@ -42,7 +42,7 @@ public class RoadTaggerTest {
     @Before
     public void setup() {
         when(speedProfiles.getTags(any(MemoryFeature.class))).thenReturn(newHashMap());
-        when(geocoding.getPostalCodes(any(Long.class))).thenReturn(of("9120"));
+        when(geocoding.getLeftAndRightPostalCode(any(Long.class))).thenReturn(of("9120"));
         when(geocoding.getInterpolations(any(Long.class))).thenReturn(of("even;odd"));
         when(transportationAreaProvider.getBuiltUp(any(Long.class))).thenReturn(of("123;456"));
         when(transportationAreaProvider.getSmallestAreas(any(Long.class))).thenReturn(of("789;112"));

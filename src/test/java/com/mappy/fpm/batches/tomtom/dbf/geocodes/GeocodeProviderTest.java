@@ -63,25 +63,25 @@ public class GeocodeProviderTest {
 
     @Test
     public void should_add_a_postal_code() {
-        Optional<String> postcodes = geocodeProvider.getPostalCodes(10200000000143L);
-        assertThat(postcodes).isEqualTo(of("AD700"));
+        Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000000143L);
+        assertThat(postcodes).isEqualTo(of("AD700;AD700"));
     }
 
     @Test
     public void should_add_a_postal_code_if_left_is_null() {
-        Optional<String> postcodes = geocodeProvider.getPostalCodes(10200000000176L);
-        assertThat(postcodes).isEqualTo(of("AD700"));
+        Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000000176L);
+        assertThat(postcodes).isEqualTo(of(";AD700"));
     }
 
     @Test
     public void should_add_a_postal_code_if_right_is_null() {
-        Optional<String> postcodes = geocodeProvider.getPostalCodes(10200000001935L);
-        assertThat(postcodes).isEqualTo(of("AD500"));
+        Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000001935L);
+        assertThat(postcodes).isEqualTo(of("AD500;"));
     }
 
     @Test
     public void should_add_postal_code_on_left_and_right() {
-        Optional<String> postcodes = geocodeProvider.getPostalCodes(10200000003341L);
+        Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000003341L);
         assertThat(postcodes).isEqualTo(of("AD700;AD500"));
     }
 
