@@ -39,6 +39,7 @@ public enum TomtomFile {
     TIME_DOMAIN("mn", "_td."),
     LAND_USE_AND_LAND_COVER_ALTERNATE_NAMES("mn", "_lxnm."),
     TRANSPORTATION_ELEMENT_BELONGING_TO_AREA("mn", "_ta."),
+    ROUTE_NUMBERS("mn", "_rn."),
 
     NETWORK_PROFILE_LINK("sp", "_hsnp."),
     HISTORICAL_SPEED_PROFILES("sp", "_hspr."),
