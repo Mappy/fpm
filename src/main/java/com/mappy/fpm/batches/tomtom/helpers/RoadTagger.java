@@ -2,6 +2,7 @@ package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
+import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
@@ -32,8 +33,7 @@ public class RoadTagger {
 
     public static final Integer TUNNEL = 1;
     public static final Integer BRIDGE = 2;
-    private static final int ROAD_ELEMENT = 4110;
-
+    private static final Integer ROAD_ELEMENT = 4110;
     private final SpeedProfiles speedProfiles;
     private final GeocodeProvider geocodeProvider;
     private final SignPosts signPosts;
@@ -43,11 +43,12 @@ public class RoadTagger {
     private final TimeDomainsData timeDomainsData;
     private final TimeDomainsParser timeDomainsParser;
     private final TransportationAreaProvider transportationAreaProvider;
+    private final RouteNumbersProvider routeNumbersProvider;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
                       SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsData timeDomainsData, TimeDomainsParser timeDomainsParser,
-                      TransportationAreaProvider transportationAreaProvider) {
+                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider) {
         this.speedProfiles = speedProfiles;
         this.geocodeProvider = geocodeProvider;
         this.signPosts = signPosts;
@@ -57,6 +58,7 @@ public class RoadTagger {
         this.timeDomainsData = timeDomainsData;
         this.timeDomainsParser = timeDomainsParser;
         this.transportationAreaProvider = transportationAreaProvider;
+        this.routeNumbersProvider = routeNumbersProvider;
         this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
     }
 
@@ -70,7 +72,9 @@ public class RoadTagger {
         tags.putAll(level(feature));
 
         addTagIf("name", feature.getString("NAME"), ofNullable(feature.getString("NAME")).isPresent(), tags);
-        addTagIf("ref", feature.getString("SHIELDNUM"), ofNullable(feature.getString("SHIELDNUM")).isPresent(), tags);
+        addTagIf("int_ref", feature.getString("SHIELDNUM"), ofNullable(feature.getString("SHIELDNUM")).isPresent(), tags);
+        routeNumbersProvider.getInternationalRouteNumbers(id).ifPresent(s -> tags.put("int_ref", s));
+        routeNumbersProvider.getNationalRouteNumbers(id).ifPresent(s -> tags.put("ref", s));
         addTagIf("oneway", "yes", isOneway(feature), tags);
 
         tags.putAll(tolls.tag(id));
@@ -177,7 +181,7 @@ public class RoadTagger {
         Map<String, String> tags = newHashMap();
         Optional<Integer> feattype = ofNullable(feature.getInteger("FEATTYP"));
 
-        if (feattype.isPresent() && feattype.get() == ROAD_ELEMENT) {
+        if (feattype.isPresent() && feattype.get().equals(ROAD_ELEMENT)) {
             Integer fow = feature.getInteger("FOW");
 
             ofNullable(feature.getInteger("FRC"))//

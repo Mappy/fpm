@@ -3,6 +3,7 @@ package com.mappy.fpm.batches.tomtom.helpers;
 import com.google.common.collect.ImmutableMap;
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
+import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
@@ -15,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -37,7 +39,8 @@ public class RoadTaggerTest {
     private final TimeDomainsData timeDomainsData = mock(TimeDomainsData.class);
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
     private final TollTagger tollTagger = mock(TollTagger.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider);
+    private final RouteNumbersProvider routeNumbersProvider = mock(RouteNumbersProvider.class);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider);
 
     @Before
     public void setup() {
@@ -46,6 +49,8 @@ public class RoadTaggerTest {
         when(geocoding.getInterpolations(any(Long.class))).thenReturn(of("even;odd"));
         when(transportationAreaProvider.getBuiltUp(any(Long.class))).thenReturn(of("123;456"));
         when(transportationAreaProvider.getSmallestAreas(any(Long.class))).thenReturn(of("789;112"));
+        when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(of("E41"));
+        when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(of("N5"));
     }
 
     @Test
@@ -175,8 +180,13 @@ public class RoadTaggerTest {
 
     @Test
     public void should_add_ref_tag() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "SHIELDNUM", "A13")))).containsEntry("ref", "A13");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0")))).doesNotContainKey("ref");
+        when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(Optional.empty());
+        when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(Optional.empty());
+
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "SHIELDNUM", "A13"))))
+                .containsEntry("int_ref", "A13");
+        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0"))))
+                .doesNotContainKey("ref");
     }
 
     @Test
@@ -247,5 +257,12 @@ public class RoadTaggerTest {
     public void should_have_areas_ids() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
                 .containsEntry("admin:tomtom", "789;112");
+    }
+
+    @Test
+    public void should_have_route_numbers() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
+                .containsEntry("int_ref", "E41")
+                .containsEntry("ref", "N5");
     }
 }
