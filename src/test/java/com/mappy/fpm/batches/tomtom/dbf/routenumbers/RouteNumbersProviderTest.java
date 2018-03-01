@@ -4,7 +4,7 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Map;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -20,14 +20,18 @@ public class RouteNumbersProviderTest {
         when(tomtomFolder.getFile("rn.dbf")).thenReturn("src/test/resources/tomtom/routenumbers/luxlux___________rn.dbf");
         routeNumbers = new RouteNumbersProvider(tomtomFolder);
         routeNumbers.loadGeocodingAttributes("rn.dbf");
-
     }
 
+    @Test
+    public void should_add_international_road_name() {
+        Optional<String> tag = routeNumbers.getInternationalRouteNumbers(123L);
+        assertThat(tag).isEqualTo(Optional.of("E41"));
+    }
 
     @Test
-    public void should_add_alternative_road_names() {
-        String tag = routeNumbers.getRouteNumbers(123L);
-        assertThat(tag).isEmpty();
+    public void should_add_national_road_name() {
+        Optional<String> tag = routeNumbers.getNationalRouteNumbers(123L);
+        assertThat(tag).isEqualTo(Optional.of("N5"));
     }
 
 }

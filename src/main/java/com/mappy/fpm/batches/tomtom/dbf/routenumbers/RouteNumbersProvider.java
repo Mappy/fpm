@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches.tomtom.dbf.routenumbers;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableList;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
@@ -8,11 +9,15 @@ import org.jamel.dbf.structure.DbfRow;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Slf4j
@@ -20,6 +25,7 @@ public class RouteNumbersProvider {
 
     private final Map<Long, List<RouteNumbers>> routenumbers = newHashMap();
     private final TomtomFolder folder;
+    private final Integer INTERNATIONAL_ROUTE = 5;
 
     @Inject
     public RouteNumbersProvider(TomtomFolder folder) {
@@ -30,8 +36,22 @@ public class RouteNumbersProvider {
         routenumbers.putAll(readFile(filename));
     }
 
-    public String getRouteNumbers(Long id) {
-        return "";
+    public Optional<String> getInternationalRouteNumbers(Long id) {
+        return getRoute(id, routeNumbers -> INTERNATIONAL_ROUTE.equals(routeNumbers.getRouteNumberType()));
+    }
+
+    public Optional<String> getNationalRouteNumbers(Long id) {
+        return getRoute(id, routeNumbers -> !INTERNATIONAL_ROUTE.equals(routeNumbers.getRouteNumberType()));
+    }
+
+    private Optional<String> getRoute(Long id, Predicate<RouteNumbers> routeNumbersPredicate) {
+        return ofNullable(routenumbers.get(id))
+                .orElse(ImmutableList.of())
+                .stream()
+                .filter(routeNumbersPredicate)
+                .sorted(Comparator.comparing(RouteNumbers::getRouteNumberPriority))
+                .map(RouteNumbers::getFullRouteNumber)
+                .findFirst();
     }
 
     private Map<Long, List<RouteNumbers>> readFile(String filename) {
