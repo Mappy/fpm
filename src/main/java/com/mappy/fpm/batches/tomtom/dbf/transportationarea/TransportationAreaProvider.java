@@ -1,15 +1,13 @@
 package com.mappy.fpm.batches.tomtom.dbf.transportationarea;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import lombok.extern.slf4j.Slf4j;
-import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,22 +20,20 @@ import static com.mappy.fpm.batches.tomtom.dbf.transportationarea.Transportation
 import static java.util.Comparator.comparing;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.stream.Collectors.joining;
 
 @Slf4j
 @Singleton
-public class TransportationAreaProvider {
+public class TransportationAreaProvider extends TomtomDbfReader {
     private final Map<Long, List<TransportationArea>> transportationAreas = newHashMap();
-    private final TomtomFolder folder;
 
     @Inject
     public TransportationAreaProvider(TomtomFolder folder) {
-        this.folder = folder;
+        super(folder);
     }
 
     public void loadTransportationAreaAttributes(String filename) {
-        transportationAreas.putAll(readFile(filename));
+        readFile(filename, this::getTransportationAreas);
     }
 
     public Optional<String> getBuiltUp(Long tomtomId) {
@@ -75,35 +71,11 @@ public class TransportationAreaProvider {
         return transportationArea -> isARoadElement(transportationArea.getType()) && isTheMinimumAreaType(transportationArea.getAreaType(), needBuiltUp);
     }
 
-
-    private Map<Long, List<TransportationArea>> readFile(String filename) {
-        Map<Long, List<TransportationArea>> transportations = newHashMap();
-
-        File file = new File(folder.getFile(filename));
-        if (file.exists()) {
-            log.info("Reading {}", file);
-            try (DbfReader reader = new DbfReader(file)) {
-                DbfRow row;
-                Stopwatch stopwatch = Stopwatch.createStarted();
-                int counter = 0;
-
-                while ((row = reader.nextRow()) != null) {
-                    TransportationArea geocode = TransportationArea.fromDbf(row);
-                    List<TransportationArea> transportationAreaList = transportations.containsKey(geocode.getId()) ? transportations.get(geocode.getId()) : newArrayList();
-                    transportationAreaList.add(geocode);
-                    transportations.put(geocode.getId(), transportationAreaList);
-                    counter++;
-                }
-                long time = stopwatch.elapsed(MILLISECONDS);
-                stopwatch.stop();
-                log.info("Added {} object(s){}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
-            }
-
-        } else {
-            log.info("File not found : {}", file.getAbsolutePath());
-        }
-
-        return transportations;
+    private void getTransportationAreas(DbfRow row) {
+        TransportationArea geocode = TransportationArea.fromDbf(row);
+        List<TransportationArea> transportationAreaList = transportationAreas.containsKey(geocode.getId()) ? transportationAreas.get(geocode.getId()) : newArrayList();
+        transportationAreaList.add(geocode);
+        transportationAreas.put(geocode.getId(), transportationAreaList);
     }
 
 }

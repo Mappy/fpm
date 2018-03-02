@@ -1,17 +1,15 @@
 package com.mappy.fpm.batches.tomtom.dbf.geocodes;
 
 import com.google.common.base.Enums;
-import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.names.Language;
 import lombok.extern.slf4j.Slf4j;
-import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,25 +20,21 @@ import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static java.util.Optional.empty;
-import static java.util.Optional.of;
-import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.Optional.*;
 
 @Slf4j
 @Singleton
-public class GeocodeProvider {
+public class GeocodeProvider extends TomtomDbfReader {
 
     private final Map<Long, List<Geocode>> geocodings = newHashMap();
-    private final TomtomFolder folder;
 
     @Inject
     public GeocodeProvider(TomtomFolder folder) {
-        this.folder = folder;
+        super(folder);
     }
 
     public void loadGeocodingAttributes(String filename) {
-        geocodings.putAll(readFile(filename));
+        readFile(filename, this::getGeocodings);
     }
 
     public Optional<String> getLeftAndRightPostalCode(Long tomtomId) {
@@ -52,7 +46,7 @@ public class GeocodeProvider {
     }
 
     private String getLeftAndRightPostalCode(Geocode geocode) {
-        return of(geocode.getLeftPostalCode()).orElse("") +  ";" + of(geocode.getRightPostalCode()).orElse("");
+        return of(geocode.getLeftPostalCode()).orElse("") + ";" + of(geocode.getRightPostalCode()).orElse("");
     }
 
     public Optional<String> getInterpolations(Long tomtomId) {
@@ -107,33 +101,11 @@ public class GeocodeProvider {
         return (key1, key2) -> key2;
     }
 
-    private Map<Long, List<Geocode>> readFile(String filename) {
-        Map<Long, List<Geocode>> geocodes = newHashMap();
-
-        File file = new File(folder.getFile(filename));
-        if (file.exists()) {
-            log.info("Reading {}", file);
-            try (DbfReader reader = new DbfReader(file)) {
-                DbfRow row;
-                Stopwatch stopwatch = Stopwatch.createStarted();
-                int counter = 0;
-
-                while ((row = reader.nextRow()) != null) {
-                    Geocode geocode = Geocode.fromDbf(row);
-                    List<Geocode> geocodingAttributes = geocodes.containsKey(geocode.getId()) ? geocodes.get(geocode.getId()) : newArrayList();
-                    geocodingAttributes.add(geocode);
-                    geocodes.put(geocode.getId(), geocodingAttributes);
-                    counter++;
-                }
-                long time = stopwatch.elapsed(MILLISECONDS);
-                stopwatch.stop();
-                log.info("Added {} object(s){}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
-            }
-
-        } else {
-            log.info("File not found : {}", file.getAbsolutePath());
-        }
-
-        return geocodes;
+    private void getGeocodings(DbfRow row) {
+        Geocode geocode = Geocode.fromDbf(row);
+        List<Geocode> geocodingAttributes = geocodings.containsKey(geocode.getId()) ? geocodings.get(geocode.getId()) : newArrayList();
+        geocodingAttributes.add(geocode);
+        geocodings.put(geocode.getId(), geocodingAttributes);
     }
+
 }
