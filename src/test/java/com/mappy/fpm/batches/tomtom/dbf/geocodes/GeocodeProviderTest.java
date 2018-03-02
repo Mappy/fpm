@@ -22,7 +22,6 @@ public class GeocodeProviderTest {
         when(tomtomFolder.getFile("gc.dbf")).thenReturn("src/test/resources/tomtom/geocode/andand___________gc.dbf");
         geocodeProvider = new GeocodeProvider(tomtomFolder);
         geocodeProvider.loadGeocodingAttributes("gc.dbf");
-
     }
 
     @Test

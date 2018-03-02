@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.structure.DbfRow;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Optional.ofNullable;
 
 @Slf4j
+@Singleton
 public class RouteNumbersProvider extends TomtomDbfReader {
 
     private final Map<Long, List<RouteNumbers>> routenumbers = newHashMap();

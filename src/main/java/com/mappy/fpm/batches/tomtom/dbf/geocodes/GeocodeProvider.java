@@ -34,7 +34,7 @@ public class GeocodeProvider extends TomtomDbfReader {
     }
 
     public void loadGeocodingAttributes(String filename) {
-        readFile(filename, this::getGeocodings);
+        readFile(filename, (DbfRow row) -> getGeocodings(geocodings, row));
     }
 
     public Optional<String> getLeftAndRightPostalCode(Long tomtomId) {
@@ -101,11 +101,12 @@ public class GeocodeProvider extends TomtomDbfReader {
         return (key1, key2) -> key2;
     }
 
-    private void getGeocodings(DbfRow row) {
+    private Map<Long, List<Geocode>> getGeocodings(Map<Long, List<Geocode>> geocodes, DbfRow row) {
         Geocode geocode = Geocode.fromDbf(row);
         List<Geocode> geocodingAttributes = geocodings.containsKey(geocode.getId()) ? geocodings.get(geocode.getId()) : newArrayList();
         geocodingAttributes.add(geocode);
         geocodings.put(geocode.getId(), geocodingAttributes);
+        return geocodes;
     }
 
 }

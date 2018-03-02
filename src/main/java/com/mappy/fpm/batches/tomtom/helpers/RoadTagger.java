@@ -7,7 +7,7 @@ import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
-import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsData;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsProvider;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
 import com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationAreaProvider;
 import com.mappy.fpm.batches.utils.Feature;
@@ -40,14 +40,14 @@ public class RoadTagger {
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
     private final TollTagger tolls;
-    private final TimeDomainsData timeDomainsData;
+    private final TimeDomainsProvider timeDomainsProvider;
     private final TimeDomainsParser timeDomainsParser;
     private final TransportationAreaProvider transportationAreaProvider;
     private final RouteNumbersProvider routeNumbersProvider;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsData timeDomainsData, TimeDomainsParser timeDomainsParser,
+                      SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsProvider timeDomainsProvider, TimeDomainsParser timeDomainsParser,
                       TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider) {
         this.speedProfiles = speedProfiles;
         this.geocodeProvider = geocodeProvider;
@@ -55,11 +55,13 @@ public class RoadTagger {
         this.lanes = lanes;
         this.speedRestriction = speedRestriction;
         this.tolls = tolls;
-        this.timeDomainsData = timeDomainsData;
+        this.timeDomainsProvider = timeDomainsProvider;
         this.timeDomainsParser = timeDomainsParser;
         this.transportationAreaProvider = transportationAreaProvider;
         this.routeNumbersProvider = routeNumbersProvider;
         this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
+        this.transportationAreaProvider.loadTransportationAreaAttributes("ta.dbf");
+        this.routeNumbersProvider.loadGeocodingAttributes("rn.dbf");
     }
 
     public Map<String, String> tag(Feature feature) {
@@ -79,7 +81,7 @@ public class RoadTagger {
 
         tags.putAll(tolls.tag(id));
 
-        Collection<TimeDomains> timeDomains = timeDomainsData.getTimeDomains(id);
+        Collection<TimeDomains> timeDomains = timeDomainsProvider.getTimeDomains(id);
         addTagIf("motor_vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
 
         if (timeDomains != null && !timeDomains.isEmpty()) {

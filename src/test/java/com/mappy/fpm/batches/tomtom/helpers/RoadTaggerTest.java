@@ -8,7 +8,7 @@ import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
-import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsData;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsProvider;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
 import com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationAreaProvider;
 import com.mappy.fpm.utils.MemoryFeature;
@@ -36,7 +36,7 @@ public class RoadTaggerTest {
     private final TransportationAreaProvider transportationAreaProvider = mock(TransportationAreaProvider.class);
     private final SignPosts signPosts = mock(SignPosts.class);
     private final LaneTagger lanes = mock(LaneTagger.class);
-    private final TimeDomainsData timeDomainsData = mock(TimeDomainsData.class);
+    private final TimeDomainsProvider timeDomainsData = mock(TimeDomainsProvider.class);
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
     private final TollTagger tollTagger = mock(TollTagger.class);
     private final RouteNumbersProvider routeNumbersProvider = mock(RouteNumbersProvider.class);
