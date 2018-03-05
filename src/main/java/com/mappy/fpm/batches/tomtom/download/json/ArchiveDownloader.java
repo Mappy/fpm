@@ -15,14 +15,14 @@ import java.io.InputStream;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 @Slf4j
-public class ContentDownloader {
+public class ArchiveDownloader {
 
     private final File outputFolder;
     private final HttpClient client;
     private final String token;
 
     @Inject
-    public ContentDownloader(@Named("outputFolder") File outputFolder, HttpClient client, @Named("token") String token) {
+    public ArchiveDownloader(@Named("outputFolder") File outputFolder, HttpClient client, @Named("token") String token) {
         this.outputFolder = outputFolder;
         this.client = client;
         this.token = token;
@@ -31,12 +31,14 @@ public class ContentDownloader {
     public void download(Content content) {
         for (int i = 0; i < 3; i++) {
             try {
-                HttpGet get = new HttpGet(content.getLocation());
-                get.addHeader("Authorization", token);
                 File downloaded = new File(outputFolder, content.getName());
                 log.info("Downloading {} to \"{}\"", content.getLocation(), downloaded.getAbsolutePath());
+
+                HttpGet get = new HttpGet(content.getLocation());
+                get.addHeader("Authorization", token);
                 HttpResponse response = client.execute(get);
                 if (response.getStatusLine().getStatusCode() >= 400) {
+                    log.error("Error when executing request, see error code={} with content={}", response.getStatusLine().getStatusCode(), response.getEntity());
                     throw new IOException("Error when executing request, see error code=" + response.getStatusLine().getStatusCode() + " with content=" + response.getEntity());
                 }
                 try (InputStream file = response.getEntity().getContent()) {

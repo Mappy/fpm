@@ -1,0 +1,40 @@
+{
+  "content": [
+    {
+      "abbreviation": "MN",
+      "description": null,
+      "id": 330,
+      "location": "https://api.test/families/330",
+      "name": "MultiNet"
+    },
+    {
+      "abbreviation": "MNPOI",
+      "description": null,
+      "id": 651,
+      "location": "https://api.test/families/651",
+      "name": "Points of Interest - MultiNet"
+    },
+    {
+      "abbreviation": "SP",
+      "description": null,
+      "id": 344,
+      "location": "https://api.test/families/344",
+      "name": "Speed Profiles"
+    },
+    {
+      "abbreviation": "2DCM",
+      "description": null,
+      "id": 542,
+      "location": "https://api.test/families/542",
+      "name": "2D City Maps"
+    }
+  ],
+  "first": true,
+  "last": true,
+  "number": 0,
+  "numberOfElements": 4,
+  "size": 50,
+  "sort": null,
+  "totalElements": 4,
+  "totalPages": 1
+}

@@ -1,0 +1,46 @@
+{
+  "content": [
+    {
+      "deliveryType": "full",
+      "dueDate": "2018-03-01T00:00:00Z",
+      "id": 315,
+      "iterationType": "commercial",
+      "location": "https://api.test/releases/315",
+      "product": {
+        "id": 230,
+        "location": "https://api.test/products/230"
+      },
+      "state": {
+        "date": "2018-02-26T15:07:19.988Z",
+        "reason": "",
+        "type": "released"
+      },
+      "version": "2018.03"
+    },
+    {
+      "deliveryType": "full",
+      "dueDate": "2016-09-01T00:00:00Z",
+      "id": 248,
+      "iterationType": "commercial",
+      "location": "https://api.test/releases/248",
+      "product": {
+        "id": 230,
+        "location": "https://api.test/products/230"
+      },
+      "state": {
+        "date": "2018-03-05T08:55:48.8Z",
+        "reason": null,
+        "type": "released"
+      },
+      "version": "2016.09"
+    }
+  ],
+  "first": true,
+  "last": true,
+  "number": 0,
+  "numberOfElements": 2,
+  "size": 50,
+  "sort": null,
+  "totalElements": 2,
+  "totalPages": 1
+}
