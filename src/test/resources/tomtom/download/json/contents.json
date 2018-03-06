@@ -1,0 +1,235 @@
+{
+  "contents": [
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "82df4e2cbeb6ee794ab140e0a4cfceea",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 835,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/835",
+      "name": "eur2016_09-shpd-li-and-and.7z.001",
+      "path": "/",
+      "sizeBytes": 77137,
+      "zones": [
+        "EUR.AND"
+      ]
+    },
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "60335e8af224c4d6572fb6ef44df35eb",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 444,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/444",
+      "name": "eur2016_09-shpd-li-fra-f20.7z.001",
+      "path": "/",
+      "sizeBytes": 9822982,
+      "zones": [
+        "EUR.FRA.F20"
+      ]
+    },
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "296a367ca82fbe3e86d501742ae436cf",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 398,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/398",
+      "name": "eur2016_09-shpd-li-fra-f22.7z.001",
+      "path": "/",
+      "sizeBytes": 11979525,
+      "zones": [
+        "EUR.FRA.F22"
+      ]
+    },
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "62ccbae52299523c54d4729402e6d681",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 792,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/792",
+      "name": "eur2016_09-shpd-mn-and-and.7z.001",
+      "path": "/",
+      "sizeBytes": 3284640,
+      "zones": [
+        "EUR.AND"
+      ]
+    },
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "0c2ba774e0fbca9f0c556c7bfab91f60",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 298,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/298",
+      "name": "eur2016_09-shpd-mn-and-ax.7z.001",
+      "path": "/",
+      "sizeBytes": 77832,
+      "zones": [
+        "EUR.AND.AX"
+      ]
+    },
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "36899ac735dde3e79a3a1da76576e6ea",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 352,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/352",
+      "name": "eur2016_09-shpd-mn-fra-ax.7z.001",
+      "path": "/",
+      "sizeBytes": 223493579,
+      "zones": [
+        "EUR.FRA.AX"
+      ]
+    },
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "bb15907595d248ac5495c45d9ac0d28b",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 321,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/321",
+      "name": "eur2016_09-shpd-mn-fra-f20.7z.001",
+      "path": "/",
+      "sizeBytes": 337624143,
+      "zones": [
+        "EUR.FRA.F20"
+      ]
+    },
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "58ac86a20875b97cc839c165d28acbc5",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 735,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/735",
+      "name": "eur2016_09-shpd-mn-fra-f22.7z.001",
+      "path": "/",
+      "sizeBytes": 401041776,
+      "zones": [
+        "EUR.FRA.F22"
+      ]
+    }
+  ],
+  "deliveryType": "full",
+  "description": null,
+  "dueDate": "2016-09-01T00:00:00Z",
+  "frequencies": [],
+  "id": 248,
+  "iterationType": "commercial",
+  "labels": [
+    "components",
+    "documentation",
+    "gdfar",
+    "gdfas",
+    "osl",
+    "shpa",
+    "shpd",
+    "txt"
+  ],
+  "location": "https://api.test/releases/248",
+  "product": {
+    "id": 230,
+    "location": "https://api.test/products/230"
+  },
+  "sourceVersion": null,
+  "state": {
+    "date": "2018-03-05T08:55:48.8Z",
+    "reason": null,
+    "type": "released"
+  },
+  "version": "2016.09",
+  "zones": [
+    {
+      "displayName": "EUR.AND",
+      "geometry": null,
+      "name": "EUR.AND"
+    },
+    {
+      "displayName": "EUR.AND.AX",
+      "geometry": null,
+      "name": "EUR.AND.AX"
+    },
+    {
+      "displayName": "EUR.FRA.AX",
+      "geometry": null,
+      "name": "EUR.FRA.AX"
+    },
+    {
+      "displayName": "EUR.FRA.F20",
+      "geometry": null,
+      "name": "EUR.FRA.F20"
+    },
+    {
+      "displayName": "EUR.FRA.F22",
+      "geometry": null,
+      "name": "EUR.FRA.F22"
+    }
+  ]
+}

@@ -37,7 +37,7 @@ public class ProductsDownloaderTest {
     @Test
     public void should_download_product_from_family() {
 
-        Stream<Product> productStream = productsDownloader.get(new Family("abb", "loc"));
+        Stream<Product> productStream = productsDownloader.apply(new Family("abb", "loc"));
 
         assertThat(productStream).containsOnly( //
                 new Product("EUR", "https://api.test/products/230"), //

@@ -1,7 +1,7 @@
 package com.mappy.fpm.batches.tomtom.download.json;
 
 import com.google.inject.Inject;
-import com.mappy.fpm.batches.tomtom.download.json.model.Content;
+import com.mappy.fpm.batches.tomtom.download.json.model.Contents.Content;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -29,20 +29,16 @@ public class ArchiveDownloader {
     }
 
     public void download(Content content) {
+        File downloaded = new File(outputFolder, content.getName());
         for (int i = 0; i < 3; i++) {
             try {
-                File downloaded = new File(outputFolder, content.getName());
                 log.info("Downloading {} to \"{}\"", content.getLocation(), downloaded.getAbsolutePath());
 
                 HttpGet get = new HttpGet(content.getLocation());
                 get.addHeader("Authorization", token);
                 HttpResponse response = client.execute(get);
-                if (response.getStatusLine().getStatusCode() >= 400) {
-                    log.error("Error when executing request, see error code={} with content={}", response.getStatusLine().getStatusCode(), response.getEntity());
-                    throw new IOException("Error when executing request, see error code=" + response.getStatusLine().getStatusCode() + " with content=" + response.getEntity());
-                }
-                try (InputStream file = response.getEntity().getContent()) {
-                    copyInputStreamToFile(file, downloaded);
+                try (InputStream archiveStream = response.getEntity().getContent()) {
+                    copyInputStreamToFile(archiveStream, downloaded);
                 }
                 return;
             }

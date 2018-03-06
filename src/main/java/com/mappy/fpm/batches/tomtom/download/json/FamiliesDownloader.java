@@ -3,6 +3,7 @@ package com.mappy.fpm.batches.tomtom.download.json;
 import com.google.gson.Gson;
 import com.mappy.fpm.batches.tomtom.download.json.model.Families;
 import com.mappy.fpm.batches.tomtom.download.json.model.Families.Family;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -17,6 +18,7 @@ import java.util.stream.Stream;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.Lists.newArrayList;
 
+@Slf4j
 public class FamiliesDownloader {
 
     private static final String FAMILIES_URL = "https://api.tomtom.com/mcapi/families";
@@ -32,13 +34,16 @@ public class FamiliesDownloader {
     }
 
     public Stream<Family> get() {
+        log.info("Get all families");
         HttpGet get = new HttpGet(FAMILIES_URL);
         get.addHeader("Authorization", token);
-        try {
-            InputStream response = client.execute(get).getEntity().getContent();
-            return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Families.class) //
-                    .getContent() //
-                    .stream() //
+
+        try (InputStream response = client.execute(get).getEntity().getContent()) {
+
+            List<Family> families = new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Families.class).getContent();
+            log.debug("Families : {}", families);
+
+            return families.stream() //
                     .filter(f -> ALLOWED.contains(f.getAbbreviation()));
         } catch (IOException e) {
             throw propagate(e);
