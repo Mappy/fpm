@@ -78,14 +78,11 @@ public class OsmosisSerializer implements GeometrySerializer {
     public Optional<Long> writeBoundary(LineString line, Map<String, String> tags) {
         Long id = geohash(7, line.getCentroid().getCoordinate());
 
-        if (wayTracker.contains(id)) {
-            log.warn("Rejecting boundary {} with tags {} because id already present.", id, tags);
-            return empty();
+        if (!wayTracker.contains(id)) {
+            wayTracker.add(id);
+            Way way = new Way(ced(id, tags), getWayNodes(line, tags));
+            sink.process(new WayContainer(way));
         }
-
-        wayTracker.add(id);
-        Way way = new Way(ced(id, tags), getWayNodes(line, tags));
-        sink.process(new WayContainer(way));
 
         return of(id);
     }

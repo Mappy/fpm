@@ -18,7 +18,6 @@ public class NameProviderTest {
     @Before
     public void setUp() {
         when(tomtomFolder.getFile("an.dbf")).thenReturn("src/test/resources/tomtom/name/andorra___________an.dbf");
-        when(tomtomFolder.getFile("gc.dbf")).thenReturn("src/test/resources/tomtom/name/andorra___________gc.dbf");
         when(tomtomFolder.getFile("lxnm.dbf")).thenReturn("src/test/resources/tomtom/name/andorra___________lxnm.dbf");
         nameProvider = new NameProvider(tomtomFolder);
     }
@@ -34,18 +33,7 @@ public class NameProviderTest {
         assertThat(tags.get("name:de")).isEqualTo("Andorra_ger");
         assertThat(tags.get("name:en")).isEqualTo("Andorra_eng");
         assertThat(tags.get("name:es")).isEqualTo("Andorra_spa");
-        assertThat(tags.get("alt_name")).isEqualTo("Andorra_aaa");
-    }
-
-    @Test
-    public void should_add_alternative_road_names() {
-        nameProvider.loadAlternateNames("gc.dbf");
-        Map<String, String> tags = nameProvider.getAlternateRoadSideNames(10200000000008L, 1);
-        assertThat(tags).hasSize(4);
-        assertThat(tags.get("name:left")).isEqualTo("Andorra_eng");
-        assertThat(tags.get("name:left:en")).isEqualTo("Andorra_eng");
-        assertThat(tags.get("name:right")).isEqualTo("Andorre");
-        assertThat(tags.get("name:right:fr")).isEqualTo("Andorre");
+        assertThat(tags.get("int_name")).isEqualTo("Andorra_aaa");
     }
 
     @Test
@@ -59,7 +47,7 @@ public class NameProviderTest {
         assertThat(tags.get("name:de")).isEqualTo("Andorra_airpurten");
         assertThat(tags.get("name:en")).isEqualTo("Andorra_airport");
         assertThat(tags.get("name:es")).isEqualTo("Andorra_aeropurto");
-        assertThat(tags.get("alt_name")).isEqualTo("Andorra_aaa");
+        assertThat(tags.get("int_name")).isEqualTo("Andorra_aaa");
     }
 
 }

@@ -6,6 +6,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BasicHttpEntity;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,19 +38,31 @@ public class ShapefileDownloaderTest {
     }
 
     @Test
-    public void should_download_shapefiles() {
-        File folder = new File("target/tests/download/Andorre");
+    public void should_download_andorre_shapefiles() {
+        File folder = getFile("AND", "Andorre", false);
+
+        assertThat(folder.listFiles()).hasSize(2);
+    }
+
+    @Test
+    public void should_download_outerworld_shapefiles() {
+        File folder = getFile("OAT", "Outerworld-Atlantique", true);
+
+        assertThat(folder.listFiles()).hasSize(1);
+    }
+
+    private File getFile(String id, String label, boolean outerworld) {
+        File folder = new File("target/tests/download/" + label );
         if (folder.exists()) {
             Stream.of(folder.listFiles()).forEach(File::delete);
             folder.delete();
         }
         assertThat(folder.exists()).isFalse();
 
-        TomtomCountry country = new TomtomCountry("AND", "Andorre");
+        TomtomCountry country = new TomtomCountry(id, label, outerworld);
         MetalinkUrl metalinkUrl = parseMetalinkUrl("eur2016_09-shpd-sp-and-ax.7z.001", "http://url1");
 
         shapefileDownloader.download(country, metalinkUrl);
-
-        assertThat(folder.listFiles()).hasSize(2);
+        return folder;
     }
 }

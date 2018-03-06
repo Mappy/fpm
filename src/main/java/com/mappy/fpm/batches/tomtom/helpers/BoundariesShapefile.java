@@ -4,11 +4,8 @@ import com.mappy.fpm.batches.tomtom.TomtomShapefile;
 import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
-import com.mappy.fpm.batches.utils.LongLineSplitter;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
 import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
@@ -27,7 +24,6 @@ import static com.vividsolutions.jts.algorithm.Centroid.getCentroid;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
-import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
 
 public abstract class BoundariesShapefile extends TomtomShapefile {
 
@@ -76,7 +72,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         ofNullable(feature.getLong("POP")).filter(pop -> pop > 0).ifPresent(pop -> relationTags.put("population", String.valueOf(pop)));
 
         List<RelationMember> members = newArrayList();
-        
+
         Map<String, String> labelTags = newHashMap(relationTags);
         labelTags.put("name", name);
         MultiPolygon multiPolygon = feature.getMultiPolygon();
@@ -85,24 +81,13 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
 
         Map<String, String> wayTags = of("name", name, "boundary", "administrative", "admin_level", osmLevel);
 
-        IntStream.range(0, multiPolygon.getNumGeometries()).forEach(i -> {
-            Polygon polygon = (Polygon) multiPolygon.getGeometryN(i);
-
-            IntStream.range(0, polygon.getNumInteriorRing()).forEach(j -> addPolygonRelations(serializer, members, wayTags, polygon.getInteriorRingN(j), "inner"));
-
-            addPolygonRelations(serializer, members, wayTags, polygon.getExteriorRing(), "outer");
-        });
+        PolygonBoundaryBuilder.addPolygons(serializer, members, multiPolygon, wayTags);
 
         putRelationTags(relationTags, wayTags);
 
         getAdminCenter(serializer, feature).ifPresent(members::add);
 
         serializer.write(members, relationTags);
-    }
-
-    private static void addPolygonRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString exteriorRing, String memberRole) {
-        LongLineSplitter.split(exteriorRing, 100)
-                .forEach(geom -> addRelationMember(serializer, wayTags, geom, memberRole).ifPresent(members::add));
     }
 
     private void putRelationTags(Map<String, String> tags, Map<String, String> wayTags) {
@@ -115,14 +100,8 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         return alpha3;
     }
 
-    private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, Feature feature) {
-        if (tomtomLevel <= 7) {
-            return getCapital(serializer, feature);
-        } else if (tomtomLevel <= 9) {
-            return getTown(serializer, feature);
-        }
-
-        return empty();
+    protected Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, Feature feature) {
+        return getCapital(serializer, feature);
     }
 
     private Optional<RelationMember> getCapital(GeometrySerializer serializer, Feature feature) {
@@ -142,7 +121,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         return empty();
     }
 
-    private Optional<RelationMember> getTown(GeometrySerializer serializer, Feature feature) {
+    protected Optional<RelationMember> getTown(GeometrySerializer serializer, Feature feature) {
 
         Centroid cityCenter = townTagger.get(feature.getLong("CITYCENTER"));
 
@@ -162,11 +141,6 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
 
         Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
         return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_center"));
-    }
-
-    private static Optional<RelationMember> addRelationMember(GeometrySerializer serializer, Map<String, String> wayTags, LineString geom, String memberRole) {
-        Optional<Long> wayId = serializer.writeBoundary(geom, wayTags);
-        return wayId.map(aLong -> new RelationMember(aLong, Way, memberRole));
     }
 
     private static Optional<RelationMember> getLabel(GeometrySerializer serializer, Map<String, String> tags, MultiPolygon multiPolygon) {

@@ -1,15 +1,14 @@
 package com.mappy.fpm.batches.tomtom.dbf.names;
 
-import com.google.common.base.Enums;
 import lombok.Getter;
 
 public enum Language {
     ALB("sq"),
     ARA("ar"),
     BAQ("eu"),
+    BEL("be"),
     BOS("bs"),
     BUL("bg"),
-//    BUN("??"),
     CAT("ca"),
     CZE("cs"),
     DAN("da"),
@@ -22,8 +21,7 @@ public enum Language {
     GER("de"),
     GLE("ga"),
     GLG("gl"),
-//    GRE("el"),
-    GRL("el"),
+    GRE("el"),
     HUN("hu"),
     ICE("is"),
     ITA("it"),
@@ -31,28 +29,22 @@ public enum Language {
     LIT("lt"),
     LTZ("lb"),
     MAC("mk"),
-//    MAT("??"),
     MLT("mt"),
     NOR("no"),
     POL("pl"),
     POR("pt"),
     ROH("rm"),
-    RUL("ru"),
     RUM("ro"),
-//    RUS("ru"),
-//    SCC("??"),
-//    SCR("??"),
-//    SCY("??"),
+    RUS("ru"),
+    SCC("sr-Latn"),
+    SCY("sr"),
     SLO("sk"),
     SLV("sl"),
-//    SMC("??"),
-//    SML("??"),
+    SMC("sh"),
     SPA("es"),
     SWE("sv"),
     TUR("tr"),
-    UKL("uk"),
-//    UKR("uk"),
-//    VAL("??"),
+    UKR("uk"),
     WEL("cy");
 
 

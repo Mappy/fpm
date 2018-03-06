@@ -51,14 +51,6 @@ public class TownTaggerTest extends AbstractTest {
     }
 
     @Test
-    public void should_load_capitals() {
-        List<Centroid> capitals = townTagger.getCapital(7);
-
-        assertThat(capitals).extracting(com.mappy.fpm.batches.tomtom.helpers.Centroid::getName).containsOnly("Antwerpen", "Brussel", "Halle", "Hasselt", "Leuven", "Maaseik", "Mechelen", "Tongeren", "Turnhout");
-        assertThat(capitals).extracting(com.mappy.fpm.batches.tomtom.helpers.Centroid::getAdminclass).containsOnly(0, 2, 7);
-    }
-
-    @Test
     public void should_return_village_with_get_place_of_citytyp_0() {
         assertThat(townTagger.get(10560000379424L).getPlace()).isEqualTo(of("village"));
     }

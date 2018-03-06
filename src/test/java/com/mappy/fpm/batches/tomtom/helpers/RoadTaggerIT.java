@@ -49,7 +49,7 @@ public class RoadTaggerIT extends AbstractTest {
         Optional<Way> way = pbfContent.getWays().stream().filter(w -> w.getTags().hasKeyValue("ref:tomtom", "10200000004654")).findFirst();
 
         assertThat(way.isPresent()).isTrue();
-        assertThat(way.get().getTags().get("service")).isEqualTo("parking_aisle");
+        way.ifPresent(way1 -> assertThat(way1.getTags().get("service")).isEqualTo("parking_aisle"));
     }
 
     @Test

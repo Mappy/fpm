@@ -70,4 +70,12 @@ public class OsmLevelGeneratorTest {
         assertThat(osmLevel).isEqualTo("10");
     }
 
+    @Test
+    public void should_return_osm_level_7_for_russia_tomtom_level_7() {
+        assertThat(osmLevelGenerator.getOsmLevel("rus", 7)).isEqualTo("7");
+        assertThat(osmLevelGenerator.getOsmLevel("rusr13", 7)).isEqualTo("7");
+        assertThat(osmLevelGenerator.getOsmLevel("rusr14", 7)).isEqualTo("7");
+    }
+
+
 }

@@ -42,10 +42,10 @@ public class LuShapefileTest extends AbstractTest {
     @Test
     public void should_change_name_to_french_when_available() {
         Optional<Way> optWay = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001002272")).findFirst();
+
         assertThat(optWay.isPresent()).isTrue();
 
         Tags tags = optWay.get().getTags();
-        assertThat(tags.get("amenity")).isEqualTo("hospital");
         assertThat(tags.get("name")).isEqualTo("Universitair Kinderziekenhuis Koningin Fabiola");
         assertThat(tags.get("name:nl")).isEqualTo("Universitair Kinderziekenhuis");
         assertThat(tags.get("name:fr")).isEqualTo("Hôpital Universitaire Des Enfants");
@@ -67,5 +67,13 @@ public class LuShapefileTest extends AbstractTest {
         Optional<Way> airport = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001002409")).findFirst();
         assertThat(airport.isPresent()).isTrue();
         assertThat(airport.get().getTags().get("aeroway")).isEqualTo("aerodrome");
+    }
+
+
+    @Test
+    public void should_tag_hospital() {
+        Optional<Way> airport = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "10560001002272")).findFirst();
+        assertThat(airport.isPresent()).isTrue();
+        assertThat(airport.get().getTags().get("amenity")).isEqualTo("hospital");
     }
 }
