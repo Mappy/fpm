@@ -4,7 +4,6 @@ import com.google.inject.Guice;
 import com.mappy.fpm.batches.AbstractTest;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openstreetmap.osmosis.osmbinary.Osmformat.HeaderBlock;
 import org.openstreetmap.osmosis.pbf2.v0_6.impl.PbfRawBlob;
