@@ -66,7 +66,7 @@ public class RoadTagger {
         this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
         this.transportationAreaProvider.loadTransportationAreaAttributes("ta.dbf");
         this.routeNumbersProvider.loadGeocodingAttributes("rn.dbf");
-        intersectionById = getIntercetionsById(tomtomDbfReader);
+        this.intersectionById = getIntercetionsById(tomtomDbfReader);
     }
 
     public Map<String, String> tag(Feature feature) {
