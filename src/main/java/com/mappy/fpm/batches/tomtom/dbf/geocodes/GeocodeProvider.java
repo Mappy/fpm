@@ -46,7 +46,7 @@ public class GeocodeProvider extends TomtomDbfReader {
     }
 
     private String getLeftAndRightPostalCode(Geocode geocode) {
-        return of(geocode.getLeftPostalCode()).orElse("") + ";" + of(geocode.getRightPostalCode()).orElse("");
+        return geocode.getLeftPostalCode().equals(geocode.getRightPostalCode()) ? geocode.getLeftPostalCode() : of(geocode.getLeftPostalCode()).orElse("") + ";" + of(geocode.getRightPostalCode()).orElse("");
     }
 
     public Optional<String> getInterpolations(Long tomtomId) {
@@ -63,7 +63,9 @@ public class GeocodeProvider extends TomtomDbfReader {
     }
 
     private String getInterpolations(Geocode geocode) {
-        return Interpolation.getOsmValue(geocode.getLeftStructuration()).orElse("") + ";" + Interpolation.getOsmValue(geocode.getRightStructuration()).orElse("");
+        String osmLeftStructuration = Interpolation.getOsmValue(geocode.getLeftStructuration()).orElse("");
+        String osmRightStructuration = Interpolation.getOsmValue(geocode.getRightStructuration()).orElse("");
+        return osmLeftStructuration.equals(osmRightStructuration) ? osmLeftStructuration : osmLeftStructuration + ";" + osmRightStructuration;
     }
 
     private boolean hasLeftOrRightInterpolation(Geocode geocode) {

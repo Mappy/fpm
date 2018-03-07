@@ -8,8 +8,8 @@ import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
-import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsProvider;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsProvider;
 import com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationAreaProvider;
 import com.mappy.fpm.utils.MemoryFeature;
 import org.junit.Before;
@@ -264,5 +264,18 @@ public class RoadTaggerTest {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
                 .containsEntry("int_ref", "E41")
                 .containsEntry("ref", "N5");
+    }
+
+    @Test
+    public void should_have_steps() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "19", "NET2CLASS", "6"))))
+                .containsEntry("highway", "steps");
+    }
+
+    @Test
+    public void should_have_road_authorities() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "20", "NET2CLASS", "6"))))
+                .containsEntry("highway", "service")
+                .containsEntry("service", "emergency_access");
     }
 }
