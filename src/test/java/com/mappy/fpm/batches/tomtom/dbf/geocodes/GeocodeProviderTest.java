@@ -63,7 +63,7 @@ public class GeocodeProviderTest {
     @Test
     public void should_add_a_postal_code() {
         Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000000143L);
-        assertThat(postcodes).isEqualTo(of("AD700;AD700"));
+        assertThat(postcodes).isEqualTo(of("AD700"));
     }
 
     @Test
@@ -85,26 +85,26 @@ public class GeocodeProviderTest {
     }
 
     @Test
-    public void should_add_an_interpolation() {
+    public void should_add_an_interpolation_only_on_right() {
         Optional<String> postcodes = geocodeProvider.getInterpolations(10200000000143L);
         assertThat(postcodes).isEqualTo(of(";odd"));
     }
 
     @Test
-    public void should_add_an_interpolation_if_left_is_null() {
+    public void should_add_an_interpolation_on_each_side() {
         Optional<String> postcodes = geocodeProvider.getInterpolations(10200000000176L);
         assertThat(postcodes).isEqualTo(of("alphabetic;odd"));
     }
 
     @Test
-    public void should_add_an_interpolation_if_right_is_null() {
+    public void should_add_an_interpolation_only_on_left() {
         Optional<String> postcodes = geocodeProvider.getInterpolations(10200000001935L);
         assertThat(postcodes).isEqualTo(of("even;"));
     }
 
     @Test
-    public void should_add_an_interpolation_on_left_and_right() {
+    public void should_add_same_interpolation_on_left_and_right() {
         Optional<String> postcodes = geocodeProvider.getInterpolations(10200000003341L);
-        assertThat(postcodes).isEqualTo(of("all;all"));
+        assertThat(postcodes).isEqualTo(of("all"));
     }
 }
