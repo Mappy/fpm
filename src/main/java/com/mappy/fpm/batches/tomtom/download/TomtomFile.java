@@ -41,6 +41,9 @@ public enum TomtomFile {
     TRANSPORTATION_ELEMENT_BELONGING_TO_AREA("mn", "_ta."),
     ROUTE_NUMBERS("mn", "_rn."),
 
+    ROUTE_INERSECTION_INDEX("mn", "_ig."),
+    ROUTE_INERSECTION("mn", "_is."),
+
     NETWORK_PROFILE_LINK("sp", "_hsnp."),
     HISTORICAL_SPEED_PROFILES("sp", "_hspr."),
 
