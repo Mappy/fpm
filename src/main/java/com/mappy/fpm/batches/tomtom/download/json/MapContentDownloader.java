@@ -1,15 +1,13 @@
 package com.mappy.fpm.batches.tomtom.download.json;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import com.mappy.fpm.batches.tomtom.download.ShapefileExtractor;
+import com.mappy.fpm.batches.tomtom.download.json.downloader.*;
 
+import javax.inject.Named;
 import java.io.File;
 
 import static com.google.inject.Guice.createInjector;
-import static com.google.inject.name.Names.named;
-import static org.apache.http.impl.NoConnectionReuseStrategy.INSTANCE;
 
 public class MapContentDownloader {
 
@@ -18,16 +16,21 @@ public class MapContentDownloader {
     private final ReleaseDownloader releaseDownloader;
     private final ContentDownloader contentDownloader;
     private final ArchiveDownloader archiveDownloader;
+    private final ShapefileExtractor shapefileExtractor;
+    private final File outputFolder;
 
     @Inject
     public MapContentDownloader(FamiliesDownloader familiesDownloader, ProductsDownloader productsDownloader, //
                                 ReleaseDownloader releaseDownloader, ContentDownloader contentDownloader, //
-                                ArchiveDownloader archiveDownloader) {
+                                ArchiveDownloader archiveDownloader, ShapefileExtractor shapefileExtractor, //
+                                @Named("outputFolder") File outputFolder) {
         this.familiesDownloader = familiesDownloader;
         this.productsDownloader = productsDownloader;
         this.releaseDownloader = releaseDownloader;
         this.contentDownloader = contentDownloader;
         this.archiveDownloader = archiveDownloader;
+        this.shapefileExtractor = shapefileExtractor;
+        this.outputFolder = outputFolder;
     }
 
     public static void main(String[] args) {
@@ -39,34 +42,15 @@ public class MapContentDownloader {
     }
 
     public void run() {
-
         familiesDownloader.get()//
-                .parallel()
+                .parallel()//
                 .flatMap(productsDownloader)//
                 .flatMap(releaseDownloader)//
                 .flatMap(contentDownloader)//
-                .forEach(archiveDownloader::download);
-    }
-
-    private static class MapContentModule extends AbstractModule {
-
-        private final File outputFolder;
-        private final String version;
-        private final String token;
-
-        private MapContentModule(String outputFolder, String token, String version) {
-            this.outputFolder = new File(outputFolder);
-            this.outputFolder.mkdirs();
-            this.version = version;
-            this.token = token;
-        }
-
-        @Override
-        protected void configure() {
-            bind(HttpClient.class).toInstance(HttpClientBuilder.create().setMaxConnPerRoute(10).setConnectionReuseStrategy(INSTANCE).build());
-            bind(File.class).annotatedWith(named("outputFolder")).toInstance(outputFolder);
-            bindConstant().annotatedWith(named("token")).to(token);
-            bindConstant().annotatedWith(named("version")).to(version);
-        }
+                .map(archiveDownloader)//
+                .forEach(file -> {
+                    shapefileExtractor.decompress(outputFolder, file);
+                    file.delete();
+                });
     }
 }

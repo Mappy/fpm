@@ -1,4 +1,4 @@
-package com.mappy.fpm.batches.tomtom.download.json;
+package com.mappy.fpm.batches.tomtom.download.json.downloader;
 
 import com.mappy.fpm.batches.tomtom.download.json.model.Contents.Content;
 import com.mappy.fpm.batches.tomtom.download.json.model.Releases.Release;

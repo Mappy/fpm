@@ -1,4 +1,4 @@
-package com.mappy.fpm.batches.tomtom.download.json;
+package com.mappy.fpm.batches.tomtom.download.json.downloader;
 
 import com.mappy.fpm.batches.tomtom.download.json.model.Contents.Content;
 import org.apache.http.HttpResponse;
@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -33,6 +34,8 @@ public class ArchiveDownloaderTest {
 
     @Test
     public void should_download_archive_from_content() {
-        archiveDownloader.download(new Content("content", "loc"));
+        File file = archiveDownloader.apply(new Content("content.7z.001", "loc"));
+
+        assertThat(file.getPath()).isEqualTo("target/content.7z.001");
     }
 }

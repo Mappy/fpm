@@ -1,11 +1,15 @@
 package com.mappy.fpm.batches.tomtom.download.json;
 
+import com.mappy.fpm.batches.tomtom.download.ShapefileExtractor;
+import com.mappy.fpm.batches.tomtom.download.json.downloader.*;
 import com.mappy.fpm.batches.tomtom.download.json.model.Contents.Content;
 import com.mappy.fpm.batches.tomtom.download.json.model.Families.Family;
 import com.mappy.fpm.batches.tomtom.download.json.model.Products.Product;
 import com.mappy.fpm.batches.tomtom.download.json.model.Releases.Release;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.Mockito.*;
@@ -19,6 +23,8 @@ public class MapContentDownloaderTest {
     private final ReleaseDownloader releaseDownloader = mock(ReleaseDownloader.class);
     private final ContentDownloader contentDownloader = mock(ContentDownloader.class);
     private final ArchiveDownloader archiveDownloader = mock(ArchiveDownloader.class);
+    private final ShapefileExtractor shapefileExtractor = mock(ShapefileExtractor.class);
+    private final File outputDirectory = mock(File.class);
 
     @Before
     public void setUp(){
@@ -33,9 +39,14 @@ public class MapContentDownloaderTest {
 
         when(contentDownloader.apply(new Release("2016_09", "loc6"))).thenReturn(newArrayList(new Content("content1", "loc9")).stream());
         when(contentDownloader.apply(new Release("2016_09", "loc7"))).thenReturn(newArrayList(new Content("content2", "loc10"), new Content("content3", "loc11")).stream());
-        when(contentDownloader.apply(new Release("2016_09", "loc8"))).thenReturn(newArrayList(new Content("content4", "loc12"), new Content("content5", "loc13")).stream());
+        when(contentDownloader.apply(new Release("2016_09", "loc8"))).thenReturn(newArrayList(new Content("content4", "loc12")).stream());
 
-        mapContentDownloader = new MapContentDownloader(familiesDownloader, productsDownloader, releaseDownloader, contentDownloader, archiveDownloader);
+        when(archiveDownloader.apply(new Content("content1", "loc9"))).thenReturn(mock(File.class));
+        when(archiveDownloader.apply(new Content("content2", "loc10"))).thenReturn(mock(File.class));
+        when(archiveDownloader.apply(new Content("content3", "loc11"))).thenReturn(mock(File.class));
+        when(archiveDownloader.apply(new Content("content4", "loc12"))).thenReturn(mock(File.class));
+
+        mapContentDownloader = new MapContentDownloader(familiesDownloader, productsDownloader, releaseDownloader, contentDownloader, archiveDownloader, shapefileExtractor, outputDirectory);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -64,11 +75,11 @@ public class MapContentDownloaderTest {
         verify(contentDownloader).apply(new Release("2016_09", "loc6"));
         verify(contentDownloader).apply(new Release("2016_09", "loc7"));
         verify(contentDownloader).apply(new Release("2016_09", "loc8"));
-        verify(archiveDownloader, times(5)).download(any(Content.class));
-        verify(archiveDownloader).download(new Content("content1", "loc9"));
-        verify(archiveDownloader).download(new Content("content2", "loc10"));
-        verify(archiveDownloader).download(new Content("content3", "loc11"));
-        verify(archiveDownloader).download(new Content("content4", "loc12"));
-        verify(archiveDownloader).download(new Content("content5", "loc13"));
+        verify(archiveDownloader, times(4)).apply(any(Content.class));
+        verify(archiveDownloader).apply(new Content("content1", "loc9"));
+        verify(archiveDownloader).apply(new Content("content2", "loc10"));
+        verify(archiveDownloader).apply(new Content("content3", "loc11"));
+        verify(archiveDownloader).apply(new Content("content4", "loc12"));
+        verify(shapefileExtractor, times(4)).decompress(eq(outputDirectory), any(File.class));
     }
 }

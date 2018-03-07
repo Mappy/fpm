@@ -3,8 +3,9 @@ package com.mappy.fpm.batches.tomtom.download;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public enum TomtomFile {
     NETWORK("mn", "_nw."),
@@ -63,6 +64,6 @@ public enum TomtomFile {
         return Stream.of(TomtomFile.values())
                 .filter(tomtomFile -> product.equals(tomtomFile.product))
                 .map(TomtomFile::getValue)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 }

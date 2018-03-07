@@ -1,4 +1,4 @@
-package com.mappy.fpm.batches.tomtom.download.json;
+package com.mappy.fpm.batches.tomtom.download.json.downloader;
 
 import com.google.inject.Inject;
 import com.mappy.fpm.batches.tomtom.download.json.model.Contents.Content;
@@ -11,11 +11,12 @@ import javax.inject.Named;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.function.Function;
 
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 @Slf4j
-public class ArchiveDownloader {
+public class ArchiveDownloader implements Function<Content, File> {
 
     private final File outputFolder;
     private final HttpClient client;
@@ -28,7 +29,7 @@ public class ArchiveDownloader {
         this.token = token;
     }
 
-    public void download(Content content) {
+    public File apply(Content content) {
         File downloaded = new File(outputFolder, content.getName());
         for (int i = 0; i < 3; i++) {
             try {
@@ -40,7 +41,7 @@ public class ArchiveDownloader {
                 try (InputStream archiveStream = response.getEntity().getContent()) {
                     copyInputStreamToFile(archiveStream, downloaded);
                 }
-                return;
+                return downloaded;
             }
             catch (IOException ex) {
                 log.error("Retrying.. ", ex);
