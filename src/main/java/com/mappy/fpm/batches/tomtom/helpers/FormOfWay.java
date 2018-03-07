@@ -25,7 +25,7 @@ public enum FormOfWay {
     SPECIAL_TRAFFIC_FIGURE(17, of()),
     GALLERY(18, of("highway", "footway", "tunnel", "yes")),
     STAIRS(19, of("highway", "steps")),
-    ROAD_OF_AUTHORITIES(20, of()),
+    ROAD_OF_AUTHORITIES(20, of("highway", "service", "service", "emergency_access")),
     CONNECTOR(21, of()),
     CUL_DE_SAC(22, of());
 

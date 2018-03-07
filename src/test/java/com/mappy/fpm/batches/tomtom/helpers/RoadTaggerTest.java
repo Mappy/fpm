@@ -271,4 +271,11 @@ public class RoadTaggerTest {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "19", "NET2CLASS", "6"))))
                 .containsEntry("highway", "steps");
     }
+
+    @Test
+    public void should_have_road_authorities() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "20", "NET2CLASS", "6"))))
+                .containsEntry("highway", "service")
+                .containsEntry("service", "emergency_access");
+    }
 }
