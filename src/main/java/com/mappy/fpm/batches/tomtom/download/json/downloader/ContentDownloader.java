@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -44,8 +43,7 @@ public class ContentDownloader implements Function<Release, Stream<Content>> {
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
 
-            List<Content> contents = new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Contents.class).getContents();
-            return contents.stream()
+            return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Contents.class).getContents().stream()
                     .filter(c -> {
                         Matcher matcher = PATTERN.matcher(c.getName());
                         return matcher.matches() && NEEDED.contains(matcher.group(3));

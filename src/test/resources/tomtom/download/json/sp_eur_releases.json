@@ -1,0 +1,29 @@
+{
+  "content": [
+    {
+      "deliveryType": "full",
+      "dueDate": "2018-03-01T00:00:00Z",
+      "id": 411,
+      "iterationType": "commercial",
+      "location": "https://api.test/releases/411",
+      "product": {
+        "id": 410,
+        "location": "https://api.test/products/410"
+      },
+      "state": {
+        "date": "2018-02-26T15:07:19.988Z",
+        "reason": "",
+        "type": "released"
+      },
+      "version": "2016.09"
+    }
+  ],
+  "first": true,
+  "last": true,
+  "number": 0,
+  "numberOfElements": 2,
+  "size": 50,
+  "sort": null,
+  "totalElements": 2,
+  "totalPages": 1
+}

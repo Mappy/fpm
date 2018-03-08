@@ -3,8 +3,8 @@
     {
       "abbreviation": "MN",
       "description": null,
-      "id": 330,
-      "location": "https://api.test/families/330",
+      "id": 300,
+      "location": "https://api.test/families/300",
       "name": "MultiNet"
     },
     {
@@ -17,15 +17,15 @@
     {
       "abbreviation": "SP",
       "description": null,
-      "id": 344,
-      "location": "https://api.test/families/344",
+      "id": 400,
+      "location": "https://api.test/families/400",
       "name": "Speed Profiles"
     },
     {
       "abbreviation": "2DCM",
       "description": null,
-      "id": 542,
-      "location": "https://api.test/families/542",
+      "id": 500,
+      "location": "https://api.test/families/500",
       "name": "2D City Maps"
     }
   ],

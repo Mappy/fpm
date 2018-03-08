@@ -1,0 +1,22 @@
+{
+  "content": [
+    {
+      "description": null,
+      "family": {
+        "id": 500,
+        "location": "https://api.test/families/500"
+      },
+      "id": 510,
+      "location": "https://api.test/products/510",
+      "name": "EUR"
+    }
+  ],
+  "first": true,
+  "last": true,
+  "number": 0,
+  "numberOfElements": 1,
+  "size": 50,
+  "sort": null,
+  "totalElements": 1,
+  "totalPages": 1
+}

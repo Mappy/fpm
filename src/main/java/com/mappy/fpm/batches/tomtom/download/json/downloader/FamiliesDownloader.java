@@ -40,10 +40,7 @@ public class FamiliesDownloader {
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
 
-            List<Family> families = new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Families.class).getContent();
-            log.debug("Families : {}", families);
-
-            return families.stream() //
+            return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Families.class).getContent().stream() //
                     .filter(f -> ALLOWED.contains(f.getAbbreviation()));
         } catch (IOException e) {
             throw propagate(e);

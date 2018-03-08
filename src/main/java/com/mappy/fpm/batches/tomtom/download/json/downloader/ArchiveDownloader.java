@@ -3,14 +3,12 @@ package com.mappy.fpm.batches.tomtom.download.json.downloader;
 import com.google.inject.Inject;
 import com.mappy.fpm.batches.tomtom.download.json.model.Contents.Content;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
 import javax.inject.Named;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.function.Function;
 
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
@@ -31,16 +29,14 @@ public class ArchiveDownloader implements Function<Content, File> {
 
     public File apply(Content content) {
         File downloaded = new File(outputFolder, content.getName());
+
+        HttpGet get = new HttpGet(content.getLocation());
+        get.addHeader("Authorization", token);
+
         for (int i = 0; i < 3; i++) {
             try {
                 log.info("Downloading {} to \"{}\"", content.getLocation(), downloaded.getAbsolutePath());
-
-                HttpGet get = new HttpGet(content.getLocation());
-                get.addHeader("Authorization", token);
-                HttpResponse response = client.execute(get);
-                try (InputStream archiveStream = response.getEntity().getContent()) {
-                    copyInputStreamToFile(archiveStream, downloaded);
-                }
+                copyInputStreamToFile(client.execute(get).getEntity().getContent(), downloaded);
                 return downloaded;
             }
             catch (IOException ex) {

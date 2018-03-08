@@ -13,7 +13,6 @@ import org.apache.http.client.methods.HttpGet;
 import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -42,8 +41,7 @@ public class ReleaseDownloader implements Function<Product, Stream<Release>> {
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
 
-            List<Release> releases = new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Releases.class).getContent();
-            return releases.stream() //
+            return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Releases.class).getContent().stream() //
                     .filter(r -> version.equals(r.getVersion()))
                     .filter(Objects::nonNull);
         } catch (IOException e) {

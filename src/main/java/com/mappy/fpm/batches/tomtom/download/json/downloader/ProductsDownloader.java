@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -39,9 +38,7 @@ public class ProductsDownloader implements Function<Family, Stream<Product>> {
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
 
-            List<Product> products = new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Products.class).getContent();
-            log.debug("Product for {} : {}", family.getAbbreviation(), products);
-            return products.stream();
+            return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Products.class).getContent().stream();
         } catch (IOException e) {
             throw propagate(e);
         }

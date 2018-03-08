@@ -1,51 +1,89 @@
 package com.mappy.fpm.batches.tomtom.download.json;
 
+import com.github.paweladamski.httpclientmock.HttpClientMock;
+import com.github.paweladamski.httpclientmock.action.Action;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
-import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.FileEntity;
-import org.junit.Ignore;
+import org.apache.http.message.BasicHttpResponse;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static com.google.inject.Guice.createInjector;
 import static com.google.inject.util.Modules.override;
+import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-@Ignore
 public class MapContentDownloaderIT {
 
-    private static final Module MODULE_IT = override(new MapContentModule("target/download", "validToken", "version"))
+    private static final String OUTPUT_FOLDER = "target/download";
+    private static final Module MODULE_IT = override(new MapContentModule(OUTPUT_FOLDER, "validToken", "2016.09"))
             .with(new MapContentModuleIT());
 
     @Test
     public void should_run_download() {
+        File file = new File(OUTPUT_FOLDER);
+        file.delete();
+
         createInjector(MODULE_IT)//
                 .getInstance(MapContentDownloader.class)//
                 .run();
+
+        Assertions.assertThat(file.list()).containsOnly("Andorre");
     }
 
     private static class MapContentModuleIT extends AbstractModule {
         @Override
         protected void configure() {
-            HttpClient client = mock(HttpClient.class);
+            HttpClientMock client = new HttpClientMock();
 
             try {
-                HttpResponse familyResponse = mock(HttpResponse.class);
-                when(familyResponse.getEntity()).thenReturn(new FileEntity(new File(getClass().getResource("/tomtom/download/json/families.json").toURI())));
-                HttpGet get = new HttpGet("https://api.tomtom.com/mcapi/families");
-                when(client.execute(get)).thenReturn(familyResponse);
+                client.onGet("https://api.tomtom.com/mcapi/families").doReturnJSON(getFile("families.json"));
+
+                client.onGet("https://api.test/families/300/products").doReturnJSON(getFile("mn_products.json"));
+                client.onGet("https://api.test/families/400/products").doReturnJSON(getFile("sp_products.json"));
+                client.onGet("https://api.test/families/500/products").doReturnJSON(getFile("2dcm_products.json"));
+
+                client.onGet("https://api.test/products/310/releases").doReturnJSON(getFile("mn_eur_releases.json"));
+                client.onGet("https://api.test/products/320/releases").doReturnJSON(getFile("mn_lam_releases.json"));
+                client.onGet("https://api.test/products/410/releases").doReturnJSON(getFile("sp_eur_releases.json"));
+                client.onGet("https://api.test/products/510/releases").doReturnJSON(getFile("2dcm_eur_releases.json"));
+
+                client.onGet("https://api.test/releases/312?label=shpd").doReturnJSON(getFile("mn_eur_2016.09_contents.json"));
+                client.onGet("https://api.test/releases/322?label=shpd").doReturnJSON(getFile("mn_lam_2016.09_contents.json"));
+                client.onGet("https://api.test/releases/411?label=shpd").doReturnJSON(getFile("sp_eur_2016.09_contents.json"));
+                client.onGet("https://api.test/releases/511?label=shpd").doReturnJSON(getFile("2dcm_eur_2016.09_contents.json"));
+
+                Action file = r -> {
+                    BasicHttpResponse response = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "ok");
+                    try {
+                        response.setEntity(new FileEntity(new File(getClass().getResource("/tomtom/download/json/and.7z.001").toURI())));
+                    } catch (URISyntaxException e) {
+                        fail();
+                    }
+                    return response;
+                };
+
+                client.onGet("https://api.test/contents/3121").doAction(file);
+                client.onGet("https://api.test/contents/3211").doAction(file);
+                client.onGet("https://api.test/contents/4111").doAction(file);
+                client.onGet("https://api.test/contents/5111").doAction(file);
 
             } catch (Exception e) {
                 fail();
             }
 
             bind(HttpClient.class).toInstance(client);
+        }
+
+        private String getFile(String name) throws IOException, URISyntaxException {
+            return readFileToString(new File(getClass().getResource("/tomtom/download/json/" + name).toURI()), "UTF-8");
         }
     }
 }

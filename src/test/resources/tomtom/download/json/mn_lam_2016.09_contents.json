@@ -1,0 +1,61 @@
+{
+  "contents": [
+    {
+      "action": {
+        "method": "7zip",
+        "name": "extract"
+      },
+      "checksum": "82df4e2cbeb6ee794ab140e0a4cfceea",
+      "checksumType": "md5",
+      "contents": [],
+      "folder": false,
+      "geoRestrictions": [],
+      "id": 3211,
+      "labels": [
+        "shpd"
+      ],
+      "location": "https://api.test/contents/3211",
+      "name": "lam2016_09-shpd-mn-and-and.7z.001",
+      "path": "/",
+      "sizeBytes": 77137,
+      "zones": [
+        "EUR.AND"
+      ]
+    }
+  ],
+  "deliveryType": "full",
+  "description": null,
+  "dueDate": "2016-09-01T00:00:00Z",
+  "frequencies": [],
+  "id": 248,
+  "iterationType": "commercial",
+  "labels": [
+    "components",
+    "documentation",
+    "gdfar",
+    "gdfas",
+    "osl",
+    "shpa",
+    "shpd",
+    "txt"
+  ],
+  "location": "https://api.test/releases/248",
+  "product": {
+    "id": 310,
+    "location": "https://api.test/products/310"
+  },
+  "sourceVersion": null,
+  "state": {
+    "date": "2018-03-05T08:55:48.8Z",
+    "reason": null,
+    "type": "released"
+  },
+  "version": "2016.09",
+  "zones": [
+    {
+      "displayName": "EUR.AND",
+      "geometry": null,
+      "name": "EUR.AND"
+    }
+  ]
+}

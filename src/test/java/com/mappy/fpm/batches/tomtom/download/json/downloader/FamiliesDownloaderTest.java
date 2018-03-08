@@ -39,8 +39,8 @@ public class FamiliesDownloaderTest {
         Stream<Family> families = familiesDownloader.get();
 
         assertThat(families).containsOnly(//
-                new Family("SP", "https://api.test/families/344"),//
-                new Family("MN", "https://api.test/families/330"), //
-                new Family("2DCM", "https://api.test/families/542"));
+                new Family("MN", "https://api.test/families/300"), //
+                new Family("SP", "https://api.test/families/400"),//
+                new Family("2DCM", "https://api.test/families/500"));
     }
 }
