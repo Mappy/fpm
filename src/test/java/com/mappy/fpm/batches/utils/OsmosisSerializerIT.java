@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTime.now;
 
+
 public class OsmosisSerializerIT extends AbstractTest {
 
     @Test

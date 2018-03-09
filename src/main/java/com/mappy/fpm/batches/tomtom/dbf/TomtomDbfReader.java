@@ -7,8 +7,14 @@ import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import static java.util.Collections.emptyMap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Slf4j

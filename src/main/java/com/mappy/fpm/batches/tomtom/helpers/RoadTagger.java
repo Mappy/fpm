@@ -1,6 +1,8 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
+import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
+import com.mappy.fpm.batches.tomtom.dbf.intersection.RouteIntersectionProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
@@ -17,8 +19,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.helpers.FormOfWay.ROUNDABOUT;
@@ -44,11 +48,12 @@ public class RoadTagger {
     private final TimeDomainsParser timeDomainsParser;
     private final TransportationAreaProvider transportationAreaProvider;
     private final RouteNumbersProvider routeNumbersProvider;
+    private Map<Long, String>  intersectionById ;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
                       SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsProvider timeDomainsProvider, TimeDomainsParser timeDomainsParser,
-                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider) {
+                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider, RouteIntersectionProvider intersectionProvider) {
         this.speedProfiles = speedProfiles;
         this.geocodeProvider = geocodeProvider;
         this.signPosts = signPosts;
@@ -62,6 +67,7 @@ public class RoadTagger {
         this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
         this.transportationAreaProvider.loadTransportationAreaAttributes("ta.dbf");
         this.routeNumbersProvider.loadGeocodingAttributes("rn.dbf");
+        this.intersectionById = intersectionProvider.getIntercetionsById();
     }
 
     public Map<String, String> tag(Feature feature) {
@@ -148,6 +154,10 @@ public class RoadTagger {
         addTagIf("mappy_length", () -> valueOf(feature.getDouble("METERS")), ofNullable(feature.getDouble("METERS")).isPresent(), tags);
 
         tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
+
+        if(SLIP_ROAD.is(feature.getInteger("FOW")) && intersectionById.containsKey(id)){
+            tags.put("destination" , intersectionById.get(id));
+        }
     }
 
     private void tagTomtomSpecial(Feature feature, Map<String, String> tags, Long id) {
