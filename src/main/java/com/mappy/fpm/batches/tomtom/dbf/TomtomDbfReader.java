@@ -26,31 +26,6 @@ public class TomtomDbfReader {
         this.folder = folder;
     }
 
-    public <K,V> Map<K, V> readAsMap(String filename, Function<DbfRow, K> keyFunc, Function<DbfRow, V> valueFunc) {
-        File file = new File(folder.getFile(filename));
-
-        if (!file.exists()) {
-            log.info("File not found : {}", file.getAbsolutePath());
-            return emptyMap();
-        }
-        Map<K, V> result = new HashMap<>();
-        log.info("Reading {}", file);
-        try (DbfReader reader = new DbfReader(file)) {
-            DbfRow row;
-            Stopwatch stopwatch = Stopwatch.createStarted();
-            int counter = 0;
-
-            while ((row = reader.nextRow()) != null) {
-                result.put(keyFunc.apply(row) , valueFunc.apply(row)) ;
-                counter++;
-            }
-            long time = stopwatch.elapsed(MILLISECONDS);
-            stopwatch.stop();
-            log.info("Added {} object(s){}", counter, counter > 0 ? " in " + time + " ms at rate " + String.format("%.2f", counter * 1.0 / time) + " obj/ms" : "");
-        }
-
-        return result ;
-    }
     protected void readFile(String filename, Consumer<DbfRow> fun) {
         File file = new File(folder.getFile(filename));
 

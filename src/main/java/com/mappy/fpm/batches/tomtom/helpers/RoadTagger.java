@@ -2,6 +2,7 @@ package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
+import com.mappy.fpm.batches.tomtom.dbf.intersection.RouteIntersectionProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
@@ -52,7 +53,7 @@ public class RoadTagger {
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
                       SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsProvider timeDomainsProvider, TimeDomainsParser timeDomainsParser,
-                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider, TomtomDbfReader tomtomDbfReader) {
+                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider, RouteIntersectionProvider intersectionProvider) {
         this.speedProfiles = speedProfiles;
         this.geocodeProvider = geocodeProvider;
         this.signPosts = signPosts;
@@ -66,7 +67,7 @@ public class RoadTagger {
         this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
         this.transportationAreaProvider.loadTransportationAreaAttributes("ta.dbf");
         this.routeNumbersProvider.loadGeocodingAttributes("rn.dbf");
-        this.intersectionById = getIntercetionsById(tomtomDbfReader);
+        this.intersectionById = intersectionProvider.getIntercetionsById();
     }
 
     public Map<String, String> tag(Feature feature) {
@@ -137,12 +138,6 @@ public class RoadTagger {
         if (condition) {
             tags.put(key, value);
         }
-    }
-
-    private Map<Long,String> getIntercetionsById(TomtomDbfReader tomtomDbfReader) {
-        Map<Long, Long> igMap = tomtomDbfReader.readAsMap("ig.dbf", row -> row.getLong("ELEMID") , row -> row.getLong("ID"));
-        Map<Long, String> isMap = tomtomDbfReader.readAsMap("is.dbf", row -> row.getLong("ID") , row -> row.getString("NAME"));
-        return igMap.entrySet().stream().collect(Collectors.toMap(Entry::getKey, entry -> isMap.get(entry.getValue())));
     }
 
     private void tagRoute(Feature feature, Map<String, String> tags, Long id) {

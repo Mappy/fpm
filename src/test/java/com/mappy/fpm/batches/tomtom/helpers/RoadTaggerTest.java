@@ -3,6 +3,7 @@ package com.mappy.fpm.batches.tomtom.helpers;
 import com.google.common.collect.ImmutableMap;
 import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
+import com.mappy.fpm.batches.tomtom.dbf.intersection.RouteIntersectionProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
@@ -43,8 +44,8 @@ public class RoadTaggerTest {
     private final TollTagger tollTagger = mock(TollTagger.class);
     private final RouteNumbersProvider routeNumbersProvider = mock(RouteNumbersProvider.class);
 
-    private final TomtomDbfReader tomtomFile = mock(TomtomDbfReader.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, tomtomFile);
+    private final RouteIntersectionProvider intersectionProvider = mock(RouteIntersectionProvider.class);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, intersectionProvider);
 
     @Before
     public void setup() {
