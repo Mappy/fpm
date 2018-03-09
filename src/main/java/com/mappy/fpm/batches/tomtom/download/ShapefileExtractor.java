@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import static com.google.common.base.Throwables.propagate;
@@ -22,10 +21,11 @@ import static com.google.common.collect.Sets.union;
 import static com.mappy.fpm.batches.tomtom.download.TomtomCountries.countries;
 import static com.mappy.fpm.batches.tomtom.download.TomtomCountries.outerworld;
 import static com.mappy.fpm.batches.tomtom.download.TomtomFile.allTomtomFiles;
+import static com.mappy.fpm.batches.tomtom.download.json.downloader.ContentDownloader.PATTERN;
 
 @Slf4j
 public class ShapefileExtractor {
-    private static final Pattern PATTERN = Pattern.compile("^(.*?)-shp(.?)-(.*?)-(.*?)-(.*?)\\.7z\\.001");
+
     private static final Set<TomtomCountry> COUNTRIES = union(countries(), outerworld());
 
     public static void decompress(File outputDirectory, File file, String type) {
@@ -59,7 +59,11 @@ public class ShapefileExtractor {
             String country = "";
             if (matcher.matches()){
                 type = matcher.group(3);
-                country = COUNTRIES.stream().filter(c -> c.getId().toLowerCase().equals(matcher.group(4).toLowerCase())).findFirst().get().getLabel();
+                String countryCode = matcher.group(4).toUpperCase();
+                if (outerworld().stream().anyMatch(c -> c.getLabel().equals(countryCode)) && "ax".equals(matcher.group(5))) {
+                    return;
+                }
+                country = COUNTRIES.stream().filter(c -> c.getId().equals(countryCode)).findFirst().get().getLabel();
             }
 
             SevenZArchiveEntry entry;
