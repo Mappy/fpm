@@ -3,24 +3,27 @@ package com.mappy.fpm.batches.tomtom.download;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public enum TomtomFile {
     NETWORK("mn", "_nw."),
+    ROAD_RESTRICTIONS("mn", "_rs."),
     MANEUVER("mn", "_mn."),
     MANEUVER_PRIORITY("mn", "_mp."),
     LAND_COVERS("mn", "_lc."),
     LAND_USES("mn", "_lu."),
     WATER_AREAS("mn", "_wa."),
     WATER_LINES("mn", "_wl."),
+    CITIES("mn", "_sm."),
     ALTERNATE_CITY_NAMES("mn", "_smnm."),
     COASTLINES("mn", "_bl."),
     RAILROADS("mn", "_rr."),
     GEOCODE_INFORMATION("mn", "_gc."),
     SPEEDS_RESTRICTIONS("mn", "_sr."),
     SIGNPOST_INFORMATION("mn", "_si."),
-    SIGNPOST_PATHS("mn", "_si."),
+    SIGNPOST_PATHS("mn", "_sp."),
     SIGNPOST("mn", "_sg."),
     LAND_DIRECTIONS("mn", "_ld."),
     BOUNDARIES_LEVEL0_COUNTRY("mn", "_a0."),
@@ -67,6 +70,6 @@ public enum TomtomFile {
         return Stream.of(TomtomFile.values())
                 .filter(tomtomFile -> product.equals(tomtomFile.product))
                 .map(TomtomFile::getValue)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 }

@@ -1,0 +1,32 @@
+{
+  "content": [
+    {
+      "description": null,
+      "family": {
+        "id": 220,
+        "location": "https://api.test/families/220"
+      },
+      "id": 230,
+      "location": "https://api.test/products/230",
+      "name": "EUR"
+    },
+    {
+      "description": null,
+      "family": {
+        "id": 220,
+        "location": "https://api.test/families/220"
+      },
+      "id": 530,
+      "location": "https://api.test/products/530",
+      "name": "LAM"
+    }
+  ],
+  "first": true,
+  "last": true,
+  "number": 0,
+  "numberOfElements": 2,
+  "size": 50,
+  "sort": null,
+  "totalElements": 2,
+  "totalPages": 1
+}
