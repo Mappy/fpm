@@ -1,16 +1,17 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
-import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
 import com.mappy.fpm.batches.tomtom.dbf.intersection.RouteIntersectionProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
+import com.mappy.fpm.batches.tomtom.dbf.poi.FeatureType;
+import com.mappy.fpm.batches.tomtom.dbf.poi.PoiProvider;
 import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
-import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsProvider;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsProvider;
 import com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationAreaProvider;
 import com.mappy.fpm.batches.utils.Feature;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.helpers.FormOfWay.ROUNDABOUT;
@@ -48,12 +47,13 @@ public class RoadTagger {
     private final TimeDomainsParser timeDomainsParser;
     private final TransportationAreaProvider transportationAreaProvider;
     private final RouteNumbersProvider routeNumbersProvider;
-    private Map<Long, String>  intersectionById ;
+    private Map<Long, String> intersectionById;
+    private final PoiProvider poiProvider;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
                       SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsProvider timeDomainsProvider, TimeDomainsParser timeDomainsParser,
-                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider, RouteIntersectionProvider intersectionProvider) {
+                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider, RouteIntersectionProvider intersectionProvider, PoiProvider poiProvider) {
         this.speedProfiles = speedProfiles;
         this.geocodeProvider = geocodeProvider;
         this.signPosts = signPosts;
@@ -64,10 +64,13 @@ public class RoadTagger {
         this.timeDomainsParser = timeDomainsParser;
         this.transportationAreaProvider = transportationAreaProvider;
         this.routeNumbersProvider = routeNumbersProvider;
+        this.poiProvider = poiProvider;
         this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
         this.transportationAreaProvider.loadTransportationAreaAttributes("ta.dbf");
         this.routeNumbersProvider.loadGeocodingAttributes("rn.dbf");
         this.intersectionById = intersectionProvider.getIntercetionsById();
+        this.poiProvider.loadPointsOfInterest("pi.dbf");
+        this.poiProvider.loadPointsOfInterestExstandedAttributes("piea.dbf");
     }
 
     public Map<String, String> tag(Feature feature) {
@@ -155,9 +158,14 @@ public class RoadTagger {
 
         tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
 
-        if(SLIP_ROAD.is(feature.getInteger("FOW")) && intersectionById.containsKey(id)){
-            tags.put("destination" , intersectionById.get(id));
+        if (SLIP_ROAD.is(feature.getInteger("FOW")) && intersectionById.containsKey(id)) {
+            tags.put("destination", intersectionById.get(id));
         }
+
+        poiProvider.getPoiNameByType(id, FeatureType.MOUNTAIN_PASS.getValue()).ifPresent(value -> {
+            tags.put("mountain_pass", "yes");
+            tags.put("name", value);
+        });
     }
 
     private void tagTomtomSpecial(Feature feature, Map<String, String> tags, Long id) {

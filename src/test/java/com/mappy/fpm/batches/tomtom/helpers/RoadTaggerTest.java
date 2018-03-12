@@ -1,10 +1,11 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.ImmutableMap;
-import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
 import com.mappy.fpm.batches.tomtom.dbf.intersection.RouteIntersectionProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
+import com.mappy.fpm.batches.tomtom.dbf.poi.FeatureType;
+import com.mappy.fpm.batches.tomtom.dbf.poi.PoiProvider;
 import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
@@ -18,17 +19,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.utils.CollectionUtils.map;
 import static com.mappy.fpm.utils.MemoryFeature.onlyTags;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class RoadTaggerTest {
@@ -43,9 +44,9 @@ public class RoadTaggerTest {
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
     private final TollTagger tollTagger = mock(TollTagger.class);
     private final RouteNumbersProvider routeNumbersProvider = mock(RouteNumbersProvider.class);
-
     private final RouteIntersectionProvider intersectionProvider = mock(RouteIntersectionProvider.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, intersectionProvider);
+    private final PoiProvider poiProvider = mock(PoiProvider.class);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, intersectionProvider, poiProvider);
 
     @Before
     public void setup() {
@@ -56,7 +57,7 @@ public class RoadTaggerTest {
         when(transportationAreaProvider.getSmallestAreas(any(Long.class))).thenReturn(of("789;112"));
         when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(of("E41"));
         when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(of("N5"));
-
+        when(poiProvider.getPoiNameByType(any(Long.class), eq(FeatureType.MOUNTAIN_PASS.getValue()))).thenReturn(empty());
     }
 
     @Test
@@ -186,8 +187,8 @@ public class RoadTaggerTest {
 
     @Test
     public void should_add_ref_tag() {
-        when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(Optional.empty());
-        when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(Optional.empty());
+        when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(empty());
+        when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(empty());
 
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "SHIELDNUM", "A13"))))
                 .containsEntry("int_ref", "A13");
@@ -283,5 +284,13 @@ public class RoadTaggerTest {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "20", "NET2CLASS", "6"))))
                 .containsEntry("highway", "service")
                 .containsEntry("service", "emergency_access");
+    }
+
+    @Test
+    public void should_have_mountain_pass() {
+        when(poiProvider.getPoiNameByType(any(Long.class), eq(FeatureType.MOUNTAIN_PASS.getValue()))).thenReturn(of("everest"));
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "NAME", "not everest", "F_ELEV", "0", "T_ELEV", "0", "FOW", "20", "NET2CLASS", "6"))))
+                .containsEntry("mountain_pass", "yes")
+                .containsEntry("name", "everest");
     }
 }

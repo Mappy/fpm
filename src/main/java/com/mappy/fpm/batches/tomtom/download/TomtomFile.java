@@ -44,6 +44,7 @@ public enum TomtomFile {
     TRANSPORTATION_ELEMENT_BELONGING_TO_AREA("mn", "_ta."),
     ROUTE_NUMBERS("mn", "_rn."),
     POINTS_OF_INTEREST("mn", "_pi."),
+    POINTS_OF_INTEREST_EXTENDED_ATTRIBUTES("mn", "_piea."),
 
     ROUTE_INERSECTION_INDEX("mn", "_ig."),
     ROUTE_INERSECTION("mn", "_is."),
