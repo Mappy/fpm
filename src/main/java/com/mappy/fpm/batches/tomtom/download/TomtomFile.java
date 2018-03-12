@@ -43,6 +43,7 @@ public enum TomtomFile {
     LAND_USE_AND_LAND_COVER_ALTERNATE_NAMES("mn", "_lxnm."),
     TRANSPORTATION_ELEMENT_BELONGING_TO_AREA("mn", "_ta."),
     ROUTE_NUMBERS("mn", "_rn."),
+    POINTS_OF_INTEREST("mn", "_pi."),
 
     ROUTE_INERSECTION_INDEX("mn", "_ig."),
     ROUTE_INERSECTION("mn", "_is."),
