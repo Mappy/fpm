@@ -16,11 +16,11 @@ public enum FunctionalRoadClass {
     MAJOR_ROAD(0, false, null, of("highway", "motorway", "foot", "no", "bicycle", "no")),
     MAJOR_ROAD_LINK(0, true, null, of("highway", "motorway_link", "foot", "no", "bicycle", "no")),
 
-    LESS_THAN_MOTORWAY(1, false, false, of("highway", "primary")),
-    LESS_THAN_MOTORWAY_LINK(1, true, false, of("highway", "primary_link")),
-
     LESS_THAN_MOTORWAY_FREEWAY(1, false, true, of("highway", "trunk", "foot", "no", "bicycle", "no")),
     LESS_THAN_MOTORWAY_FREEWAY_LINK(1, true, true, of("highway", "trunk_link", "foot", "no", "bicycle", "no")),
+
+    LESS_THAN_MOTORWAY(1, false, false, of("highway", "trunk")),
+    LESS_THAN_MOTORWAY_LINK(1, true, false, of("highway", "trunk_link")),
 
     OTHER_MAJOR_ROAD(2, false, null, of("highway", "primary")),
     OTHER_MAJOR_ROAD_link(2, true, null, of("highway", "primary_link")),
@@ -31,8 +31,8 @@ public enum FunctionalRoadClass {
     LOCAL_CONNECTING_ROAD(4, false, null, of("highway", "secondary")),
     LOCAL_CONNECTING_ROAD_LINK(4, true, null, of("highway", "secondary_link")),
 
-    LOCAL_ROAD_OF_HIGH_IMPORTANCE(5, false, null, of("highway", "secondary")),
-    LOCAL_ROAD_OF_HIGH_IMPORTANCE_LINK(5, true, null, of("highway", "secondary_link")),
+    LOCAL_ROAD_OF_HIGH_IMPORTANCE(5, false, null, of("highway", "tertiary")),
+    LOCAL_ROAD_OF_HIGH_IMPORTANCE_LINK(5, true, null, of("highway", "tertiary_link")),
 
     LOCAL_ROAD(6, false, null, of("highway", "residential")),
     LOCAL_ROAD_LINK(6, true, null, of("highway", "tertiary_link")),
