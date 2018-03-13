@@ -21,7 +21,7 @@ What this script does :
 ## Download
 
 ```bash
-docker run --rm -v /tmp/tomtomfiles:/workspace -p 9501:9501 -t mappy/fpm com.mappy.fpm.batches.tomtom.download.TomtomDownloader /workspace 2016_09  yourLogin yourPassword
+docker run --rm -v /tmp/tomtomfiles:/workspace -p 9501:9501 -t mappy/fpm com.mappy.fpm.batches.tomtom.download.json.MapContentDownloader /workspace yourToken 2016.09
 ```
 
 ```bash

@@ -28,29 +28,6 @@ public class ShapefileExtractor {
 
     private static final Set<TomtomCountry> COUNTRIES = union(countries(), outerworld());
 
-    public static void decompress(File outputDirectory, File file, String type) {
-        try {
-            SevenZFile archive = new SevenZFile(file);
-            SevenZArchiveEntry entry;
-            while ((entry = archive.getNextEntry()) != null) {
-                String filename = Paths.get(entry.getName()).getFileName().toString();
-
-                if (tablesNeeded(type).stream().anyMatch(filename::contains)) {
-                    log.info("Extracting {}", filename);
-                    byte[] content = new byte[(int) entry.getSize()];
-                    archive.read(content, 0, content.length);
-                    File outputFile = new File(outputDirectory, filename.replace(".gz", ""));
-                    try (GZIPInputStream input = new GZIPInputStream(new ByteArrayInputStream(content)); FileOutputStream output = new FileOutputStream(outputFile)) {
-                        IOUtils.copy(input, output);
-                    }
-                }
-            }
-            archive.close();
-        } catch (IOException e) {
-            throw propagate(e);
-        }
-    }
-
     public void decompress(File outputDirectory, File file) {
         try {
             SevenZFile archive = new SevenZFile(file);
