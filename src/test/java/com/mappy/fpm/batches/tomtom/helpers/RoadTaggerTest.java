@@ -58,6 +58,15 @@ public class RoadTaggerTest {
         when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(of("E41"));
         when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(of("N5"));
         when(poiProvider.getPoiNameByType(any(Long.class), eq(FeatureType.MOUNTAIN_PASS.getValue()))).thenReturn(empty());
+
+    }
+
+    @Test
+    public void should_add_intersection_exit(){
+        when(intersectionProvider.getIntersectionById())
+        .thenReturn(ImmutableMap.of(123L, "exit 13"));
+        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW" , "10"))))
+                .containsEntry("destination", "exit 13");
     }
 
     @Test

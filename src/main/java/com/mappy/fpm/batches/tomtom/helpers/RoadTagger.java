@@ -47,7 +47,7 @@ public class RoadTagger {
     private final TimeDomainsParser timeDomainsParser;
     private final TransportationAreaProvider transportationAreaProvider;
     private final RouteNumbersProvider routeNumbersProvider;
-    private Map<Long, String> intersectionById;
+    private final  RouteIntersectionProvider intersectionProvider ;
     private final PoiProvider poiProvider;
 
     @Inject
@@ -64,11 +64,12 @@ public class RoadTagger {
         this.timeDomainsParser = timeDomainsParser;
         this.transportationAreaProvider = transportationAreaProvider;
         this.routeNumbersProvider = routeNumbersProvider;
+        this.intersectionProvider = intersectionProvider ;
         this.poiProvider = poiProvider;
         this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
         this.transportationAreaProvider.loadTransportationAreaAttributes("ta.dbf");
         this.routeNumbersProvider.loadGeocodingAttributes("rn.dbf");
-        this.intersectionById = intersectionProvider.getIntercetionsById();
+        this.intersectionProvider.loadIntersectionById() ;
         this.poiProvider.loadPointsOfInterest("pi.dbf");
         this.poiProvider.loadPointsOfInterestExstandedAttributes("piea.dbf");
     }
@@ -158,8 +159,8 @@ public class RoadTagger {
 
         tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
 
-        if (SLIP_ROAD.is(feature.getInteger("FOW")) && intersectionById.containsKey(id)) {
-            tags.put("destination", intersectionById.get(id));
+        if (SLIP_ROAD.is(feature.getInteger("FOW")) && intersectionProvider.getIntersectionById().containsKey(id)) {
+            tags.put("destination", intersectionProvider.getIntersectionById().get(id));
         }
 
         poiProvider.getPoiNameByType(id, FeatureType.MOUNTAIN_PASS.getValue()).ifPresent(value -> {

@@ -14,16 +14,22 @@ import java.util.stream.Collectors;
 @Singleton
 public class RouteIntersectionProvider extends TomtomDbfReader {
 
+    private Map<Long, String> intersectionById;
+
     @Inject
     public RouteIntersectionProvider(TomtomFolder folder) {
         super(folder);
     }
 
-    public Map<Long,String> getIntercetionsById() {
+    public void loadIntersectionById() {
         Map<Long, Long> igMap = new HashMap<>() ;
         Map<Long, String> isMap = new HashMap<>() ;
         readFile("ig.dbf", row -> igMap.put(row.getLong("ELEMID"), row.getLong("ID")));
         readFile("is.dbf", row -> isMap.put(row.getLong("ID"), row.getString("NAME")));
-        return igMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> isMap.get(entry.getValue())));
+        this.intersectionById = igMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> isMap.get(entry.getValue())));
+    }
+
+    public Map<Long, String> getIntersectionById() {
+        return intersectionById;
     }
 }
