@@ -24,7 +24,6 @@ import static com.google.common.collect.ImmutableMap.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.vividsolutions.jts.algorithm.Centroid.getCentroid;
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
@@ -69,8 +68,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
             ofNullable(cityCenter).ifPresent(centroid -> getAdminCenter(serializer, name, centroid).ifPresent(members::add));
 
             Map<String, String> wayTags = newHashMap(of("name", name));
-            ofNullable(cityCenter).map(Centroid::getPlace)
-                    .ifPresent(place -> place.ifPresent(value -> wayTags.put("place", value)));
+            ofNullable(cityCenter).ifPresent(place -> wayTags.put("place", place.getPlace()));
 
             PolygonBoundaryBuilder.addPolygons(serializer, members, multiPolygon, wayTags);
 
@@ -88,7 +86,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
 
         Map<String, String> adminTags = nameProvider.getAlternateCityNames(cityCenter.getId());
         adminTags.put("name", name);
-        cityCenter.getPlace().ifPresent(value -> adminTags.put("place", value));
+        adminTags.put("place", cityCenter.getPlace());
         ofNullable(cityCenter.getPostcode()).ifPresent(code -> adminTags.put("addr:postcode", code));
 
         if (serializer.containPoint(cityCenter.getPoint())) {

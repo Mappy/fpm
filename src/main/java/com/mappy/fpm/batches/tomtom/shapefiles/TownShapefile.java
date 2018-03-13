@@ -40,7 +40,7 @@ public class TownShapefile extends TomtomShapefile {
             tags.putAll(nameProvider.getAlternateCityNames(feature.getLong("ID")));
 
             switch (feature.getInteger("CITYTYP")) {
-                case 0:
+                case 32:
                     tags.put("place", "hamlet");
                     break;
                 case 64:

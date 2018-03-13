@@ -6,10 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Wither;
 
-import java.util.Optional;
-
-import static java.util.Optional.of;
-
 @Data
 @Wither
 @AllArgsConstructor
@@ -37,23 +33,25 @@ public class Centroid {
                 .withPoint(feature.getPoint());
     }
 
-    public Optional<String> getPlace() {
-        Optional<String> place = of("town");
+    public String getPlace() {
+        String place;
 
         switch (citytyp) {
             case 0:
-                place = of("village");
+                place = "village";
                 break;
             case 1:
             case 2:
-                place = of(dispclass < 8 ? "city" : "town");
+                place = dispclass < 8 ? "city" : "town";
                 break;
             case 32:
-                place = of("hamlet");
+                place = "hamlet";
                 break;
             case 64:
-                place = of("neighbourhood");
+                place = "neighbourhood";
                 break;
+            default:
+                place = "town";
         }
         return place;
     }

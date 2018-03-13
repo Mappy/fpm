@@ -111,7 +111,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         if (capital.isPresent()) {
             Centroid cityCenter = capital.get();
             Map<String, String> adminTags = newHashMap(of("name", cityCenter.getName()));
-            cityCenter.getPlace().ifPresent(p -> adminTags.put("place", p));
+            adminTags.put("place", cityCenter.getPlace());
             String capitalValue = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
             adminTags.put("capital", "2".equals(capitalValue) ? "yes" : capitalValue);
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
@@ -131,7 +131,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
 
         Map<String, String> tags = newHashMap();
         tags.put("name", cityCenter.getName());
-        cityCenter.getPlace().ifPresent(p -> tags.put("place", p));
+        tags.put("place", cityCenter.getPlace());
         ofNullable(cityCenter.getPostcode()).ifPresent(code -> tags.put("addr:postcode", code));
 
         String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());

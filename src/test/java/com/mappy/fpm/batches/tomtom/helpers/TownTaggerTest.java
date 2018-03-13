@@ -5,9 +5,6 @@ import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
-
-import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -52,37 +49,37 @@ public class TownTaggerTest extends AbstractTest {
 
     @Test
     public void should_return_village_with_get_place_of_citytyp_0() {
-        assertThat(townTagger.get(10560000379424L).getPlace()).isEqualTo(of("village"));
+        assertThat(townTagger.get(10560000379424L).getPlace()).isEqualTo("village");
     }
 
     @Test
     public void should_return_city_with_get_place_of_citytyp_1_and_dispclass_lower_than_8() {
-        assertThat(townTagger.get(10560000718742L).getPlace()).isEqualTo(of("city"));
+        assertThat(townTagger.get(10560000718742L).getPlace()).isEqualTo("city");
     }
 
     @Test
     public void should_return_town_with_get_place_of_citytyp_1_and_dispclass_greater_than_8() {
-        assertThat(townTagger.get(10560000388234L).getPlace()).isEqualTo(of("town"));
+        assertThat(townTagger.get(10560000388234L).getPlace()).isEqualTo("town");
     }
 
     @Test
     public void should_return_city_with_get_place_of_citytyp_2_and_dispclass_lower_than_8() {
-        assertThat(townTagger.get(10560000710744L).getPlace()).isEqualTo(of("city"));
+        assertThat(townTagger.get(10560000710744L).getPlace()).isEqualTo("city");
     }
 
     @Test
     public void should_return_town_with_get_place_of_citytyp_2_and_dispclass_greater_than_8() {
-        assertThat(townTagger.get(10560000712665L).getPlace()).isEqualTo(of("town"));
+        assertThat(townTagger.get(10560000712665L).getPlace()).isEqualTo("town");
     }
 
     @Test
     public void should_return_hamlet_with_get_place_of_citytyp_32() {
-        assertThat(townTagger.get(10560000308734L).getPlace()).isEqualTo(of("hamlet"));
+        assertThat(townTagger.get(10560000308734L).getPlace()).isEqualTo("hamlet");
     }
 
     @Test
     public void should_return_neighbourhood_with_get_place_of_citytyp_64() {
-        assertThat(townTagger.get(10560000407632L).getPlace()).isEqualTo(of("neighbourhood"));
+        assertThat(townTagger.get(10560000407632L).getPlace()).isEqualTo("neighbourhood");
     }
 
     private void assertCentroid(Centroid centroid, Long id, String name, Integer adminClass, Integer dispClass, Double[] point) {
