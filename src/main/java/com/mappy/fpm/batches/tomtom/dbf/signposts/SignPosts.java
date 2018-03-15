@@ -5,6 +5,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.PictogramType;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Lists.newArrayList;
@@ -28,7 +30,7 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Slf4j
-public class SignPosts {
+public class SignPosts extends TomtomDbfReader {
 
     private static final Comparator<List<SignPost>> bySize = Comparator.comparing(List::size);
     private static final Predicate<SignPost> onlyDestinationRefTowards = signPost -> (signPost.getInfotyp() == Route_Number_on_Shield || signPost.getInfotyp() == Route_Number)
@@ -37,21 +39,40 @@ public class SignPosts {
     private static final Predicate<SignPost> onlyDestination = onlyDestinationRefTowards.or(onlyDestinationLabel);
     private static final Predicate<SignPost> onlySymbol = signPost -> signPost.getInfotyp() == Pictogram;
 
-    private final ListMultimap<Long, SignPost> si;
-    private final Map<Long, Long> sg;
-    private final Multimap<Long, SignPostPath> sp;
+    private final ListMultimap<Long, SignPost> si = ArrayListMultimap.create();
+    private final Map<Long, Long> sg = newHashMap();
+    private final Multimap<Long, SignPostPath> sp = TreeMultimap.create();
+    private final Map<Long, SignWay> ways = newHashMap();
     private final ListMultimap<Long, Long> lastWayOfPath;
     private final Set<Long> waysWithSign;
-    private final Map<Long, SignWay> ways;
 
     @Inject
     public SignPosts(TomtomFolder folder) {
-        si = siFile(folder);
-        sp = spFile(folder);
-        sg = sgFile(folder);
+        super(folder);
+        readFile("si.dbf", this::loadSignPostInformation);
+        readFile("sp.dbf", this::loadSignPostPath);
+        readFile("sg.dbf", this::loadSignPostGeometry);
+        readFile("nw.dbf", this::loadWays);
         lastWayOfPath = extractLastWay(sp);
         waysWithSign = regroupPerWays(sp);
-        ways = nwFile(folder);
+    }
+
+    private void loadWays(DbfRow row) {
+        ways.put(row.getLong("ID"), new SignWay(row.getLong("ID"), row.getLong("F_JNCTID"), row.getLong("T_JNCTID")));
+    }
+
+    private void loadSignPostGeometry(DbfRow row) {
+        sg.put(row.getLong("ID"), row.getLong("JNCTID"));
+    }
+
+    private void loadSignPostPath(DbfRow row) {
+        SignPostPath path = SignPostPath.fromRow(row);
+        sp.put(path.getId(), path);
+    }
+
+    private void loadSignPostInformation(DbfRow row) {
+        SignPost v = SignPost.fromRow(row);
+        si.put(v.getId(), v);
     }
 
     public Map<String, String> getTags(long tomtomId, boolean oneWay, Long fromJunctionId, Long toJunctionId) {
@@ -64,7 +85,7 @@ public class SignPosts {
         if (!signIds.isEmpty()) {
             Long signId = signIds.get(0);
             Long junctionId = sg.get(signId);
-            String destinationTag = null;
+            String destinationTag;
             if (oneWay) {
                 destinationTag = "destination";
             }
@@ -166,44 +187,6 @@ public class SignPosts {
                 .orElse(newArrayList());
     }
 
-    private static ListMultimap<Long, SignPost> siFile(TomtomFolder folder) {
-        ListMultimap<Long, SignPost> signs = ArrayListMultimap.create();
-        File file = new File(folder.getFile("si.dbf"));
-        if (!file.exists()) {
-            return signs;
-        }
-        log.info("Reading SI {}", file);
-        try (DbfReader reader = new DbfReader(file)) {
-            DbfRow row;
-            while ((row = reader.nextRow()) != null) {
-                if (row.getInt("AMBIG") != 1) {
-                    SignPost sign = SignPost.fromRow(row);
-                    signs.put(sign.getId(), sign);
-                }
-            }
-        }
-        log.info("Loaded {} si", signs.size());
-        return signs;
-    }
-
-    private static Multimap<Long, SignPostPath> spFile(TomtomFolder folder) {
-        File file = new File(folder.getFile("sp.dbf"));
-        Multimap<Long, SignPostPath> result = TreeMultimap.create();
-        if (!file.exists()) {
-            return result;
-        }
-        log.info("Reading SP {}", file);
-        try (DbfReader reader = new DbfReader(file)) {
-            DbfRow row;
-            while ((row = reader.nextRow()) != null) {
-                SignPostPath path = SignPostPath.fromRow(row);
-                result.put(path.getId(), path);
-            }
-        }
-        log.info("Loaded {} sign paths", result.size());
-        return result;
-    }
-
     private static ListMultimap<Long, Long> extractLastWay(Multimap<Long, SignPostPath> sp) {
         ListMultimap<Long, Long> result = ArrayListMultimap.create();
 
@@ -222,42 +205,6 @@ public class SignPosts {
         }
 
         return result;
-    }
-
-    private static Map<Long, Long> sgFile(TomtomFolder folder) {
-        File file = new File(folder.getFile("sg.dbf"));
-        Map<Long, Long> speeds = newHashMap();
-        if (!file.exists()) {
-            return speeds;
-        }
-
-        log.info("Reading SG {}", file);
-        try (DbfReader reader = new DbfReader(file)) {
-            DbfRow row;
-            while ((row = reader.nextRow()) != null) {
-                speeds.put(row.getLong("ID"), row.getLong("JNCTID"));
-            }
-        }
-        log.info("Loaded {} Sign posts junctions", speeds.size());
-        return speeds;
-    }
-
-    private static Map<Long, SignWay> nwFile(TomtomFolder folder) {
-        File file = new File(folder.getFile("nw.dbf"));
-        Map<Long, SignWay> speeds = newHashMap();
-        if (!file.exists()) {
-            return speeds;
-        }
-
-        log.info("Reading NW {}", file);
-        try (DbfReader reader = new DbfReader(file)) {
-            DbfRow row;
-            while ((row = reader.nextRow()) != null) {
-                speeds.put(row.getLong("ID"), new SignWay(row.getLong("ID"), row.getLong("F_JNCTID"), row.getLong("T_JNCTID")));
-            }
-        }
-        log.info("Loaded {} road segment", speeds.size());
-        return speeds;
     }
 
     @Data
