@@ -10,7 +10,6 @@ import java.io.File;
 import static com.google.inject.Guice.createInjector;
 
 public class MapContentDownloader {
-
     private final FamiliesDownloader familiesDownloader;
     private final ProductsDownloader productsDownloader;
     private final ReleaseDownloader releaseDownloader;
@@ -48,9 +47,6 @@ public class MapContentDownloader {
                 .flatMap(releaseDownloader)//
                 .flatMap(contentDownloader)//
                 .map(archiveDownloader)//
-                .forEach(file -> {
-                    shapefileExtractor.decompress(outputFolder, file);
-                    file.delete();
-                });
+                .forEach(file -> shapefileExtractor.decompress(outputFolder, file));
     }
 }
