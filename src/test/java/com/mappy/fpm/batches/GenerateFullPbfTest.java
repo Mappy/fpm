@@ -19,18 +19,16 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 public class GenerateFullPbfTest {
-
     private final OsmMerger osmMerger = Mockito.spy(new OsmMerger());
     private final GenerateFullPbf generateFullPbf = new GenerateFullPbf(osmMerger, "src/test/resources/generateFullPbf", "target/tests", "Europe.osm.pbf", 1);
 
-    @Test(expected = IllegalArgumentException.class)
-    public void should_throw_IllegalArgumentException_when_country_is_unknown() {
-        generateFullPbf.run(newArrayList("fakeCountry"));
+    @Test
+    public void should_skip_an_unexpected_country() {
+        generateFullPbf.run(newArrayList("Fake country"));
     }
 
     @Test
     public void should_generate_Andorra() throws Exception {
-
         generateFullPbf.run(newArrayList("Andorre"));
 
         assertThat(new File("target/tests/Andorre/pbfFiles/and.osm.pbf").exists()).isTrue();
