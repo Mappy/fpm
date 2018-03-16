@@ -101,7 +101,7 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
-        assertThat(tags).hasSize(17);
+        assertThat(tags).hasSize(3);
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Anderlecht", "Sint-Gillis", "Vorst");
         assertThat(tags).extracting(t -> t.get("boundary")).containsOnly("administrative");
         assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("8");

@@ -100,7 +100,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
-        assertThat(tags).hasSize(8);
+        assertThat(tags).hasSize(4);
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Rougnat", "Auzances", "La Chaux-Bourdue", "Le Montely");
         assertThat(tags).extracting(t -> t.get("place")).containsOnly("hamlet");
     }

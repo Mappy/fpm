@@ -79,14 +79,14 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
                 .filter(relationMember -> "outer".equals(relationMember.getRole()))//
                 .collect(toList());
 
-        assertThat(labels).hasSize(9);
+        assertThat(labels).hasSize(1);
 
         assertThat(labels.stream()
                 .map(RelationMember::getEntity) //
                 .filter(entity -> entity.getTags().hasKeyValue("boundary", "administrative")) //
                 .filter(entity -> entity.getTags().hasKeyValue("name", "Andorra")) //
                 .filter(entity -> entity.getTags().hasKeyValue("admin_level", "2")))
-                .hasSize(9);
+                .hasSize(1);
     }
 
     @Test

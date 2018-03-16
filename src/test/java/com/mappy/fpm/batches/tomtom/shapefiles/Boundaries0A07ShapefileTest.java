@@ -69,7 +69,7 @@ public class Boundaries0A07ShapefileTest extends AbstractTest {
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 
-        assertThat(tags).hasSize(329);
+        assertThat(tags).hasSize(40);
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Limoges", "Angoulême", "Tulle", "Guéret", "Poitiers", "Niort", "La Rochelle");
         assertThat(tags).extracting(t -> t.get("boundary")).containsOnly("administrative");
         assertThat(tags).extracting(t -> t.get("admin_level")).containsOnly("7");

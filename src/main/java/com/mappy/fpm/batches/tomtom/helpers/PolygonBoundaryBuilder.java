@@ -27,7 +27,7 @@ public class PolygonBoundaryBuilder {
     }
 
     private static void addPolygonRelations(GeometrySerializer serializer, List<RelationMember> members, Map<String, String> wayTags, LineString exteriorRing, String memberRole) {
-        LongLineSplitter.split(exteriorRing, 100)
+        LongLineSplitter.split(exteriorRing, 1000)
                 .forEach(geom -> addRelationMember(serializer, wayTags, geom, memberRole).ifPresent(members::add));
     }
 
