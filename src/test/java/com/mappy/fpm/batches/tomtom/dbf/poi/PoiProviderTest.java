@@ -23,8 +23,6 @@ public class PoiProviderTest {
         when(tomtomFolder.getFile("pi.dbf")).thenReturn("src/test/resources/tomtom/poi/andand___________pi.dbf");
         when(tomtomFolder.getFile("piea.dbf")).thenReturn("src/test/resources/tomtom/poi/andand___________piea.dbf");
         poiProvider = new PoiProvider(tomtomFolder);
-        poiProvider.loadPointsOfInterest("pi.dbf");
-        poiProvider.loadPointsOfInterestExstandedAttributes("piea.dbf");
     }
 
     @Test

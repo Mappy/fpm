@@ -66,12 +66,7 @@ public class RoadTagger {
         this.routeNumbersProvider = routeNumbersProvider;
         this.intersectionProvider = intersectionProvider ;
         this.poiProvider = poiProvider;
-        this.geocodeProvider.loadGeocodingAttributes("gc.dbf");
-        this.transportationAreaProvider.loadTransportationAreaAttributes("ta.dbf");
-        this.routeNumbersProvider.loadGeocodingAttributes("rn.dbf");
         this.intersectionProvider.loadIntersectionById() ;
-        this.poiProvider.loadPointsOfInterest("pi.dbf");
-        this.poiProvider.loadPointsOfInterestExstandedAttributes("piea.dbf");
     }
 
     public Map<String, String> tag(Feature feature) {

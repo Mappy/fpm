@@ -28,14 +28,8 @@ public class PoiProvider extends TomtomDbfReader {
     @Inject
     public PoiProvider(TomtomFolder folder) {
         super(folder);
-    }
-
-    public void loadPointsOfInterest(String filename) {
-        readFile(filename, row -> poiNames.put(row.getLong("CLTRPELID"), Poi.fromDbf(row)));
-    }
-
-    public void loadPointsOfInterestExstandedAttributes(String filename) {
-        readFile(filename, this::getExtendedAttributes);
+        readFile("pi.dbf", row -> poiNames.put(row.getLong("CLTRPELID"), Poi.fromDbf(row)));
+        readFile("piea.dbf", this::getExtendedAttributes);
     }
 
     public Optional<String> getPoiNameByType(Long id, String type) {

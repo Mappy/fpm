@@ -21,7 +21,6 @@ public class TransportationAreaProviderTest {
     public void setUp() {
         when(tomtomFolder.getFile("ta.dbf")).thenReturn("src/test/resources/tomtom/transportationarea/andandand________ta.dbf");
         transportationAreaProvider = new TransportationAreaProvider(tomtomFolder);
-        transportationAreaProvider.loadTransportationAreaAttributes("ta.dbf");
     }
 
     @Test

@@ -28,10 +28,7 @@ public class RouteNumbersProvider extends TomtomDbfReader {
     @Inject
     public RouteNumbersProvider(TomtomFolder folder) {
         super(folder);
-    }
-
-    public void loadGeocodingAttributes(String filename) {
-        readFile(filename, this::getRouteNumbers);
+        readFile("rn.dbf", this::getRouteNumbers);
     }
 
     public Optional<String> getInternationalRouteNumbers(Long id) {

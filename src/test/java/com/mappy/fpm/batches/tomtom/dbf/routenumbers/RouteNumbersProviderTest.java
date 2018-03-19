@@ -19,7 +19,6 @@ public class RouteNumbersProviderTest {
     public void setUp() {
         when(tomtomFolder.getFile("rn.dbf")).thenReturn("src/test/resources/tomtom/routenumbers/luxlux___________rn.dbf");
         routeNumbers = new RouteNumbersProvider(tomtomFolder);
-        routeNumbers.loadGeocodingAttributes("rn.dbf");
     }
 
     @Test

@@ -30,10 +30,7 @@ public class TransportationAreaProvider extends TomtomDbfReader {
     @Inject
     public TransportationAreaProvider(TomtomFolder folder) {
         super(folder);
-    }
-
-    public void loadTransportationAreaAttributes(String filename) {
-        readFile(filename, this::getTransportationAreas);
+        readFile("ta.dbf", this::getTransportationAreas);
     }
 
     public Optional<String> getBuiltUp(Long tomtomId) {

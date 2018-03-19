@@ -31,10 +31,7 @@ public class GeocodeProvider extends TomtomDbfReader {
     @Inject
     public GeocodeProvider(TomtomFolder folder) {
         super(folder);
-    }
-
-    public void loadGeocodingAttributes(String filename) {
-        readFile(filename, (DbfRow row) -> getGeocodings(geocodings, row));
+        readFile("gc.dbf", (DbfRow row) -> getGeocodings(geocodings, row));
     }
 
     public Optional<String> getLeftAndRightPostalCode(Long tomtomId) {
