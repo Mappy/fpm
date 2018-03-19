@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.*;
@@ -70,16 +68,9 @@ public class GenerateFullPbf {
         log.info("Running with countries : {}", countries);
 
         try {
-            List<String> countryPbfFiles = countries.stream()
-                    .filter(this::hasCountryInFS) //
-                    .map(this::generateCountry) //
-                    .collect(toList());
-
-            if (countryPbfFiles.isEmpty()) {
-                log.warn("No country processed!");
-                return;
-            }
+            List<String> countryPbfFiles = countries.stream().map(this::generateCountry).collect(toList());
             mergePbfFiles(countryPbfFiles, outputDirectoryPath + "/" + outputFileName, newArrayList());
+
         } finally {
             log.info("Shutting down service...");
             executorService.shutdown();
@@ -91,18 +82,25 @@ public class GenerateFullPbf {
         log.info("Generating country : {}", country);
 
         File file = new File(inputDirectoryPath + "/" + country);
+        if (!file.exists()) {
+            String msg = format("No input file for country : %s.", country);
+            log.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
 
         List<String> zonePbfFiles = newArrayList();
         List<Future<?>> zonesFutures = newArrayList();
 
         for (String zoneFileName : of(file.list()).filter(f -> f.endsWith(TOWN_SUFFIX) || f.endsWith(ROAD_SUFFIX) || f.endsWith(FERRY_SUFFIX) || f.endsWith(COUNTRY_SUFFIX)).collect(toList())) {
+
             String zone = zoneFileName.replace(TOWN_SUFFIX, "").replace(ROAD_SUFFIX, "").replace(FERRY_SUFFIX, "").replace(COUNTRY_SUFFIX, "");
 
             Tomtom2Osm instance = createInjector(new Tomtom2OsmModule(
                     inputDirectoryPath + "/" + country + "/",
                     outputDirectoryPath + "/" + country + "/pbfFiles",
                     outputDirectoryPath + "/splitter",
-                    zone)).getInstance(Tomtom2Osm.class);
+                    zone)
+            ).getInstance(Tomtom2Osm.class);
 
             Future<?> zoneFuture = executorService.submit(() -> {
                 try {
@@ -136,17 +134,9 @@ public class GenerateFullPbf {
         tasks.forEach(t -> {
             try {
                 t.get();
-            } catch (ExecutionException | InterruptedException e) {
+            } catch (ExecutionException|InterruptedException e) {
                 propagate(e);
             }
         });
-    }
-
-    private boolean hasCountryInFS(String country) {
-        if (Files.exists(Paths.get(inputDirectoryPath + "/" + country))) {
-            return true;
-        }
-        log.warn(format("No input file for country : %s. Skipping...", country));
-        return false;
     }
 }
