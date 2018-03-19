@@ -10,15 +10,12 @@ import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
 public class PolygonsUtils {
+
     public static Iterable<Polygon> polygons(Geometry g) {
         return polygonsFrom(g).collect(Collectors.toList());
     }
 
-    public static Iterable<Polygon> polygons(MultiPolygon g) {
-        return polygonsFrom(g).collect(Collectors.toList());
-    }
-
-    public static Stream<Polygon> polygonsFrom(Geometry g) {
+    private static Stream<Polygon> polygonsFrom(Geometry g) {
         if (g instanceof Polygon) {
             return Stream.of((Polygon) g);
         }
@@ -39,5 +36,4 @@ public class PolygonsUtils {
     public static Geometry difference(Geometry polygon, List<Geometry> query) {
         return query.stream().reduce(polygon, Geometry::difference);
     }
-
 }

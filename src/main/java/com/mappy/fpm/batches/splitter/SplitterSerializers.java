@@ -2,7 +2,6 @@ package com.mappy.fpm.batches.splitter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mappy.fpm.api.SplittedAreas;
 import com.vividsolutions.jts.geom.Envelope;
 import crosby.binary.osmosis.OsmosisSerializer;
 import org.openstreetmap.osmosis.core.misc.v0_6.NullWriter;
@@ -22,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 
 public class SplitterSerializers {
     private final String pbf;
-    private final SplittedAreas areas = new SplittedAreas();
+    private final SplitAreas areas = new SplitAreas();
     private final List<Sink> serializers = Lists.newArrayList();
     private final Map<String, Integer> index = Maps.newHashMap();
     private final String parent;

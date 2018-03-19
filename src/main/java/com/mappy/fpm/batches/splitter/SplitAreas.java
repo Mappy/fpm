@@ -1,7 +1,5 @@
-package com.mappy.fpm.api;
+package com.mappy.fpm.batches.splitter;
 
-import com.github.davidmoten.geo.LatLong;
-import com.mappy.fpm.batches.utils.Geohash;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -16,11 +14,12 @@ import java.util.List;
 import static com.google.common.base.Throwables.propagate;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class SplittedAreas {
+public class SplitAreas {
+
     private static final GeometryFactory gf = new GeometryFactory();
     private final STRtree tree;
 
-    public SplittedAreas() {
+    public SplitAreas() {
         try {
             this.tree = new STRtree();
             int i = 1;
@@ -34,10 +33,6 @@ public class SplittedAreas {
         }
     }
 
-    public List<String> file(BoundingBox bbox) {
-        return file(bbox.envelope());
-    }
-
     @SuppressWarnings("unchecked")
     public List<String> file(Envelope envelope) {
         return tree.query(envelope);
@@ -47,11 +42,6 @@ public class SplittedAreas {
     public String file(double x, double y) {
         List<String> query = tree.query(point(x, y));
         return !query.isEmpty() ? query.get(0) : null;
-    }
-
-    public String file(long geohash) {
-        LatLong decodeGeohash = Geohash.decodeGeohash(geohash);
-        return file(decodeGeohash.getLon(), decodeGeohash.getLat());
     }
 
     private static Envelope point(double x, double y) {

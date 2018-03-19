@@ -5,7 +5,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import com.mappy.fpm.batches.utils.Geohash;
 import com.vividsolutions.jts.geom.Envelope;
 import lombok.extern.slf4j.Slf4j;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.mappy.fpm.batches.GenerateFullPbf.OSM_SUFFIX;
+import static com.mappy.fpm.batches.utils.Geohash.decodeGeohash;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Slf4j
@@ -33,10 +33,6 @@ public class Splitter {
     public Splitter(@Named("com.mappy.fpm.serializer.output") String filename, SplitterSerializers kml) {
         this.filename = filename + OSM_SUFFIX;
         this.kml = kml;
-    }
-
-    public static void main(String[] args) {
-        new Splitter(args[0], new SplitterSerializers(args[1], args[2])).run();
     }
 
     public void run() {
@@ -70,7 +66,7 @@ public class Splitter {
 
             @Override
             public void process(WayContainer way) {
-                List<Integer> targets = kml.serializer(enveloppe(way));
+                List<Integer> targets = kml.serializer(envelope(way));
                 if (wayByRelations.containsKey(way.getEntity().getId())) {
                     for (Long rel : wayByRelations.get(way.getEntity().getId())) {
                         relationTargets.putAll(rel, targets);
@@ -83,7 +79,7 @@ public class Splitter {
 
             @Override
             public void process(RelationContainer rel) {
-                List<Integer> serializer = kml.serializer(enveloppe(rel));
+                List<Integer> serializer = kml.serializer(envelope(rel));
                 Set<Integer> targets = Sets.newHashSet(serializer);
                 targets.addAll(Sets.newHashSet(relationTargets.get(rel.getEntity().getId())));
                 for (int target : targets) {
@@ -100,7 +96,7 @@ public class Splitter {
 
             @Override
             public void process(WayContainer way) {
-                List<Integer> targets = kml.serializer(enveloppe(way));
+                List<Integer> targets = kml.serializer(envelope(way));
                 if (targets.size() > 1) {
                     for (WayNode wn : way.getEntity().getWayNodes()) {
                         for (int target : targets) {
@@ -119,19 +115,19 @@ public class Splitter {
         });
     }
 
-    private static Envelope enveloppe(WayContainer way) {
+    private static Envelope envelope(WayContainer way) {
         Envelope env = new Envelope();
         for (WayNode wn : way.getEntity().getWayNodes()) {
-            LatLong geohash = Geohash.decodeGeohash(wn.getNodeId());
+            LatLong geohash = decodeGeohash(wn.getNodeId());
             env.expandToInclude(geohash.getLon(), geohash.getLat());
         }
         return env;
     }
 
-    private static Envelope enveloppe(RelationContainer rel) {
+    private static Envelope envelope(RelationContainer rel) {
         Envelope env = new Envelope();
         for (RelationMember wn : rel.getEntity().getMembers()) {
-            LatLong geohash = Geohash.decodeGeohash(wn.getMemberId());
+            LatLong geohash = decodeGeohash(wn.getMemberId());
             env.expandToInclude(geohash.getLon(), geohash.getLat());
         }
         return env;

@@ -1,4 +1,4 @@
-package com.mappy.fpm.api;
+package com.mappy.fpm.batches.splitter;
 
 import lombok.Data;
 
@@ -8,6 +8,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 @Data
 public class BoundingBox {
+
     private static final GeometryFactory gf = new GeometryFactory();
     private final double minLat, minLong, maxLat, maxLong;
 
