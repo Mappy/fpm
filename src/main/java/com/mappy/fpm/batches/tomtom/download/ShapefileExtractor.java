@@ -25,7 +25,6 @@ import static com.mappy.fpm.batches.tomtom.download.json.downloader.ContentDownl
 
 @Slf4j
 public class ShapefileExtractor {
-
     private static final Set<TomtomCountry> COUNTRIES = union(countries(), outerworld());
 
     public void decompress(File outputDirectory, File file) {
@@ -34,7 +33,7 @@ public class ShapefileExtractor {
             Matcher matcher = PATTERN.matcher(file.getName());
             String type = "";
             String country = "";
-            if (matcher.matches()){
+            if (matcher.matches()) {
                 type = matcher.group(3);
                 String countryCode = matcher.group(4).toUpperCase();
                 if (outerworld().stream().anyMatch(c -> c.getLabel().equals(countryCode)) && "ax".equals(matcher.group(5))) {
@@ -62,6 +61,8 @@ public class ShapefileExtractor {
             archive.close();
         } catch (IOException e) {
             throw propagate(e);
+        } finally {
+            file.delete();
         }
     }
 
@@ -71,7 +72,6 @@ public class ShapefileExtractor {
         if (allTomtomFiles.isEmpty()) {
             throw new IllegalStateException();
         }
-
         return allTomtomFiles;
     }
 }

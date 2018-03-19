@@ -8,7 +8,6 @@ import org.apache.http.ProtocolVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.message.BasicHttpResponse;
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,25 +16,24 @@ import java.net.URISyntaxException;
 
 import static com.google.inject.Guice.createInjector;
 import static com.google.inject.util.Modules.override;
+import static java.nio.file.Files.list;
+import static java.nio.file.Paths.get;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 public class MapContentDownloaderIT {
-
     private static final String OUTPUT_FOLDER = "target/download";
-    private static final Module MODULE_IT = override(new MapContentModule(OUTPUT_FOLDER, "validToken", "2016.09"))
-            .with(new MapContentModuleIT());
+    private static final Module MODULE_IT = override(new MapContentModule(OUTPUT_FOLDER, "validToken", "2016.09")).with(new MapContentModuleIT());
 
     @Test
-    public void should_run_download() {
-        File file = new File(OUTPUT_FOLDER);
-        file.delete();
-
+    public void should_run_download() throws IOException {
         createInjector(MODULE_IT)//
                 .getInstance(MapContentDownloader.class)//
                 .run();
 
-        Assertions.assertThat(file.list()).containsOnly("Andorre");
+        assertThat(list(get(OUTPUT_FOLDER))) //
+                .containsExactly(get(OUTPUT_FOLDER, "Andorre"));
     }
 
     private static class MapContentModuleIT extends AbstractModule {
