@@ -56,6 +56,7 @@ public class GeocodeProvider extends TomtomDbfReader {
                 .stream()
                 .filter(filterPredicate)
                 .map(mapFunction)
+                .filter(s -> !s.isEmpty())
                 .findFirst();
     }
 

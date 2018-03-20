@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -102,8 +103,14 @@ public class GeocodeProviderTest {
     }
 
     @Test
-    public void should_add_same_interpolation_on_left_and_right() {
+    public void should_add_a_tomtom_irregular_interpolation() {
         Optional<String> postcodes = geocodeProvider.getInterpolations(10200000003341L);
-        assertThat(postcodes).isEqualTo(of("all"));
+        assertThat(postcodes).isEqualTo(of("tomtom:irregular;all"));
+    }
+
+    @Test
+    public void should_not_have_interpolation() {
+        Optional<String> postcodes = geocodeProvider.getInterpolations(10200000006600L);
+        assertThat(postcodes).isEqualTo(empty());
     }
 }

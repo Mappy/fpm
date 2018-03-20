@@ -10,7 +10,7 @@ public enum Interpolation {
     EVEN(2, "even"),
     ODD(3, "odd"),
     MIXED(4, "all"),
-    IRREGULAR_HOUSE_NUMBER(5, "all"),
+    IRREGULAR_HOUSE_NUMBER(5, "tomtom:irregular"),
     ALPHA_NUMERIC_MIXED(6, "alphabetic");
 
     private final Integer tomtomStructure;
