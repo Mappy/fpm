@@ -25,7 +25,7 @@ public class InterpolationTest {
     @Test
     public void should_tag_tomtom_structure_two_with_interpolation_irregular() {
         Optional<String> osmValue = Interpolation.getOsmValue(5);
-        assertEquals(osmValue, of("tomtom:irregular"));
+        assertEquals(osmValue, of("irregular:tomtom"));
     }
 
 }

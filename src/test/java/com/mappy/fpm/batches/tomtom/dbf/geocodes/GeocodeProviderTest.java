@@ -105,7 +105,7 @@ public class GeocodeProviderTest {
     @Test
     public void should_add_a_tomtom_irregular_interpolation() {
         Optional<String> postcodes = geocodeProvider.getInterpolations(10200000003341L);
-        assertThat(postcodes).isEqualTo(of("tomtom:irregular;all"));
+        assertThat(postcodes).isEqualTo(of("irregular:tomtom;all"));
     }
 
     @Test
