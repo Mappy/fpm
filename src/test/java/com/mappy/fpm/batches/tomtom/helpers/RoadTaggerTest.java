@@ -57,15 +57,15 @@ public class RoadTaggerTest {
         when(transportationAreaProvider.getSmallestAreas(any(Long.class))).thenReturn(of("789;112"));
         when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(of("E41"));
         when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(of("N5"));
+        when(routeNumbersProvider.getRouteTypeOrderByPriority(any(Long.class))).thenReturn(of("5"));
         when(poiProvider.getPoiNameByType(any(Long.class), eq(FeatureType.MOUNTAIN_PASS.getValue()))).thenReturn(empty());
-
     }
 
     @Test
-    public void should_add_intersection_exit(){
+    public void should_add_intersection_exit() {
         when(intersectionProvider.getIntersectionById())
-        .thenReturn(ImmutableMap.of(123L, "exit 13"));
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW" , "10"))))
+                .thenReturn(ImmutableMap.of(123L, "exit 13"));
+        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10"))))
                 .containsEntry("destination", "exit 13");
     }
 
@@ -289,10 +289,11 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_have_route_numbers() {
+    public void should_have_route_numbers_and_type() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
                 .containsEntry("int_ref", "E41")
-                .containsEntry("ref", "N5");
+                .containsEntry("ref", "N5")
+                .containsEntry("route_type:tomtom", "5");
     }
 
     @Test

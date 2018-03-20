@@ -47,7 +47,7 @@ public class RoadTagger {
     private final TimeDomainsParser timeDomainsParser;
     private final TransportationAreaProvider transportationAreaProvider;
     private final RouteNumbersProvider routeNumbersProvider;
-    private final  RouteIntersectionProvider intersectionProvider ;
+    private final RouteIntersectionProvider intersectionProvider;
     private final PoiProvider poiProvider;
 
     @Inject
@@ -64,9 +64,9 @@ public class RoadTagger {
         this.timeDomainsParser = timeDomainsParser;
         this.transportationAreaProvider = transportationAreaProvider;
         this.routeNumbersProvider = routeNumbersProvider;
-        this.intersectionProvider = intersectionProvider ;
+        this.intersectionProvider = intersectionProvider;
         this.poiProvider = poiProvider;
-        this.intersectionProvider.loadIntersectionById() ;
+        this.intersectionProvider.loadIntersectionById();
     }
 
     public Map<String, String> tag(Feature feature) {
@@ -172,6 +172,7 @@ public class RoadTagger {
         addTagIf("global_importance:tomtom", valueOf(feature.getInteger("NET2CLASS")), ofNullable(feature.getInteger("NET2CLASS")).isPresent(), tags);
         transportationAreaProvider.getSmallestAreas(id).ifPresent(ids -> tags.put("admin:tomtom", ids));
         transportationAreaProvider.getBuiltUp(id).ifPresent(ids -> tags.put("bua:tomtom", ids));
+        routeNumbersProvider.getRouteTypeOrderByPriority(id).ifPresent(type -> tags.put("route_type:tomtom", type));
     }
 
     private void tagsTimeDomains(Map<String, String> tags, Collection<TimeDomains> timeDomains) {

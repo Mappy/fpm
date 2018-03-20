@@ -8,7 +8,6 @@ import org.jamel.dbf.structure.DbfRow;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +15,7 @@ import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 
 @Slf4j
@@ -39,12 +39,21 @@ public class RouteNumbersProvider extends TomtomDbfReader {
         return getRoute(id, routeNumbers -> !INTERNATIONAL_ROUTE.equals(routeNumbers.getRouteNumberType()));
     }
 
+    public Optional<String> getRouteTypeOrderByPriority(Long id) {
+        return ofNullable(routenumbers.get(id))
+                .orElse(ImmutableList.of())
+                .stream()
+                .sorted(comparing(RouteNumbers::getRouteNumberPriority))
+                .map(type -> String.valueOf(type.getRouteNumberType()))
+                .findFirst();
+    }
+
     private Optional<String> getRoute(Long id, Predicate<RouteNumbers> routeNumbersPredicate) {
         return ofNullable(routenumbers.get(id))
                 .orElse(ImmutableList.of())
                 .stream()
                 .filter(routeNumbersPredicate)
-                .sorted(Comparator.comparing(RouteNumbers::getRouteNumberPriority))
+                .sorted(comparing(RouteNumbers::getRouteNumberPriority))
                 .map(RouteNumbers::getFullRouteNumber)
                 .findFirst();
     }

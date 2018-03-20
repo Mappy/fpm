@@ -33,4 +33,10 @@ public class RouteNumbersProviderTest {
         assertThat(tag).isEqualTo(Optional.of("N5"));
     }
 
+    @Test
+    public void should_get_route_type() {
+        Optional<String> tag = routeNumbers.getRouteTypeOrderByPriority(123L);
+        assertThat(tag).isEqualTo(Optional.of("5"));
+    }
+
 }
