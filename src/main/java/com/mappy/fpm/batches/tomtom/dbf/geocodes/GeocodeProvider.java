@@ -13,14 +13,14 @@ import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.*;
+import static java.util.stream.Collectors.*;
 
 @Slf4j
 @Singleton
@@ -75,11 +75,11 @@ public class GeocodeProvider extends TomtomDbfReader {
     }
 
     public Map<String, String> getAlternateRoadNamesWithSide(Long tomtomId) {
-        return ofNullable(geocodings.get(tomtomId))
-                .orElse(ImmutableList.of())
+        return geocodings.getOrDefault(tomtomId, emptyList())
                 .stream()
-                .filter(alternativeName -> ofNullable(alternativeName.getSideOfLine()).isPresent())
-                .collect(Collectors.toMap(this::getKeyAlternativeNameWithSide, Geocode::getName, mergeIntoMap()));
+                .filter(alternativeName -> alternativeName.getSideOfLine() != null)
+                .filter(geocode -> Enums.getIfPresent(Language.class, geocode.getLanguage()).isPresent())
+                .collect(groupingBy(this::getKeyAlternativeNameWithSide, mapping(Geocode::getName, joining(";") )));
     }
 
     private Optional<String> getSideOfLine(Long side) {
@@ -93,12 +93,8 @@ public class GeocodeProvider extends TomtomDbfReader {
 
     private String getKeyAlternativeNameWithSide(Geocode geocode) {
         Optional<String> side = getSideOfLine(geocode.getSideOfLine());
-        Optional<Language> language = ofNullable(Enums.getIfPresent(Language.class, geocode.getLanguage()).orNull());
-        return "name" + language.map(language1 -> ":" + side.map(s -> s + ":").orElse("") + language1.getValue()).orElse(side.map(s -> ":" + s).orElse(""));
-    }
-
-    private BinaryOperator<String> mergeIntoMap() {
-        return (key1, key2) -> key2;
+        String language = Language.valueOf(geocode.getLanguage()).getValue();
+        return "name" + ":" + side.map(s -> s + ":").orElse("") + language ;
     }
 
     private Map<Long, List<Geocode>> getGeocodings(Map<Long, List<Geocode>> geocodes, DbfRow row) {
