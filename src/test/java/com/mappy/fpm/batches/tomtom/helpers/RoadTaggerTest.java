@@ -273,10 +273,10 @@ public class RoadTaggerTest {
 
     @Test
     public void should_tag_left_and_interpolation_address() {
-        when(geocoding.getInterpolationAddress(any(Long.class))).thenReturn(ImmutableMap.of("interpolation:left" , "{1,10}" , "interpolation:right" , "{11,20}"));
+        when(geocoding.getInterpolationAddress(any(Long.class))).thenReturn(ImmutableMap.of("interpolation:left" , "1;10" , "interpolation:right" , "11;20"));
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
-                .containsEntry("interpolation:left" , "{1,10}" )
-                .containsEntry("interpolation:right" , "{11,20}");
+                .containsEntry("interpolation:left" , "1;10" )
+                .containsEntry("interpolation:right" , "11;20");
     }
 
     @Test

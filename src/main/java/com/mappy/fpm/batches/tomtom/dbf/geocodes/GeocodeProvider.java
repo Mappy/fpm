@@ -110,11 +110,11 @@ public class GeocodeProvider extends TomtomDbfReader {
             Map<String,String> interpolationAddress = new HashMap<>() ;
             Geocode geocode = geocodings.get(id).iterator().next();
             if(isNoneBlank(geocode.getLeftFromAdd())) {
-                interpolationAddress.put("interpolation:left" , "{" + geocode.getLeftFromAdd() + "," + geocode.getLeftToAdd() + "}") ;
+                interpolationAddress.put("interpolation:left" , geocode.getLeftFromAdd() + ";" + geocode.getLeftToAdd() ) ;
             }
 
             if(isNoneBlank(geocode.getRightFromAdd())) {
-                interpolationAddress.put("interpolation:right" , "{" + geocode.getRightFromAdd() + "," + geocode.getRightToAdd() + "}") ;
+                interpolationAddress.put("interpolation:right" , geocode.getRightFromAdd() + ";" + geocode.getRightToAdd()) ;
             }
             return interpolationAddress ;
         }

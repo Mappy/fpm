@@ -125,14 +125,14 @@ public class GeocodeProviderTest {
         Map<String, String> interpolationAdress = geocodeProvider.getInterpolationAddress(10200000000143L);
         assertThat(interpolationAdress)
                 .containsOnlyKeys("interpolation:right")
-                .containsEntry("interpolation:right" , "{117,111}") ;
+                .containsEntry("interpolation:right" , "117;111") ;
     }
     @Test
     public void should_add_interpolation_left_and_right() {
         Map<String, String> interpolationAdress = geocodeProvider.getInterpolationAddress(10200000002234L);
         assertThat(interpolationAdress)
                 .containsOnlyKeys("interpolation:left", "interpolation:right")
-                .containsEntry("interpolation:left" , "{64,64}")
-                .containsEntry("interpolation:right" , "{109,107}") ;
+                .containsEntry("interpolation:left" , "64;64")
+                .containsEntry("interpolation:right" , "109;107") ;
     }
 }
