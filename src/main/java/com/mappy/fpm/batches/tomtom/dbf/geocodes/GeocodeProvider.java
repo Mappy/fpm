@@ -10,17 +10,17 @@ import org.jamel.dbf.structure.DbfRow;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Optional.*;
 import static java.util.stream.Collectors.*;
+import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 
 @Slf4j
 @Singleton
@@ -103,6 +103,22 @@ public class GeocodeProvider extends TomtomDbfReader {
         geocodingAttributes.add(geocode);
         geocodings.put(geocode.getId(), geocodingAttributes);
         return geocodes;
+    }
+
+    public Map<String,String> getInterpolationAddress(Long id) {
+        if(geocodings.containsKey(id)){
+            Map<String,String> interpolationAddress = new HashMap<>() ;
+            Geocode geocode = geocodings.get(id).iterator().next();
+            if(isNoneBlank(geocode.getLeftFromAdd())) {
+                interpolationAddress.put("interpolation:left" , geocode.getLeftFromAdd() + ";" + geocode.getLeftToAdd() ) ;
+            }
+
+            if(isNoneBlank(geocode.getRightFromAdd())) {
+                interpolationAddress.put("interpolation:right" , geocode.getRightFromAdd() + ";" + geocode.getRightToAdd()) ;
+            }
+            return interpolationAddress ;
+        }
+        return emptyMap();
     }
 
 }

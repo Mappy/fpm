@@ -119,4 +119,20 @@ public class GeocodeProviderTest {
         Optional<String> postcodes = geocodeProvider.getInterpolations(10200000006600L);
         assertThat(postcodes).isEqualTo(empty());
     }
+
+    @Test
+    public void should_add_interpolation_right() {
+        Map<String, String> interpolationAdress = geocodeProvider.getInterpolationAddress(10200000000143L);
+        assertThat(interpolationAdress)
+                .containsOnlyKeys("interpolation:right")
+                .containsEntry("interpolation:right" , "117;111") ;
+    }
+    @Test
+    public void should_add_interpolation_left_and_right() {
+        Map<String, String> interpolationAdress = geocodeProvider.getInterpolationAddress(10200000002234L);
+        assertThat(interpolationAdress)
+                .containsOnlyKeys("interpolation:left", "interpolation:right")
+                .containsEntry("interpolation:left" , "60;64")
+                .containsEntry("interpolation:right" , "109;107") ;
+    }
 }
