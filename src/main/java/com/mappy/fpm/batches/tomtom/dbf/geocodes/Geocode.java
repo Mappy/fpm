@@ -33,7 +33,7 @@ public class Geocode {
                 entry.getInt("L_STRUCT"),
                 entry.getInt("R_STRUCT"),
                 entry.getLong("SOL"),
-                entry.getString("L_T_F_ADD"),
+                entry.getString("L_F_F_ADD"),
                 entry.getString("L_T_F_ADD"),
                 entry.getString("R_F_F_ADD"),
                 entry.getString("R_T_F_ADD"));

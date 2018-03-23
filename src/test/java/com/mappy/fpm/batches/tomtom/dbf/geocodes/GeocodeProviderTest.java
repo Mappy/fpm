@@ -132,7 +132,7 @@ public class GeocodeProviderTest {
         Map<String, String> interpolationAdress = geocodeProvider.getInterpolationAddress(10200000002234L);
         assertThat(interpolationAdress)
                 .containsOnlyKeys("interpolation:left", "interpolation:right")
-                .containsEntry("interpolation:left" , "64;64")
+                .containsEntry("interpolation:left" , "60;64")
                 .containsEntry("interpolation:right" , "109;107") ;
     }
 }
