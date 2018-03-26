@@ -11,9 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.mappy.fpm.batches.CountryWapper.ALL_COUNTRIES;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -26,6 +28,25 @@ public class GenerateFullPbfTest {
     @Test(expected = IllegalArgumentException.class)
     public void should_throw_IllegalArgumentException_when_country_is_unknown() {
         generateFullPbf.run(newArrayList("fakeCountry"));
+    }
+
+    @Test
+    public void should_get_valid_countries(){
+        assertThat(GenerateFullPbf.checkAndValidCountries("Albania,Andorra"))
+                .containsExactly("Albania" , "Andorra") ;
+    }
+
+    @Test
+    public void should_get_all_valid_countries_when_input_country_list_is_empty(){
+        assertThat(GenerateFullPbf.checkAndValidCountries(" "))
+                .containsAll(ALL_COUNTRIES);
+    }
+
+    @Test
+    public void should_throw_IllegalArgumentException_when_invalid_countries(){
+        assertThatThrownBy(() -> GenerateFullPbf.checkAndValidCountries("invalid_country,Albania,Andorra"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Invalid countries : invalid_country" );
     }
 
     @Test
