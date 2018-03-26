@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.mappy.fpm.batches.merge.pbf.OsmMerger;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
@@ -19,8 +20,10 @@ import static com.google.common.base.Splitter.on;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.inject.Guice.createInjector;
+import static com.mappy.fpm.batches.CountryWapper.ALL_COUNTRIES;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
 
@@ -50,7 +53,7 @@ public class GenerateFullPbf {
     public static void main(String[] args) {
         checkArgument(args.length == 5, "Usage: GenerateFullPbf <countryList> <inputDirectoryPath> <outputDirectoryPath> <outputFileName> <threadNumber>");
 
-        String countryList = args[0];
+        List<String> countries = checkAndValidCountries(args[0]);
         String inputDirectoryPath = args[1];
         String outputDirectoryPath = args[2];
         String outputFileName = args[3];
@@ -61,7 +64,7 @@ public class GenerateFullPbf {
                 inputDirectoryPath, //
                 outputDirectoryPath, //
                 outputFileName, //
-                parseInt(threadNumber)).run(on(",").trimResults().splitToList(countryList));
+                parseInt(threadNumber)).run(countries);
     }
 
     public void run(List<String> countries) {
@@ -75,6 +78,21 @@ public class GenerateFullPbf {
             log.info("Shutting down service...");
             executorService.shutdown();
         }
+    }
+
+    @VisibleForTesting
+    static List<String> checkAndValidCountries(String countryList) {
+        List<String> countries = on(",").trimResults().splitToList(countryList);
+        String invalidCountries = countries.stream()
+                .filter(country -> !ALL_COUNTRIES.contains(country))
+                .collect(joining(", "));
+        checkArgument(invalidCountries.isEmpty(), "Invalid countries : " + invalidCountries +
+                "\n" + ALL_COUNTRIES.stream().collect(joining(", ", "Valid countries [", "]")));
+
+        if (countries.isEmpty()) {
+            return ALL_COUNTRIES.stream().collect(toList());
+        }
+        return countries;
     }
 
     @NotNull
