@@ -5,6 +5,7 @@ import com.mappy.fpm.batches.merge.pbf.OsmMerger;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
 import org.jetbrains.annotations.NotNull;
@@ -82,8 +83,9 @@ public class GenerateFullPbf {
 
     @VisibleForTesting
     static List<String> checkAndValidCountries(String countryList) {
-        List<String> countries = on(",").trimResults().splitToList(countryList);
+        List<String> countries = on(",").trimResults().splitToList(countryList).stream().filter(StringUtils::isNotBlank).collect(toList());
         String invalidCountries = countries.stream()
+                .filter(StringUtils::isNotBlank)
                 .filter(country -> !ALL_COUNTRIES.contains(country))
                 .collect(joining(", "));
         checkArgument(invalidCountries.isEmpty(), "Invalid countries : " + invalidCountries +

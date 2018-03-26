@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.mappy.fpm.batches.CountryWapper.ALL_COUNTRIES;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +34,12 @@ public class GenerateFullPbfTest {
     public void should_get_valid_countries(){
         assertThat(GenerateFullPbf.checkAndValidCountries("Albania,Andorra"))
                 .containsExactly("Albania" , "Andorra") ;
+    }
+
+    @Test
+    public void should_get_all_valid_countries_when_input_country_list_is_empty(){
+        assertThat(GenerateFullPbf.checkAndValidCountries(" "))
+                .containsAll(ALL_COUNTRIES);
     }
 
     @Test
