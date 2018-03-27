@@ -70,7 +70,7 @@ class CountryWapper {
             .add("Outerworld-Indian") //
             .add("Outerworld-Atlantic") //
             .add("Outerworld-Russia") //
-            .add("Outerworld-Switzerland") //
+            .add("Outerworld-Sweden") //
             .add("Outerworld-Turkey") //
             .add("Outerworld-Greece") //
             .build();
