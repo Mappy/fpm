@@ -23,33 +23,34 @@ public class TransportationAreaProviderTest {
         transportationAreaProvider = new TransportationAreaProvider(tomtomFolder);
     }
 
-    @Test
-    public void should_have_an_area_with_same_id_on_both_sides() {
-        Optional<String> areas = transportationAreaProvider.getSmallestAreas(123L);
-        assertThat(areas).isEqualTo(of("444"));
-    }
 
     @Test
     public void should_not_have_ferry_elements() {
-        Optional<String> areas = transportationAreaProvider.getSmallestAreas(789L);
+        Optional<String> areas = transportationAreaProvider.getLeftSmallestAreas(789L);
         assertThat(areas).isEqualTo(empty());
     }
 
     @Test
     public void should_not_have_neighborhood_elements() {
-        Optional<String> areas = transportationAreaProvider.getSmallestAreas(111L);
+        Optional<String> areas = transportationAreaProvider.getRightSmallestAreas(111L);
         assertThat(areas).isEqualTo(empty());
     }
 
     @Test
-    public void should_have_an_area_with_different_ids_on_left_and_right() {
-        Optional<String> areas = transportationAreaProvider.getSmallestAreas(222L);
-        assertThat(areas).isEqualTo(of("123;789"));
+    public void should_have_an_area_with_different_ids_on_left() {
+        Optional<String> areasLeft = transportationAreaProvider.getLeftSmallestAreas(222L);
+        assertThat(areasLeft).isEqualTo(of("123"));
     }
 
     @Test
-    public void should_have_a_built_up_with_same_id_on_both_sides() {
-        Optional<String> areas = transportationAreaProvider.getBuiltUp(123L);
-        assertThat(areas).isEqualTo(of("777"));
+    public void should_have_an_area_with_different_ids_on_right() {
+        Optional<String> areasRight = transportationAreaProvider.getRightSmallestAreas(222L);
+        assertThat(areasRight).isEqualTo(of("789"));
+    }
+
+    @Test
+    public void should_have_a_built_up_without_left_sides() {
+        Optional<String> areas = transportationAreaProvider.getBuiltUpLeft(123L);
+        assertThat(areas).isEqualTo(empty());
     }
 }

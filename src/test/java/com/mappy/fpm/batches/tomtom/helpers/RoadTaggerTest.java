@@ -19,7 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -54,8 +53,10 @@ public class RoadTaggerTest {
         when(speedProfiles.getTags(any(MemoryFeature.class))).thenReturn(newHashMap());
         when(geocoding.getLeftAndRightPostalCode(any(Long.class))).thenReturn(of("9120"));
         when(geocoding.getInterpolations(any(Long.class))).thenReturn(of("even;odd"));
-        when(transportationAreaProvider.getBuiltUp(any(Long.class))).thenReturn(of("123;456"));
-        when(transportationAreaProvider.getSmallestAreas(any(Long.class))).thenReturn(of("789;112"));
+        when(transportationAreaProvider.getBuiltUpLeft(any(Long.class))).thenReturn(of("123"));
+        when(transportationAreaProvider.getBuiltUpRight(any(Long.class))).thenReturn(of("456"));
+        when(transportationAreaProvider.getLeftSmallestAreas(any(Long.class))).thenReturn(of("789"));
+        when(transportationAreaProvider.getRightSmallestAreas(any(Long.class))).thenReturn(of("112"));
         when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(of("E41"));
         when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(of("N5"));
         when(routeNumbersProvider.getRouteTypeOrderByPriority(any(Long.class))).thenReturn(of("5"));
@@ -288,13 +289,15 @@ public class RoadTaggerTest {
     @Test
     public void should_have_built_up_ids() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
-                .containsEntry("bua:tomtom", "123;456");
+                .containsEntry("bua:tomtom:left", "123")
+                .containsEntry("bua:tomtom:right", "456");
     }
 
     @Test
     public void should_have_areas_ids() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
-                .containsEntry("admin:tomtom", "789;112");
+                .containsEntry("admin:tomtom:left", "789")
+                .containsEntry("admin:tomtom:right", "112");
     }
 
     @Test
