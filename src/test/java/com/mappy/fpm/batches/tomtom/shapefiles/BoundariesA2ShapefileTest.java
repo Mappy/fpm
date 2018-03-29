@@ -116,7 +116,7 @@ public class BoundariesA2ShapefileTest extends AbstractTest {
 
         List<RelationMember> adminCenter = pbfContent.getRelations().stream()//
                 .flatMap(relation -> relation.getMembers().stream())//
-                .filter(relationMember -> "admin_center".equals(relationMember.getRole()))//
+                .filter(relationMember -> "admin_centre".equals(relationMember.getRole()))//
                 .collect(toList());
 
         assertThat(adminCenter).hasSize(1);

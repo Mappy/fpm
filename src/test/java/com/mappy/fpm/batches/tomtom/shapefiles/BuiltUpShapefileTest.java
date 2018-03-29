@@ -68,7 +68,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
     public void should_add_city_center_on_polygon() {
         List<RelationMember> members = pbfContent.getRelations().stream()
                 .flatMap(r -> r.getMembers().stream())
-                .filter(m -> "admin_center".equals(m.getRole()))
+                .filter(m -> "admin_centre".equals(m.getRole()))
                 .collect(toList());
 
         assertThat(members).hasSize(4);

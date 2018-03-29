@@ -96,7 +96,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
 
         Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
         Long adminCenter = node.map(Entity::getId).orElse(0L);
-        return of(new RelationMember(adminCenter, Node, "admin_center"));
+        return of(new RelationMember(adminCenter, Node, "admin_centre"));
 
     }
 }
