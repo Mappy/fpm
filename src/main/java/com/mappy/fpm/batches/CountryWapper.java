@@ -48,9 +48,9 @@ class CountryWapper {
             .add("Slovenia") //
             .add("Sweden") //
             .add("Turkey") //
-            .add("West-Indies") //
+            .add("French-West-Indies") //
             .add("Reunion-and-Mayotte") //
-            .add("Guyana") //
+            .add("French-Guiana") //
             .add("Poland") //
             .add("Ukraine") //
             .add("Outerworld-Belgium") //

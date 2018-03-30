@@ -65,8 +65,8 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("SWE", "Sweden"));
         countries.add(new TomtomCountry("TUR", "Turkey"));
         countries.add(new TomtomCountry("UKR", "Ukraine"));
-        countries.add(new TomtomCountry("GLP", "West-Indies"));
-        countries.add(new TomtomCountry("GUF", "Guyana"));
+        countries.add(new TomtomCountry("GLP", "French-West-Indies"));
+        countries.add(new TomtomCountry("GUF", "French-Guyana"));
         countries.add(new TomtomCountry("REU", "Reunion-and-Mayotte"));
         return countries;
     }
