@@ -71,7 +71,7 @@ public class GenerateFullPbfTest {
 
         assertRelationsWithRoleIsNotEmpty(pbfContent, "label");
 
-        assertRelationsWithRoleIsNotEmpty(pbfContent, "admin_center");
+        assertRelationsWithRoleIsNotEmpty(pbfContent, "admin_centre");
     }
 
     private void assertAdminLevelWithNameFrIsPresent(PbfContent pbfContent, String level) {

@@ -137,7 +137,7 @@ public class BoundariesA9ShapefileTest extends AbstractTest {
 
         List<Tags> tags = pbfContent.getRelations().stream()
                 .flatMap(f -> f.getMembers().stream())
-                .filter(relationMember -> "admin_center".equals(relationMember.getRole()))
+                .filter(relationMember -> "admin_centre".equals(relationMember.getRole()))
                 .map(m -> m.getEntity().getTags())
                 .collect(toList());
 

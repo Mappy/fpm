@@ -115,7 +115,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
             String capitalValue = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
             adminTags.put("capital", "2".equals(capitalValue) ? "yes" : capitalValue);
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
-            return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_center"));
+            return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_centre"));
         }
 
         return empty();
@@ -140,7 +140,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
 
         Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
-        return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_center"));
+        return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_centre"));
     }
 
     private static Optional<RelationMember> getLabel(GeometrySerializer serializer, Map<String, String> tags, MultiPolygon multiPolygon) {
