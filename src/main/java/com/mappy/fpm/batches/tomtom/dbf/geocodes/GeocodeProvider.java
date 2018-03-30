@@ -13,6 +13,7 @@ import javax.inject.Singleton;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -46,8 +47,32 @@ public class GeocodeProvider extends TomtomDbfReader {
         return geocode.getLeftPostalCode().equals(geocode.getRightPostalCode()) ? geocode.getLeftPostalCode() : of(geocode.getLeftPostalCode()).orElse("") + ";" + of(geocode.getRightPostalCode()).orElse("");
     }
 
-    public Optional<String> getInterpolations(Long tomtomId) {
-        return getFirstGeocodingElement(tomtomId, this::hasLeftOrRightInterpolation, this::getInterpolations);
+    public Optional<String> getInterpolationsAddressLeft(Long tomtomId) {
+        return getGeocodings(tomtomId).findFirst().map(Geocode::getLeftStructuration).map(Interpolation::getOsmValue) ;
+    }
+
+    public Optional<String> getInterpolationsAddressRight(Long tomtomId) {
+        return getGeocodings(tomtomId).findFirst().map(Geocode::getRightStructuration).map(Interpolation::getOsmValue) ;
+    }
+
+    private Stream<Geocode> getGeocodings(Long tomtomId) {
+        return geocodings.getOrDefault(tomtomId, emptyList()).stream();
+    }
+
+    public Map<String,String> getInterpolations(Long id) {
+        if(geocodings.containsKey(id)){
+            Map<String,String> interpolationAddress = new HashMap<>() ;
+            Geocode geocode = geocodings.get(id).iterator().next();
+            if(isNoneBlank(geocode.getLeftFromAdd())) {
+                interpolationAddress.put("interpolation:left" , geocode.getLeftFromAdd() + ";" + geocode.getLeftToAdd() ) ;
+            }
+
+            if(isNoneBlank(geocode.getRightFromAdd())) {
+                interpolationAddress.put("interpolation:right" , geocode.getRightFromAdd() + ";" + geocode.getRightToAdd()) ;
+            }
+            return interpolationAddress ;
+        }
+        return emptyMap();
     }
 
     private Optional<String> getFirstGeocodingElement(Long tomtomId, Predicate<Geocode> filterPredicate, Function<Geocode, String> mapFunction) {
@@ -60,23 +85,9 @@ public class GeocodeProvider extends TomtomDbfReader {
                 .findFirst();
     }
 
-    private String getInterpolations(Geocode geocode) {
-        String osmLeftStructuration = Interpolation.getOsmValue(geocode.getLeftStructuration()).orElse("");
-        String osmRightStructuration = Interpolation.getOsmValue(geocode.getRightStructuration()).orElse("");
-        return osmLeftStructuration.equals(osmRightStructuration) ? osmLeftStructuration : osmLeftStructuration + ";" + osmRightStructuration;
-    }
-
-    private boolean hasLeftOrRightInterpolation(Geocode geocode) {
-        return ofNullable(geocode.getLeftStructuration()).filter(this::isInterpolate).isPresent() || ofNullable(geocode.getRightStructuration()).filter(this::isInterpolate).isPresent();
-    }
-
-    private boolean isInterpolate(Integer integer) {
-        return integer >= 1 && integer <= 6;
-    }
 
     public Map<String, String> getAlternateRoadNamesWithSide(Long tomtomId) {
-        return geocodings.getOrDefault(tomtomId, emptyList())
-                .stream()
+        return getGeocodings(tomtomId)
                 .filter(alternativeName -> alternativeName.getSideOfLine() != null)
                 .filter(geocode -> Enums.getIfPresent(Language.class, geocode.getLanguage()).isPresent())
                 .collect(groupingBy(this::getKeyAlternativeNameWithSide, mapping(Geocode::getName, joining(";") )));
@@ -103,22 +114,6 @@ public class GeocodeProvider extends TomtomDbfReader {
         geocodingAttributes.add(geocode);
         geocodings.put(geocode.getId(), geocodingAttributes);
         return geocodes;
-    }
-
-    public Map<String,String> getInterpolationAddress(Long id) {
-        if(geocodings.containsKey(id)){
-            Map<String,String> interpolationAddress = new HashMap<>() ;
-            Geocode geocode = geocodings.get(id).iterator().next();
-            if(isNoneBlank(geocode.getLeftFromAdd())) {
-                interpolationAddress.put("interpolation:left" , geocode.getLeftFromAdd() + ";" + geocode.getLeftToAdd() ) ;
-            }
-
-            if(isNoneBlank(geocode.getRightFromAdd())) {
-                interpolationAddress.put("interpolation:right" , geocode.getRightFromAdd() + ";" + geocode.getRightToAdd()) ;
-            }
-            return interpolationAddress ;
-        }
-        return emptyMap();
     }
 
 }

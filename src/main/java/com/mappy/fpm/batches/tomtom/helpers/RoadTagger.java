@@ -104,10 +104,11 @@ public class RoadTagger {
 
         tags.putAll(geocodeProvider.getAlternateRoadNamesWithSide(id));
 
-        tags.putAll(geocodeProvider.getInterpolationAddress(id));
+        tags.putAll(geocodeProvider.getInterpolations(id));
 
         geocodeProvider.getLeftAndRightPostalCode(id).ifPresent(postcodes -> tags.put("is_in", postcodes));
-        geocodeProvider.getInterpolations(id).ifPresent(interpolations -> tags.put("addr:interpolation", interpolations));
+        geocodeProvider.getInterpolationsAddressLeft(id).ifPresent(interpolations -> tags.put("addr:interpolation:left", interpolations));
+        geocodeProvider.getInterpolationsAddressRight(id).ifPresent(interpolations -> tags.put("addr:interpolation:right", interpolations));
 
         return tags;
     }

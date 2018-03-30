@@ -92,44 +92,54 @@ public class GeocodeProviderTest {
 
     @Test
     public void should_add_an_interpolation_only_on_right() {
-        Optional<String> postcodes = geocodeProvider.getInterpolations(10200000000143L);
-        assertThat(postcodes).isEqualTo(of(";odd"));
+        Optional<String> postcodesLeft = geocodeProvider.getInterpolationsAddressLeft(10200000000143L);
+        Optional<String> postcodesRight = geocodeProvider.getInterpolationsAddressRight(10200000000143L);
+        assertThat(postcodesLeft).isEmpty() ;
+        assertThat(postcodesRight).contains("odd");
     }
 
     @Test
     public void should_add_an_interpolation_on_each_side() {
-        Optional<String> postcodes = geocodeProvider.getInterpolations(10200000000176L);
-        assertThat(postcodes).isEqualTo(of("alphabetic;odd"));
+        Optional<String> postcodesLeft = geocodeProvider.getInterpolationsAddressLeft(10200000000176L);
+        Optional<String> postcodesRight = geocodeProvider.getInterpolationsAddressRight(10200000000176L);
+        assertThat(postcodesLeft).contains("alphabetic");
+        assertThat(postcodesRight).contains("odd");
     }
 
     @Test
     public void should_add_an_interpolation_only_on_left() {
-        Optional<String> postcodes = geocodeProvider.getInterpolations(10200000001935L);
-        assertThat(postcodes).isEqualTo(of("even;"));
+        Optional<String> postcodesLeft = geocodeProvider.getInterpolationsAddressLeft(10200000001935L);
+        Optional<String> postcodesRight = geocodeProvider.getInterpolationsAddressRight(10200000001935L);
+        assertThat(postcodesLeft).contains("even");
+        assertThat(postcodesRight).isEmpty() ;
     }
 
     @Test
     public void should_add_a_tomtom_irregular_interpolation() {
-        Optional<String> postcodes = geocodeProvider.getInterpolations(10200000003341L);
-        assertThat(postcodes).isEqualTo(of("irregular:tomtom;all"));
+        Optional<String> postcodesLeft = geocodeProvider.getInterpolationsAddressLeft(10200000003341L);
+        Optional<String> postcodesRight = geocodeProvider.getInterpolationsAddressRight(10200000003341L);
+        assertThat(postcodesLeft).contains("irregular:tomtom");
+        assertThat(postcodesRight).contains("all");
     }
 
     @Test
     public void should_not_have_interpolation() {
-        Optional<String> postcodes = geocodeProvider.getInterpolations(10200000006600L);
-        assertThat(postcodes).isEqualTo(empty());
+        Optional<String> postcodesLeft = geocodeProvider.getInterpolationsAddressLeft(10200000006600L);
+        Optional<String> postcodesRight = geocodeProvider.getInterpolationsAddressRight(10200000006600L);
+        assertThat(postcodesLeft).isEqualTo(empty());
+        assertThat(postcodesRight).isEqualTo(empty());
     }
 
     @Test
     public void should_add_interpolation_right() {
-        Map<String, String> interpolationAdress = geocodeProvider.getInterpolationAddress(10200000000143L);
+        Map<String, String> interpolationAdress = geocodeProvider.getInterpolations(10200000000143L);
         assertThat(interpolationAdress)
                 .containsOnlyKeys("interpolation:right")
                 .containsEntry("interpolation:right" , "117;111") ;
     }
     @Test
     public void should_add_interpolation_left_and_right() {
-        Map<String, String> interpolationAdress = geocodeProvider.getInterpolationAddress(10200000002234L);
+        Map<String, String> interpolationAdress = geocodeProvider.getInterpolations(10200000002234L);
         assertThat(interpolationAdress)
                 .containsOnlyKeys("interpolation:left", "interpolation:right")
                 .containsEntry("interpolation:left" , "60;64")
