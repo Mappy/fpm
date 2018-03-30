@@ -106,7 +106,8 @@ public class RoadTagger {
 
         tags.putAll(geocodeProvider.getInterpolations(id));
 
-        geocodeProvider.getLeftAndRightPostalCode(id).ifPresent(postcodes -> tags.put("is_in", postcodes));
+        geocodeProvider.getLeftPostalCode(id).ifPresent(postcodes -> tags.put("is_in:left", postcodes));
+        geocodeProvider.getRightPostalCode(id).ifPresent(postcodes -> tags.put("is_in:right", postcodes));
         geocodeProvider.getInterpolationsAddressLeft(id).ifPresent(interpolations -> tags.put("addr:interpolation:left", interpolations));
         geocodeProvider.getInterpolationsAddressRight(id).ifPresent(interpolations -> tags.put("addr:interpolation:right", interpolations));
 

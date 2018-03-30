@@ -68,26 +68,33 @@ public class GeocodeProviderTest {
 
     @Test
     public void should_add_a_postal_code() {
-        Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000000143L);
-        assertThat(postcodes).isEqualTo(of("AD700"));
+        Optional<String> postcodesLeft = geocodeProvider.getLeftPostalCode(10200000000143L);
+        Optional<String> postcodesRight = geocodeProvider.getRightPostalCode(10200000000143L);
+        assertThat(postcodesLeft).isEqualTo(postcodesRight).contains("AD700");
     }
 
     @Test
     public void should_add_a_postal_code_if_left_is_null() {
-        Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000000176L);
-        assertThat(postcodes).isEqualTo(of(";AD700"));
+        Optional<String> postcodesLeft = geocodeProvider.getLeftPostalCode(10200000000176L);
+        Optional<String> postcodesRight = geocodeProvider.getRightPostalCode(10200000000176L);
+        assertThat(postcodesLeft).isEmpty();
+        assertThat(postcodesRight).contains("AD700");
     }
 
     @Test
     public void should_add_a_postal_code_if_right_is_null() {
-        Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000001935L);
-        assertThat(postcodes).isEqualTo(of("AD500;"));
+        Optional<String> postcodesLeft = geocodeProvider.getLeftPostalCode(10200000001935L);
+        Optional<String> postcodesRight = geocodeProvider.getRightPostalCode(10200000001935L);
+        assertThat(postcodesLeft).contains("AD500");
+        assertThat(postcodesRight).isEmpty() ;
     }
 
     @Test
     public void should_add_postal_code_on_left_and_right() {
-        Optional<String> postcodes = geocodeProvider.getLeftAndRightPostalCode(10200000003341L);
-        assertThat(postcodes).isEqualTo(of("AD700;AD500"));
+        Optional<String> postcodesLeft = geocodeProvider.getLeftPostalCode(10200000003341L);
+        Optional<String> postcodesRight = geocodeProvider.getRightPostalCode(10200000003341L);
+        assertThat(postcodesLeft).contains("AD700");
+        assertThat(postcodesRight).contains("AD500");
     }
 
     @Test

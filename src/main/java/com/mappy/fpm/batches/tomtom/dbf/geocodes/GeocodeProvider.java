@@ -1,18 +1,16 @@
 package com.mappy.fpm.batches.tomtom.dbf.geocodes;
 
 import com.google.common.base.Enums;
-import com.google.common.collect.ImmutableList;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.names.Language;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jamel.dbf.structure.DbfRow;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -35,16 +33,12 @@ public class GeocodeProvider extends TomtomDbfReader {
         readFile("gc.dbf", (DbfRow row) -> getGeocodings(geocodings, row));
     }
 
-    public Optional<String> getLeftAndRightPostalCode(Long tomtomId) {
-        return getFirstGeocodingElement(tomtomId, this::hasLeftOrRightPostalCode, this::getLeftAndRightPostalCode);
+    public Optional<String> getLeftPostalCode(Long tomtomId) {
+        return getGeocodings(tomtomId).findFirst().map(Geocode::getLeftPostalCode).filter(StringUtils::isNotEmpty) ;
     }
 
-    private boolean hasLeftOrRightPostalCode(Geocode geocode) {
-        return ofNullable(geocode.getLeftPostalCode()).isPresent() || ofNullable(geocode.getRightPostalCode()).isPresent();
-    }
-
-    private String getLeftAndRightPostalCode(Geocode geocode) {
-        return geocode.getLeftPostalCode().equals(geocode.getRightPostalCode()) ? geocode.getLeftPostalCode() : of(geocode.getLeftPostalCode()).orElse("") + ";" + of(geocode.getRightPostalCode()).orElse("");
+    public Optional<String> getRightPostalCode(Long tomtomId) {
+        return getGeocodings(tomtomId).findFirst(). map(Geocode::getRightPostalCode).filter(StringUtils::isNotEmpty) ;
     }
 
     public Optional<String> getInterpolationsAddressLeft(Long tomtomId) {
@@ -74,17 +68,6 @@ public class GeocodeProvider extends TomtomDbfReader {
         }
         return emptyMap();
     }
-
-    private Optional<String> getFirstGeocodingElement(Long tomtomId, Predicate<Geocode> filterPredicate, Function<Geocode, String> mapFunction) {
-        return ofNullable(geocodings.get(tomtomId))
-                .orElse(ImmutableList.of())
-                .stream()
-                .filter(filterPredicate)
-                .map(mapFunction)
-                .filter(s -> !s.isEmpty())
-                .findFirst();
-    }
-
 
     public Map<String, String> getAlternateRoadNamesWithSide(Long tomtomId) {
         return getGeocodings(tomtomId)

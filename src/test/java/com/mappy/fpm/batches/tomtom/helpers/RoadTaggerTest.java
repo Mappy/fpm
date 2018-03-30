@@ -51,7 +51,8 @@ public class RoadTaggerTest {
     @Before
     public void setup() {
         when(speedProfiles.getTags(any(MemoryFeature.class))).thenReturn(newHashMap());
-        when(geocoding.getLeftAndRightPostalCode(any(Long.class))).thenReturn(of("9120"));
+        when(geocoding.getLeftPostalCode(any(Long.class))).thenReturn(of("9120"));
+        when(geocoding.getRightPostalCode(any(Long.class))).thenReturn(of("9130"));
         when(geocoding.getInterpolationsAddressLeft(any(Long.class))).thenReturn(of("even"));
         when(geocoding.getInterpolationsAddressRight(any(Long.class))).thenReturn(of("odd"));
         when(transportationAreaProvider.getBuiltUpLeft(any(Long.class))).thenReturn(of("123"));
@@ -264,7 +265,8 @@ public class RoadTaggerTest {
     @Test
     public void should_tag_is_in() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
-                .containsEntry("is_in", "9120");
+                .containsEntry("is_in:left", "9120")
+                .containsEntry("is_in:right", "9130");
     }
 
     @Test
