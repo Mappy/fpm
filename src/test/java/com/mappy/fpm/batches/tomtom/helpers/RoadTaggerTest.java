@@ -51,8 +51,10 @@ public class RoadTaggerTest {
     @Before
     public void setup() {
         when(speedProfiles.getTags(any(MemoryFeature.class))).thenReturn(newHashMap());
-        when(geocoding.getLeftAndRightPostalCode(any(Long.class))).thenReturn(of("9120"));
-        when(geocoding.getInterpolations(any(Long.class))).thenReturn(of("even;odd"));
+        when(geocoding.getLeftPostalCode(any(Long.class))).thenReturn(of("9120"));
+        when(geocoding.getRightPostalCode(any(Long.class))).thenReturn(of("9130"));
+        when(geocoding.getInterpolationsAddressLeft(any(Long.class))).thenReturn(of("even"));
+        when(geocoding.getInterpolationsAddressRight(any(Long.class))).thenReturn(of("odd"));
         when(transportationAreaProvider.getBuiltUpLeft(any(Long.class))).thenReturn(of("123"));
         when(transportationAreaProvider.getBuiltUpRight(any(Long.class))).thenReturn(of("456"));
         when(transportationAreaProvider.getLeftSmallestAreas(any(Long.class))).thenReturn(of("789"));
@@ -263,18 +265,20 @@ public class RoadTaggerTest {
     @Test
     public void should_tag_is_in() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
-                .containsEntry("is_in", "9120");
+                .containsEntry("is_in:left", "9120")
+                .containsEntry("is_in:right", "9130");
     }
 
     @Test
     public void should_tag_interpolation() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
-                .containsEntry("addr:interpolation", "even;odd");
+                .containsEntry("addr:interpolation:left", "even")
+                .containsEntry("addr:interpolation:right", "odd");
     }
 
     @Test
     public void should_tag_left_and_interpolation_address() {
-        when(geocoding.getInterpolationAddress(any(Long.class))).thenReturn(ImmutableMap.of("interpolation:left" , "1;10" , "interpolation:right" , "11;20"));
+        when(geocoding.getInterpolations(any(Long.class))).thenReturn(ImmutableMap.of("interpolation:left" , "1;10" , "interpolation:right" , "11;20"));
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
                 .containsEntry("interpolation:left" , "1;10" )
                 .containsEntry("interpolation:right" , "11;20");
