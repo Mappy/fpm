@@ -11,21 +11,8 @@ public class TransportationArea {
     private final Integer type;
     private final Long areaId;
     private final Integer areaType;
-    private final SideOfLine sideOfLine;
+    private final Integer sideOfLine;
 
-    enum SideOfLine{
-        LEFT(1),
-        RIGHT(2);
-        int value ;
-
-        SideOfLine(int value) {
-            this.value = value;
-        }
-
-        private static SideOfLine fromValue(int value){
-            return value == 1 ? LEFT : RIGHT ;
-        }
-    }
 
     public static TransportationArea fromDbf(DbfRow entry) {
         return new TransportationArea(
@@ -33,7 +20,7 @@ public class TransportationArea {
                 entry.getInt("TRPELTYP"),
                 entry.getLong("AREID"),
                 entry.getInt("ARETYP"),
-                SideOfLine.fromValue(entry.getInt("SOL")));
+                entry.getInt("SOL"));
     }
 
     public enum TransportationElementType {
