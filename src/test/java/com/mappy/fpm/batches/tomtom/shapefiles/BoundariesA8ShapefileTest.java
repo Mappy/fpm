@@ -58,13 +58,13 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
         GeometryFactory factory = mock(GeometryFactory.class);
 
         Point point = new Point(new PackedCoordinateSequence.Double(new double[]{4.307077, 50.8366041}, 2), factory);
-        when(townTagger.get(10560000718742L)).thenReturn(new Centroid(10560000718742L, "Anderlecht", "123", 8, 1, 7, point));
+        when(townTagger.getCityCentroid(10560000718742L)).thenReturn(new Centroid(10560000718742L, "Anderlecht", "123", 8, 1, 7, point));
 
         Point point2 = new Point(new PackedCoordinateSequence.Double(new double[]{4.3451859, 50.8251293}, 2), factory);
-        when(townTagger.get(10560000388234L)).thenReturn(new Centroid(10560000388234L, "Sint-Gillis", "456", 8, 1, 8, point2));
+        when(townTagger.getCityCentroid(10560000388234L)).thenReturn(new Centroid(10560000388234L, "Sint-Gillis", "456", 8, 1, 8, point2));
 
         Point point3 = new Point(new PackedCoordinateSequence.Double(new double[]{4.3134424, 50.8055758}, 2), factory);
-        when(townTagger.get(10560000455427L)).thenReturn(new Centroid(10560000455427L, "Vorst", null, 8, 1, 8, point3));
+        when(townTagger.getCityCentroid(10560000455427L)).thenReturn(new Centroid(10560000455427L, "Vorst", null, 8, 1, 8, point3));
 
         BoundariesA8Shapefile shapefile = new BoundariesA8Shapefile(tomtomFolder, townTagger, nameProvider, osmLevelGenerator);
 

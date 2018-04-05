@@ -20,7 +20,7 @@ import static java.util.Optional.ofNullable;
 public class TownTagger {
 
     private final Map<Long, Centroid> centroidsCity = newHashMap();
-    private final Map<Long, Centroid> centroidsHamlet = newHashMap();
+    private final Map<Long, Centroid> centroidsBuiltUp = newHashMap();
 
     @Inject
     public TownTagger(TomtomFolder folder) {
@@ -37,7 +37,7 @@ public class TownTagger {
 
                     centroidsCity.put(id, centroid.withId(id));
 
-                    putCentroidHamlet(feature, centroid);
+                    putBuiltUpCentroid(feature, centroid);
                 }
             }
         } else {
@@ -45,22 +45,22 @@ public class TownTagger {
         }
     }
 
-    public Centroid get(Long centroidId) {
+    public Centroid getCityCentroid(Long centroidId) {
         return centroidsCity.get(centroidId);
     }
 
-    public Centroid getHamlet(Long centroidId) {
-        return centroidsHamlet.get(centroidId);
+    public Centroid getBuiltUpCentroid(Long centroidId) {
+        return centroidsBuiltUp.get(centroidId);
     }
 
-    private void putCentroidHamlet(Feature feature, Centroid centroid) {
+    private void putBuiltUpCentroid(Feature feature, Centroid centroid) {
         ofNullable(feature.getString("BUANAME")).ifPresent(buaname -> {
 
             Optional<String> axname = ofNullable(feature.getString("AXNAME"));
             String name = feature.getString("NAME");
 
             if ((!axname.isPresent() || !axname.get().equals(name)) && buaname.equals(name)) {
-                ofNullable(feature.getLong("BUAID")).ifPresent(buaid -> centroidsHamlet.put(buaid, centroid.withId(buaid)));
+                ofNullable(feature.getLong("BUAID")).ifPresent(buaid -> centroidsBuiltUp.put(buaid, centroid.withId(buaid)));
             }
         });
     }
