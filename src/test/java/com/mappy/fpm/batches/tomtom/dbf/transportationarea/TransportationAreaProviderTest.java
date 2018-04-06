@@ -50,7 +50,15 @@ public class TransportationAreaProviderTest {
 
     @Test
     public void should_have_a_built_up_without_left_sides() {
-        Optional<String> areas = transportationAreaProvider.getBuiltUpLeft(123L);
-        assertThat(areas).isEqualTo(empty());
+        Optional<String> areasLeft = transportationAreaProvider.getBuiltUpLeft(123L);
+        Optional<String> areasRight = transportationAreaProvider.getBuiltUpRight(123L);
+        assertThat(areasRight).isEqualTo(areasLeft).contains("777");
+    }
+
+    @Test
+    public void should_have_same_ids_on_left_and_right() {
+        Optional<String> areasLeft = transportationAreaProvider.getLeftSmallestAreas(123L);
+        Optional<String> areasRight = transportationAreaProvider.getRightSmallestAreas(123L);
+        assertThat(areasLeft).isEqualTo(areasRight).contains("444");
     }
 }

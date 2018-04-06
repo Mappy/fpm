@@ -123,7 +123,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
 
     protected Optional<RelationMember> getTown(GeometrySerializer serializer, Feature feature) {
 
-        Centroid cityCenter = townTagger.get(feature.getLong("CITYCENTER"));
+        Centroid cityCenter = townTagger.getCityCentroid(feature.getLong("CITYCENTER"));
 
         if (cityCenter == null) {
             return empty();

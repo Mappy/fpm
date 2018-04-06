@@ -33,7 +33,7 @@ public class TownShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
 
-        if (feature.getInteger("ADMINCLASS") > 9) {
+        if (isAnOtherAdministrativeArea(feature)) {
             HashMap<String, String> tags = newHashMap();
 
             tags.put("name", feature.getString("NAME"));
@@ -50,5 +50,9 @@ public class TownShapefile extends TomtomShapefile {
 
             serializer.writePoint(feature.getPoint(), tags);
         }
+    }
+
+    private boolean isAnOtherAdministrativeArea(Feature feature) {
+        return feature.getInteger("ADMINCLASS") > 9;
     }
 }

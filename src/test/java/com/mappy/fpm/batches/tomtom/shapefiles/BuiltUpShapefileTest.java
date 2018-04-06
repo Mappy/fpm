@@ -45,16 +45,16 @@ public class BuiltUpShapefileTest extends AbstractTest {
         GeometryFactory factory = mock(GeometryFactory.class);
 
         Point point = new Point(new LiteCoordinateSequence(new double[]{2.5027452, 46.0514552}, 2), factory);
-        when(townTagger.getHamlet(12500001063055L)).thenReturn(new Centroid(12500001063055L, "Rougnat", null, 8, 32, 7, point));
+        when(townTagger.getBuiltUpCentroid(12500001063055L)).thenReturn(new Centroid(12500001063055L, "Rougnat", null, 8, 32, 7, point));
 
         Point point2 = new Point(new LiteCoordinateSequence(new double[]{4.601984, 51.181340}, 2), factory);
-        when(townTagger.getHamlet(12500001060481L)).thenReturn(new Centroid(12500001060481L, "Auzances", "456", 8, 32, 8, point2));
+        when(townTagger.getBuiltUpCentroid(12500001060481L)).thenReturn(new Centroid(12500001060481L, "Auzances", "456", 8, 32, 8, point2));
 
         Point point3 = new Point(new LiteCoordinateSequence(new double[]{4.606374, 51.162370}, 2), factory);
-        when(townTagger.getHamlet(12500001067545L)).thenReturn(new Centroid(12500001067545L, "La Chaux-Bourdue", "123", 8, 32, 8, point3));
+        when(townTagger.getBuiltUpCentroid(12500001067545L)).thenReturn(new Centroid(12500001067545L, "La Chaux-Bourdue", "123", 8, 32, 8, point3));
 
         Point point4 = new Point(new LiteCoordinateSequence(new double[]{4.596975, 51.210989}, 2), factory);
-        when(townTagger.getHamlet(12500001060737L)).thenReturn(new Centroid(112500001060737L, "Le Montely", "1011", 8, 32, 8, point4));
+        when(townTagger.getBuiltUpCentroid(12500001060737L)).thenReturn(new Centroid(112500001060737L, "Le Montely", "1011", 8, 32, 8, point4));
 
         BuiltUpShapefile shapefile = new BuiltUpShapefile(tomtomFolder, nameProvider, townTagger);
 

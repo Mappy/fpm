@@ -59,7 +59,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
             Map<String, String> tags = nameProvider.getAlternateNames(extId);
             tags.put("ref:tomtom", String.valueOf(extId));
             tags.put("name", name);
-            Centroid cityCenter = townTagger.getHamlet(extId);
+            Centroid cityCenter = townTagger.getBuiltUpCentroid(extId);
 
             List<RelationMember> members = newArrayList();
             MultiPolygon multiPolygon = feature.getMultiPolygon();
