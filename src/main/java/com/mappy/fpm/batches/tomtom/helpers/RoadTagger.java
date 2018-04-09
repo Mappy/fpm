@@ -102,6 +102,8 @@ public class RoadTagger {
 
         tagRoute(feature, tags, id);
 
+        tags.putAll(geocodeProvider.getAlternateRoadNamesWithSideOld(id));
+
         tags.putAll(geocodeProvider.getAlternateRoadNamesWithSide(id));
 
         tags.putAll(geocodeProvider.getInterpolations(id));

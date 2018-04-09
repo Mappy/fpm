@@ -11,10 +11,12 @@ import org.jamel.dbf.structure.DbfRow;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.*;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.*;
@@ -69,10 +71,19 @@ public class GeocodeProvider extends TomtomDbfReader {
         return emptyMap();
     }
 
+    @Deprecated()
+    public Map<String, String> getAlternateRoadNamesWithSideOld(Long tomtomId) {
+        return getGeocodings(tomtomId)
+                .filter(alternativeName -> alternativeName.getSideOfLine() != null)
+                .filter(geocode -> Enums.getIfPresent(Language.class, geocode.getLanguage()).isPresent())
+                .collect(groupingBy(this::getKeyNameWithSide, mapping(Geocode::getName, joining(";") )));
+    }
+
     public Map<String, String> getAlternateRoadNamesWithSide(Long tomtomId) {
         return getGeocodings(tomtomId)
                 .filter(alternativeName -> alternativeName.getSideOfLine() != null)
                 .filter(geocode -> Enums.getIfPresent(Language.class, geocode.getLanguage()).isPresent())
+                .sorted(Comparator.comparing(this::getMinBitMask))
                 .collect(groupingBy(this::getKeyAlternativeNameWithSide, mapping(Geocode::getName, joining(";") )));
     }
 
@@ -85,10 +96,16 @@ public class GeocodeProvider extends TomtomDbfReader {
         return empty();
     }
 
-    private String getKeyAlternativeNameWithSide(Geocode geocode) {
+    @Deprecated
+    private String getKeyNameWithSide(Geocode geocode) {
         Optional<String> side = getSideOfLine(geocode.getSideOfLine());
         String language = Language.valueOf(geocode.getLanguage()).getValue();
         return "name" + ":" + side.map(s -> s + ":").orElse("") + language ;
+    }
+    private String getKeyAlternativeNameWithSide(Geocode geocode) {
+        Optional<String> side = getSideOfLine(geocode.getSideOfLine());
+        String language = Language.valueOf(geocode.getLanguage()).getValue();
+        return "alt_name" + ":" + side.map(s -> s + ":").orElse("") + language ;
     }
 
     private Map<Long, List<Geocode>> getGeocodings(Map<Long, List<Geocode>> geocodes, DbfRow row) {
@@ -97,6 +114,10 @@ public class GeocodeProvider extends TomtomDbfReader {
         geocodingAttributes.add(geocode);
         geocodings.put(geocode.getId(), geocodingAttributes);
         return geocodes;
+    }
+
+    private int getMinBitMask(Geocode geocode) {
+        return IntStream.of(1,2,4,8,16,32,64).filter(mask -> (geocode.getType() & mask) == mask).findFirst().orElse(MAX_VALUE)  ;
     }
 
 }

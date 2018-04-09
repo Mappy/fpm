@@ -55,6 +55,8 @@ public class RoadTaggerTest {
         when(geocoding.getRightPostalCode(any(Long.class))).thenReturn(of("9130"));
         when(geocoding.getInterpolationsAddressLeft(any(Long.class))).thenReturn(of("even"));
         when(geocoding.getInterpolationsAddressRight(any(Long.class))).thenReturn(of("odd"));
+        when(geocoding.getAlternateRoadNamesWithSide(any(Long.class))).thenReturn(ImmutableMap.of("name:left:fr" ,  "name_left_fr" //
+                , "name:right:fr" ,  "name_right_fr"));
         when(transportationAreaProvider.getBuiltUpLeft(any(Long.class))).thenReturn(of("123"));
         when(transportationAreaProvider.getBuiltUpRight(any(Long.class))).thenReturn(of("456"));
         when(transportationAreaProvider.getLeftSmallestAreas(any(Long.class))).thenReturn(of("789"));
@@ -331,5 +333,13 @@ public class RoadTaggerTest {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "NAME", "not everest", "F_ELEV", "0", "T_ELEV", "0", "FOW", "20", "NET2CLASS", "6"))))
                 .containsEntry("mountain_pass", "yes")
                 .containsEntry("name", "everest");
+    }
+
+    @Test
+    public void should_add_Alternate_RoadNames_With_Side(){
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
+                .containsEntry("name:left:fr" ,  "name_left_fr")
+                .containsEntry("name:right:fr" ,  "name_right_fr");
+
     }
 }
