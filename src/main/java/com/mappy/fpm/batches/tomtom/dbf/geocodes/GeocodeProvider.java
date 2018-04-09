@@ -21,7 +21,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.*;
 import static java.util.stream.Collectors.*;
-import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 
 @Slf4j
 @Singleton
@@ -59,11 +58,11 @@ public class GeocodeProvider extends TomtomDbfReader {
         if(geocodings.containsKey(id)){
             Map<String,String> interpolationAddress = new HashMap<>() ;
             Geocode geocode = geocodings.get(id).iterator().next();
-            if(isNoneBlank(geocode.getLeftFromAdd())) {
+            if(geocode.getLeftFromAdd() != null &&  geocode.getLeftFromAdd() != -1) {
                 interpolationAddress.put("interpolation:left" , geocode.getLeftFromAdd() + ";" + geocode.getLeftToAdd() ) ;
             }
 
-            if(isNoneBlank(geocode.getRightFromAdd())) {
+            if(geocode.getRightFromAdd() != null && geocode.getRightFromAdd() != -1) {
                 interpolationAddress.put("interpolation:right" , geocode.getRightFromAdd() + ";" + geocode.getRightToAdd()) ;
             }
             return interpolationAddress ;
