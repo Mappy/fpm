@@ -16,10 +16,10 @@ public class Geocode {
     private final Integer leftStructuration;
     private final Integer rightStructuration;
     private final Long sideOfLine;
-    private final String leftFromAdd ;
-    private final String leftToAdd ;
-    private final String rightFromAdd ;
-    private final String rightToAdd ;
+    private final Long leftFromAdd ;
+    private final Long leftToAdd ;
+    private final Long rightFromAdd ;
+    private final Long rightToAdd ;
 
 
     public static Geocode fromDbf(DbfRow entry) {
@@ -33,9 +33,9 @@ public class Geocode {
                 entry.getInt("L_STRUCT"),
                 entry.getInt("R_STRUCT"),
                 entry.getLong("SOL"),
-                entry.getString("L_F_F_ADD"),
-                entry.getString("L_T_F_ADD"),
-                entry.getString("R_F_F_ADD"),
-                entry.getString("R_T_F_ADD"));
+                entry.getLong("L_F_ADD"),
+                entry.getLong("L_T_ADD"),
+                entry.getLong("R_F_ADD"),
+                entry.getLong("R_T_ADD"));
     }
 }
