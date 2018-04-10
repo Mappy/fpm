@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -55,8 +57,8 @@ public class RoadTaggerTest {
         when(geocoding.getRightPostalCode(any(Long.class))).thenReturn(of("9130"));
         when(geocoding.getInterpolationsAddressLeft(any(Long.class))).thenReturn(of("even"));
         when(geocoding.getInterpolationsAddressRight(any(Long.class))).thenReturn(of("odd"));
-        when(geocoding.getAlternateRoadNamesWithSide(any(Long.class))).thenReturn(ImmutableMap.of("name:left:fr" ,  "name_left_fr" //
-                , "name:right:fr" ,  "name_right_fr"));
+        when(geocoding.getNamesAndAlternateNamesWithSide(any(Long.class))).thenReturn(ImmutableMap.of("name:left:fr" ,  "name_left_fr" //
+                , "alt_name:left:fr" ,  "alt_name_left_fr"  , "name:right:fr" ,  "name_right_fr"));
         when(transportationAreaProvider.getBuiltUpLeft(any(Long.class))).thenReturn(of("123"));
         when(transportationAreaProvider.getBuiltUpRight(any(Long.class))).thenReturn(of("456"));
         when(transportationAreaProvider.getLeftSmallestAreas(any(Long.class))).thenReturn(of("789"));
@@ -337,9 +339,11 @@ public class RoadTaggerTest {
 
     @Test
     public void should_add_Alternate_RoadNames_With_Side(){
+        Stream.of("").collect(Collectors.toList())
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
                 .containsEntry("name:left:fr" ,  "name_left_fr")
-                .containsEntry("name:right:fr" ,  "name_right_fr");
+                .containsEntry("name:right:fr" ,  "name_right_fr")
+                .containsEntry("alt_name:left:fr" ,  "alt_name_left_fr");
 
     }
 }

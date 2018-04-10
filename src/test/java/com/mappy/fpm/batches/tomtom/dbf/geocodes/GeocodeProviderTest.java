@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Optional.empty;
-import static java.util.Optional.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -26,43 +25,44 @@ public class GeocodeProviderTest {
 
     @Test
     public void should_add_alternative_road_names() {
-        Map<String, String> tags = geocodeProvider.getAlternateRoadNamesWithSide(10200000002470L);
+        Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000002470L);
         assertThat(tags).hasSize(1);
-        assertThat(tags.get("alt_name:ca")).isEqualTo("Avinguda del Consell de la Terra");
+        assertThat(tags.get("name:ca")).isEqualTo("Avinguda del Consell de la Terra");
     }
 
     @Test
     public void should_concat_alternative_road_names() {
-        Map<String, String> tags = geocodeProvider.getAlternateRoadNamesWithSide(10200000003569L);
-        assertThat(tags).hasSize(1);
-        assertThat(tags.get("alt_name:ca")).isEqualTo("Carrer de la Unió;Carrer Maria Pla");
+        Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000003569L);
+        assertThat(tags).hasSize(2);
+        assertThat(tags.get("name:ca")).isEqualTo("Carrer de la Unió");
+        assertThat(tags.get("alt_name:ca")).isEqualTo("Carrer Maria Pla");
     }
 
     @Test
     public void should_add_alternative_road_names_on_left() {
-        Map<String, String> tags = geocodeProvider.getAlternateRoadNamesWithSide(10200000000143L);
+        Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000000143L);
         assertThat(tags).hasSize(1);
-        assertThat(tags.get("alt_name:left:ca")).isEqualTo("Avinguda Carlemany");
+        assertThat(tags.get("name:left:ca")).isEqualTo("Avinguda Carlemany");
     }
 
     @Test
     public void should_add_alternative_road_names_on_right() {
-        Map<String, String> tags = geocodeProvider.getAlternateRoadNamesWithSide(10200000000176L);
+        Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000000176L);
         assertThat(tags).hasSize(1);
-        assertThat(tags.get("alt_name:right:ca")).isEqualTo("Carrer d'Isabelle Sandy");
+        assertThat(tags.get("name:right:ca")).isEqualTo("Carrer d'Isabelle Sandy");
     }
 
     @Test
     public void should_add_alternative_road_names_in_french() {
-        Map<String, String> tags = geocodeProvider.getAlternateRoadNamesWithSide(10200000003341L);
+        Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000003341L);
         assertThat(tags).hasSize(2);
-        assertThat(tags.get("alt_name:ca")).isEqualTo("Carrer de La Unió");
-        assertThat(tags.get("alt_name:fr")).isEqualTo("Avinguda Carlemany");
+        assertThat(tags.get("name:ca")).isEqualTo("Carrer de La Unió");
+        assertThat(tags.get("name:fr")).isEqualTo("Avinguda Carlemany");
     }
 
     @Test
     public void should_not_add_alternative_road_names_with_unknow_language() {
-        Map<String, String> tags = geocodeProvider.getAlternateRoadNamesWithSide(10200000001935L);
+        Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000001935L);
         assertThat(tags).hasSize(0);
     }
 
