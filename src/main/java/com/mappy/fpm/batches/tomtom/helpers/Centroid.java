@@ -34,25 +34,6 @@ public class Centroid {
     }
 
     public String getPlace() {
-        String place;
-
-        switch (citytyp) {
-            case 0:
-                place = "village";
-                break;
-            case 1:
-            case 2:
-                place = dispclass < 8 ? "city" : "town";
-                break;
-            case 32:
-                place = "hamlet";
-                break;
-            case 64:
-                place = "neighbourhood";
-                break;
-            default:
-                place = "town";
-        }
-        return place;
+        return CityType.getOsmValue(citytyp, dispclass);
     }
 }

@@ -56,4 +56,5 @@ public class TownShapefileTest extends AbstractTest {
         assertThat(hamlet.getTags().get("name:fr")).isEqualTo("hameaux");
         assertThat(hamlet.getTags().get("name:nl")).isEqualTo("gehuchten");
     }
+
 }
