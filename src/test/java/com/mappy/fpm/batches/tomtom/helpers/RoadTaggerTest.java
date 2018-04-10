@@ -339,7 +339,6 @@ public class RoadTaggerTest {
 
     @Test
     public void should_add_Alternate_RoadNames_With_Side(){
-        Stream.of("").collect(Collectors.toList())
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
                 .containsEntry("name:left:fr" ,  "name_left_fr")
                 .containsEntry("name:right:fr" ,  "name_right_fr")
