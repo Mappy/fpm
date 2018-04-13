@@ -72,26 +72,26 @@ public class GeocodeProvider extends TomtomDbfReader {
     }
 
     public Map<String, String> getNamesAndAlternateNamesWithSide(Long tomtomId) {
+
         return getGeocodings(tomtomId)
                 .filter(alternativeName -> alternativeName.getSideOfLine() != null)
-                .filter(geocode -> Enums.getIfPresent(Language.class, geocode.getLanguage()).isPresent())
                 .sorted(Comparator.comparing(this::getMinBitMask))
                 .collect(groupingBy(this::getKeyAlternativeNameWithSide, mapping(Geocode::getName, joining(";") )));
     }
 
-    private Optional<String> getSideOfLine(Long side) {
+    private String getSideOfLine(Long side) {
         if (side == 1) {
-            return of("left");
+            return "left";
         } else if (side == 2) {
-            return of("right");
+            return "right";
         }
-        return empty();
+        return null;
     }
 
     private String getKeyAlternativeNameWithSide(Geocode geocode) {
-        Optional<String> side = getSideOfLine(geocode.getSideOfLine());
-        String language = Language.valueOf(geocode.getLanguage()).getValue();
-        return getNameTag(geocode) + ":" + side.map(s -> s + ":").orElse("") + language ;
+        String side = getSideOfLine(geocode.getSideOfLine());
+        String language = geocode.getLanguage().getValue();
+        return  Stream.of(getNameTag(geocode), side, language).filter(Objects::nonNull).collect(joining(":")) ;
     }
 
     private Map<Long, List<Geocode>> getGeocodings(Map<Long, List<Geocode>> geocodes, DbfRow row) {
@@ -107,7 +107,7 @@ public class GeocodeProvider extends TomtomDbfReader {
     }
 
     private String getNameTag(Geocode geocode) {
-        return getMinBitMask(geocode) == OFFICIAL_NAME ? "name" :  "alt_name";
+        return getMinBitMask(geocode) != OFFICIAL_NAME || geocode.getLanguage() == Language.UND ? "alt_name" : "name" ;
     }
 
 }

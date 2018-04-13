@@ -61,9 +61,9 @@ public class GeocodeProviderTest {
     }
 
     @Test
-    public void should_not_add_alternative_road_names_with_unknow_language() {
+    public void should_add_alternative_road_names_with_unknow_language() {
         Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000001935L);
-        assertThat(tags).hasSize(0);
+        assertThat(tags).hasSize(1).containsEntry("alt_name" , "Carrer Maria Pla");
     }
 
     @Test
