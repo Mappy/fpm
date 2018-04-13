@@ -9,6 +9,8 @@ import javax.inject.Singleton;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toMap;
+
 
 @Slf4j
 @Singleton
@@ -26,7 +28,8 @@ public class RouteIntersectionProvider extends TomtomDbfReader {
         Map<Long, String> isMap = new HashMap<>() ;
         readFile("ig.dbf", row -> igMap.put(row.getLong("ELEMID"), row.getLong("ID")));
         readFile("is.dbf", row -> isMap.put(row.getLong("ID"), row.getString("NAME")));
-        this.intersectionById = igMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> isMap.get(entry.getValue())));
+        this.intersectionById = igMap.entrySet().stream()
+                .collect(toMap(Map.Entry::getKey, entry -> isMap.get(entry.getValue())));
     }
 
     public Map<Long, String> getIntersectionById() {

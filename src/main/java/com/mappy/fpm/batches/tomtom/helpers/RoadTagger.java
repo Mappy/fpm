@@ -156,11 +156,11 @@ public class RoadTagger {
 
         addTagIf("mappy_length", () -> valueOf(feature.getDouble("METERS")), ofNullable(feature.getDouble("METERS")).isPresent(), tags);
 
-        tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
-
         if (SLIP_ROAD.is(feature.getInteger("FOW")) && intersectionProvider.getIntersectionById().containsKey(id)) {
-            tags.put("destination", intersectionProvider.getIntersectionById().get(id));
+            tags.put("junction:ref", intersectionProvider.getIntersectionById().get(id));
         }
+
+        tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
 
         poiProvider.getPoiNameByType(id, FeatureType.MOUNTAIN_PASS.getValue()).ifPresent(value -> {
             tags.put("mountain_pass", "yes");

@@ -74,7 +74,7 @@ public class RoadTaggerTest {
         when(intersectionProvider.getIntersectionById())
                 .thenReturn(ImmutableMap.of(123L, "exit 13"));
         assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10"))))
-                .containsEntry("destination", "exit 13");
+                .containsEntry("junction:ref", "exit 13");
     }
 
     @Test
