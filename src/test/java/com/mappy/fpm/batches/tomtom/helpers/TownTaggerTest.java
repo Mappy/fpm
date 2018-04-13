@@ -49,7 +49,7 @@ public class TownTaggerTest extends AbstractTest {
 
     @Test
     public void should_return_village_with_get_place_of_citytyp_0() {
-        assertThat(townTagger.getCityCentroid(10560000379424L).getPlace()).isEqualTo("village");
+        assertThat(townTagger.getCityCentroid(10560000379424L).getPlace()).isEqualTo("isolated_dwelling");
     }
 
     @Test
