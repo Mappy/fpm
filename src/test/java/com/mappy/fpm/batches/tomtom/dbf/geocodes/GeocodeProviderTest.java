@@ -35,7 +35,7 @@ public class GeocodeProviderTest {
         Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000003569L);
         assertThat(tags).hasSize(2);
         assertThat(tags.get("name:ca")).isEqualTo("Carrer de la Unió");
-        assertThat(tags.get("alt_name:ca")).isEqualTo("Carrer Maria Pla");
+        assertThat(tags.get("alt_name:ca")).isEqualTo("Carrer Maria Pla;Avinguda Carlemany;Carrer dels Paraires");
     }
 
     @Test
@@ -64,6 +64,20 @@ public class GeocodeProviderTest {
     public void should_add_alternative_road_names_with_unknow_language() {
         Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000001935L);
         assertThat(tags).hasSize(1).containsEntry("alt_name" , "Carrer Maria Pla");
+    }
+
+    @Test
+    public void should_joining_alternative_road_names_with_unknow_language() {
+        Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000005856L);
+        assertThat(tags).hasSize(1).containsEntry("alt_name" , "Carrer de les Nacions Unides;Carrer de La Unió");
+    }
+
+    @Test
+    public void should_add_alternative_road_names_with_unknow_language_left_and_right() {
+        Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000005857L);
+        assertThat(tags).hasSize(2)
+                .containsEntry("alt_name:left" , "Carrer de les Nacions Unides")
+                .containsEntry("alt_name:right" , "Avinguda del Fener");
     }
 
     @Test
