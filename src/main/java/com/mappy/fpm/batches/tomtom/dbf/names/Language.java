@@ -2,6 +2,8 @@ package com.mappy.fpm.batches.tomtom.dbf.names;
 
 import lombok.Getter;
 
+import java.util.stream.Stream;
+
 public enum Language {
     ALB("sq"),
     ARA("ar"),
@@ -45,8 +47,8 @@ public enum Language {
     SWE("sv"),
     TUR("tr"),
     UKR("uk"),
-    WEL("cy");
-
+    WEL("cy"),
+    UND(null);
 
     @Getter
     private final String value;
@@ -55,4 +57,7 @@ public enum Language {
         this.value = value;
     }
 
+    public static Language fromValue(String name) {
+        return Stream.of(Language.values()).filter(v -> v.name().equals(name)).findFirst().orElse(UND);
+    }
 }

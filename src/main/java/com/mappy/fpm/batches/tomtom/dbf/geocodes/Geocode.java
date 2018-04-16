@@ -1,8 +1,10 @@
 package com.mappy.fpm.batches.tomtom.dbf.geocodes;
 
+import com.mappy.fpm.batches.tomtom.dbf.names.Language;
 import lombok.Data;
 import org.jamel.dbf.structure.DbfRow;
 
+import static com.mappy.fpm.batches.tomtom.dbf.names.Language.fromValue;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Data
@@ -10,7 +12,7 @@ public class Geocode {
     private final Long id;
     private final Long type;
     private final String name;
-    private final String language;
+    private final Language language;
     private final String leftPostalCode;
     private final String rightPostalCode;
     private final Integer leftStructuration;
@@ -27,7 +29,7 @@ public class Geocode {
                 entry.getLong("ID"),
                 entry.getLong("NAMETYP"),
                 entry.getString("FULLNAME", UTF_8),
-                entry.getString("NAMELC", UTF_8),
+                fromValue(entry.getString("NAMELC", UTF_8)),
                 entry.getString("L_PC", UTF_8),
                 entry.getString("R_PC", UTF_8),
                 entry.getInt("L_STRUCT"),
