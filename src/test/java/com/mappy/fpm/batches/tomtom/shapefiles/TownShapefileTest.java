@@ -57,4 +57,10 @@ public class TownShapefileTest extends AbstractTest {
         assertThat(hamlet.getTags().get("name:nl")).isEqualTo("gehuchten");
     }
 
+    @Test
+    public void should_load_st_gillis_as_point_because_he_hasnt_any_geometry() {
+        Node hamlet = pbfContent.getNodes().stream().filter(node -> node.getTags().hasKeyValue("place", "town")).findFirst().get();
+        assertThat(hamlet.getTags().get("name")).isEqualTo("Sint-Gillis");
+    }
+
 }
