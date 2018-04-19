@@ -103,7 +103,7 @@ public class RoadTagger {
         }
 
         tagRoute(feature, tags, id);
-        
+
         tags.putAll(geocodeProvider.getInterpolations(id));
 
         geocodeProvider.getLeftPostalCode(id).ifPresent(postcodes -> tags.put("is_in:left", postcodes));

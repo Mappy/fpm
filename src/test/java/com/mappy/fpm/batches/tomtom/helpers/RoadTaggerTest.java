@@ -19,8 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -57,8 +55,8 @@ public class RoadTaggerTest {
         when(geocoding.getRightPostalCode(any(Long.class))).thenReturn(of("9130"));
         when(geocoding.getInterpolationsAddressLeft(any(Long.class))).thenReturn(of("even"));
         when(geocoding.getInterpolationsAddressRight(any(Long.class))).thenReturn(of("odd"));
-        when(geocoding.getNamesAndAlternateNamesWithSide(any(Long.class))).thenReturn(ImmutableMap.of("name:left:fr" ,  "name_left_fr" //
-                , "alt_name:left:fr" ,  "alt_name_left_fr"  , "name:right:fr" ,  "name_right_fr"));
+        when(geocoding.getNamesAndAlternateNamesWithSide(any(Long.class))).thenReturn(ImmutableMap.of("name:left:fr", "name_left_fr" //
+                , "alt_name:left:fr", "alt_name_left_fr", "name:right:fr", "name_right_fr"));
         when(transportationAreaProvider.getBuiltUpLeft(any(Long.class))).thenReturn(of("123"));
         when(transportationAreaProvider.getBuiltUpRight(any(Long.class))).thenReturn(of("456"));
         when(transportationAreaProvider.getLeftSmallestAreas(any(Long.class))).thenReturn(of("789"));
@@ -105,7 +103,7 @@ public class RoadTaggerTest {
                 .containsEntry("route", "ferry")
                 .containsEntry("name", "Calais - Douvres")
                 .containsEntry("duration", "00:10:54")
-                .containsEntry("name:left:fr" ,  "name_left_fr");
+                .containsEntry("name:left:fr", "name_left_fr");
         assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "MINUTES", "10", "", ""))))
                 .containsEntry("route", "ferry").doesNotContainKey("name");
     }
@@ -285,10 +283,10 @@ public class RoadTaggerTest {
 
     @Test
     public void should_tag_left_and_interpolation_address() {
-        when(geocoding.getInterpolations(any(Long.class))).thenReturn(ImmutableMap.of("interpolation:left" , "1;10" , "interpolation:right" , "11;20"));
+        when(geocoding.getInterpolations(any(Long.class))).thenReturn(ImmutableMap.of("interpolation:left", "1;10", "interpolation:right", "11;20"));
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
-                .containsEntry("interpolation:left" , "1;10" )
-                .containsEntry("interpolation:right" , "11;20");
+                .containsEntry("interpolation:left", "1;10")
+                .containsEntry("interpolation:right", "11;20");
     }
 
     @Test
@@ -341,11 +339,11 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_add_Alternate_RoadNames_With_Side(){
+    public void should_add_Alternate_RoadNames_With_Side() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
-                .containsEntry("name:left:fr" ,  "name_left_fr")
-                .containsEntry("name:right:fr" ,  "name_right_fr")
-                .containsEntry("alt_name:left:fr" ,  "alt_name_left_fr");
+                .containsEntry("name:left:fr", "name_left_fr")
+                .containsEntry("name:right:fr", "name_right_fr")
+                .containsEntry("alt_name:left:fr", "alt_name_left_fr");
 
     }
 }

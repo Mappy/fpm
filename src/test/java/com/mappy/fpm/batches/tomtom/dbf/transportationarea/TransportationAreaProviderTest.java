@@ -25,9 +25,15 @@ public class TransportationAreaProviderTest {
 
 
     @Test
-    public void should_not_have_ferry_elements() {
+    public void should_not_have_address_area_elements() {
         Optional<String> areas = transportationAreaProvider.getLeftSmallestAreas(789L);
         assertThat(areas).isEqualTo(empty());
+    }
+
+    @Test
+    public void should_have_ferry_elements() {
+        Optional<String> areas = transportationAreaProvider.getLeftSmallestAreas(112L);
+        assertThat(areas).isEqualTo(of("222"));
     }
 
     @Test

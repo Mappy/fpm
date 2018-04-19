@@ -16,8 +16,8 @@ import java.util.function.Predicate;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationArea.AreaType.isTheMinimumAreaType;
-import static com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationArea.TransportationElementType.isARoadElement;
+import static com.mappy.fpm.batches.tomtom.dbf.transportationarea.AreaType.isTheMinimumAreaType;
+import static com.mappy.fpm.batches.tomtom.dbf.transportationarea.TransportationElementType.withArea;
 import static java.util.Collections.emptyList;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
@@ -72,7 +72,7 @@ public class TransportationAreaProvider extends TomtomDbfReader {
     }
 
     private Predicate<TransportationArea> getTransportationAreaPredicate(Boolean needBuiltUp) {
-        return transportationArea -> isARoadElement(transportationArea.getType()) && isTheMinimumAreaType(transportationArea.getAreaType(), needBuiltUp);
+        return transportationArea -> withArea(transportationArea.getType()) && isTheMinimumAreaType(transportationArea.getAreaType(), needBuiltUp);
     }
 
     private void getTransportationAreas(DbfRow row) {
