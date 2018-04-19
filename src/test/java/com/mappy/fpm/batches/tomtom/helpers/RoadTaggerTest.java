@@ -102,7 +102,10 @@ public class RoadTaggerTest {
     @Test
     public void should_tag_ferries() {
         assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "NAME", "Calais - Douvres", "MINUTES", "10.902"))))
-                .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54");
+                .containsEntry("route", "ferry")
+                .containsEntry("name", "Calais - Douvres")
+                .containsEntry("duration", "00:10:54")
+                .containsEntry("name:left:fr" ,  "name_left_fr");
         assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "MINUTES", "10", "", ""))))
                 .containsEntry("route", "ferry").doesNotContainKey("name");
     }

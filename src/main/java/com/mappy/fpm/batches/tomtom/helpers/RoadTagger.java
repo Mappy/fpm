@@ -96,14 +96,14 @@ public class RoadTagger {
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
 
+        tags.putAll(geocodeProvider.getNamesAndAlternateNamesWithSide(id));
+
         if (tags.containsValue("ferry")) {
             return tags;
         }
 
         tagRoute(feature, tags, id);
-
-        tags.putAll(geocodeProvider.getNamesAndAlternateNamesWithSide(id));
-
+        
         tags.putAll(geocodeProvider.getInterpolations(id));
 
         geocodeProvider.getLeftPostalCode(id).ifPresent(postcodes -> tags.put("is_in:left", postcodes));
