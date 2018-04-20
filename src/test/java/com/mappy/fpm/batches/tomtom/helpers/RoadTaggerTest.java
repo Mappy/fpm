@@ -59,8 +59,8 @@ public class RoadTaggerTest {
                 , "alt_name:left:fr", "alt_name_left_fr", "name:right:fr", "name_right_fr"));
         when(transportationAreaProvider.getBuiltUpLeft(any(Long.class))).thenReturn(of("123"));
         when(transportationAreaProvider.getBuiltUpRight(any(Long.class))).thenReturn(of("456"));
-        when(transportationAreaProvider.getLeftSmallestAreas(any(Long.class))).thenReturn(of("789"));
-        when(transportationAreaProvider.getRightSmallestAreas(any(Long.class))).thenReturn(of("112"));
+        when(transportationAreaProvider.getSmallestAreasLeft(any(Long.class))).thenReturn(of("789"));
+        when(transportationAreaProvider.geSmallestAreasRight(any(Long.class))).thenReturn(of("112"));
         when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(of("E41"));
         when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(of("N5"));
         when(routeNumbersProvider.getRouteTypeOrderByPriority(any(Long.class))).thenReturn(of("5"));

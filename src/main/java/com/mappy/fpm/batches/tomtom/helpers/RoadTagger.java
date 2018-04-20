@@ -174,8 +174,8 @@ public class RoadTagger {
         tags.put("to:tomtom", valueOf(feature.getLong("T_JNCTID")));
         addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("global_importance:tomtom", valueOf(feature.getInteger("NET2CLASS")), ofNullable(feature.getInteger("NET2CLASS")).isPresent(), tags);
-        transportationAreaProvider.getLeftSmallestAreas(id).ifPresent(ids -> tags.put("admin:tomtom:left", ids));
-        transportationAreaProvider.getRightSmallestAreas(id).ifPresent(ids -> tags.put("admin:tomtom:right", ids));
+        transportationAreaProvider.getSmallestAreasLeft(id).ifPresent(ids -> tags.put("admin:tomtom:left", ids));
+        transportationAreaProvider.geSmallestAreasRight(id).ifPresent(ids -> tags.put("admin:tomtom:right", ids));
         transportationAreaProvider.getBuiltUpLeft(id).ifPresent(ids -> tags.put("bua:tomtom:left", ids));
         transportationAreaProvider.getBuiltUpRight(id).ifPresent(ids -> tags.put("bua:tomtom:right", ids));
         routeNumbersProvider.getRouteTypeOrderByPriority(id).ifPresent(type -> tags.put("route_type:tomtom", type));

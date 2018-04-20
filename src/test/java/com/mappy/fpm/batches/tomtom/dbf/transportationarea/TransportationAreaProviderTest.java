@@ -26,31 +26,31 @@ public class TransportationAreaProviderTest {
 
     @Test
     public void should_not_have_address_area_elements() {
-        Optional<String> areas = transportationAreaProvider.getLeftSmallestAreas(789L);
+        Optional<String> areas = transportationAreaProvider.getSmallestAreasLeft(789L);
         assertThat(areas).isEqualTo(empty());
     }
 
     @Test
     public void should_have_ferry_elements() {
-        Optional<String> areas = transportationAreaProvider.getLeftSmallestAreas(112L);
+        Optional<String> areas = transportationAreaProvider.getSmallestAreasLeft(112L);
         assertThat(areas).isEqualTo(of("222"));
     }
 
     @Test
     public void should_not_have_neighborhood_elements() {
-        Optional<String> areas = transportationAreaProvider.getRightSmallestAreas(111L);
+        Optional<String> areas = transportationAreaProvider.geSmallestAreasRight(111L);
         assertThat(areas).isEqualTo(empty());
     }
 
     @Test
     public void should_have_an_area_with_different_ids_on_left() {
-        Optional<String> areasLeft = transportationAreaProvider.getLeftSmallestAreas(222L);
+        Optional<String> areasLeft = transportationAreaProvider.getSmallestAreasLeft(222L);
         assertThat(areasLeft).isEqualTo(of("123"));
     }
 
     @Test
     public void should_have_an_area_with_different_ids_on_right() {
-        Optional<String> areasRight = transportationAreaProvider.getRightSmallestAreas(222L);
+        Optional<String> areasRight = transportationAreaProvider.geSmallestAreasRight(222L);
         assertThat(areasRight).isEqualTo(of("789"));
     }
 
@@ -63,8 +63,16 @@ public class TransportationAreaProviderTest {
 
     @Test
     public void should_have_same_ids_on_left_and_right() {
-        Optional<String> areasLeft = transportationAreaProvider.getLeftSmallestAreas(123L);
-        Optional<String> areasRight = transportationAreaProvider.getRightSmallestAreas(123L);
+        Optional<String> areasLeft = transportationAreaProvider.getSmallestAreasLeft(123L);
+        Optional<String> areasRight = transportationAreaProvider.geSmallestAreasRight(123L);
         assertThat(areasLeft).isEqualTo(areasRight).contains("444");
+    }
+
+    @Test
+    public void should_have_id_only_on_right_side() {
+        Optional<String> areasLeft = transportationAreaProvider.getBuiltUpLeft(333L);
+        Optional<String> areasRight = transportationAreaProvider.getBuiltUpRight(333L);
+        assertThat(areasRight).contains("555");
+        assertThat(areasLeft).isEqualTo(empty());
     }
 }
