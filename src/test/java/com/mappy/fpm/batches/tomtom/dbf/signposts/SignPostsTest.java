@@ -86,7 +86,7 @@ public class SignPostsTest {
 
         SignPosts signPosts = new SignPosts(folder);
 
-        assertThat(signPosts.exitRefFor(10560001774691L)).containsExactly("17", "Brussel");
+        assertThat(signPosts.exitRefFor(10560001774691L)).contains("17");
     }
 
     @Test
@@ -118,8 +118,8 @@ public class SignPostsTest {
 
         SignPosts signPosts = new SignPosts(folder);
 
-        assertThat(signPosts.symbolRefFor(10560001774691L)).containsExactly("none", "none", "industrial");
-        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactly("Bruxelles-Centre", "Brussel-Centrum", "Anderlecht");
+        assertThat(signPosts.symbolRefFor(10560001774691L)).containsExactly("none", "none", "none", "industrial");
+        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactly("Brussel", "Bruxelles-Centre", "Brussel-Centrum", "Anderlecht");
     }
 
     @Test
