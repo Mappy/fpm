@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.dbf.signposts;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
@@ -15,11 +16,14 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import static com.google.common.base.Joiner.on;
+
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.InfoType.*;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Branch;
+import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Exit;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Towards;
+import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
@@ -29,10 +33,10 @@ public class SignPosts extends TomtomDbfReader {
 
     private static final Predicate<SignPost> onlyDestinationRefTowards = signPost -> isaRouteNumber(signPost.getInfotyp()) && signPost.getContyp() == Towards;
     private static final Predicate<SignPost> onlyDestinationRefBranch = signPost -> isaRouteNumber(signPost.getInfotyp()) && signPost.getContyp() == Branch;
-    private static final Predicate<SignPost> onlyDestinationLabel = signPost -> signPost.getInfotyp() == Place_Name || signPost.getInfotyp() == Other_Destination;
+    private static final Predicate<SignPost> onlyDestinationLabel = signPost -> asList(Place_Name, Other_Destination, Exit_Name).contains(signPost.getInfotyp()) ;
     private static final Predicate<SignPost> onlyDestination = onlyDestinationRefTowards.or(onlyDestinationLabel);
     private static final Predicate<SignPost> onlySymbol = signPost -> signPost.getInfotyp() == Pictogram;
-    private static final Predicate<SignPost> onlyExit = signPost -> signPost.getInfotyp() == Exit_Number || signPost.getInfotyp() == Exit_Name;
+    private static final Predicate<SignPost> onlyExit = signPost -> Exit.equals(signPost.getContyp())  && signPost.getInfotyp() == Exit_Number;
 
     private final ListMultimap<Long, SignPost> si = ArrayListMultimap.create();
     private final Map<Long, Long> sg = newHashMap();
@@ -111,10 +115,7 @@ public class SignPosts extends TomtomDbfReader {
             tags.put(destinationTag + ":symbol", on(";").join(symbolRefFor));
         }
 
-        List<String> exitRefFor = exitRefFor(tomtomId);
-        if (isNotEmpty(exitRefFor)) {
-            tags.put("junction:ref", on(";").join(exitRefFor));
-        }
+        exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", exitRef));
         return tags;
     }
 
@@ -142,17 +143,20 @@ public class SignPosts extends TomtomDbfReader {
                 .findFirst();
     }
 
-    public List<String> signPostHeaderFor(long tomtomId) {
+    @VisibleForTesting
+    List<String> signPostHeaderFor(long tomtomId) {
         return refFor(tomtomId, onlyDestinationRefBranch).stream()
                 .map(SignPost::getTxtcont)
                 .collect(toList());
     }
 
-    public List<String> signPostContentFor(long tomtomId) {
+    @VisibleForTesting
+    List<String> signPostContentFor(long tomtomId) {
         return refFor(tomtomId, onlyDestination).stream().map(SignPost::getTxtcont).collect(toList());
     }
 
-    public List<String> symbolRefFor(long tomtomId) {
+    @VisibleForTesting
+    List<String> symbolRefFor(long tomtomId) {
 
         Collection<List<SignPost>> signPostsBySeqnr = getSignPostsBySequentialNumber(tomtomId);
 
@@ -187,9 +191,11 @@ public class SignPosts extends TomtomDbfReader {
                 .orElse("none");
     }
 
-    public List<String> exitRefFor(long tomtomId) {
-        return refFor(tomtomId, onlyExit).stream() //
-                .map(SignPost::getTxtcont).collect(toList());
+    Optional<String> exitRefFor(long tomtomId) {
+        return lastWayOfPath.get(tomtomId).stream().flatMap(a -> si.get(a).stream())
+                .filter(onlyExit)
+                .map(SignPost::getTxtcont)
+                .findFirst();
     }
 
     private List<SignPost> refFor(long tomtomId, Predicate<SignPost> filter) {
