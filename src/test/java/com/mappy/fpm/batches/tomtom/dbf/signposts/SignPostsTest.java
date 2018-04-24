@@ -90,6 +90,24 @@ public class SignPostsTest {
     }
 
     @Test
+    public void should_get_numeric_value_for_exit_ref_and_label_for_destination() {
+        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si7.dbf").getPath());
+        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp7.dbf").getPath());
+
+        SignPosts signPosts = new SignPosts(folder);
+
+        assertThat(signPosts.exitRefFor(10560001774691L)).contains("2");
+        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactlyInAnyOrder("Villejuif" , "Arcueil" , "Le Kremlin-Bicêtre") ;
+
+        assertThat(signPosts.exitRefFor(20560001774200L)).contains("10.1");
+        assertThat(signPosts.signPostContentFor(20560001774200L)).containsExactlyInAnyOrder("Eurocentre" , "Grenade") ;
+
+        assertThat(signPosts.exitRefFor(30560001774400L)).contains("4a");
+        assertThat(signPosts.signPostContentFor(30560001774400L)).containsExactlyInAnyOrder("Garges-lès-Gonesse" , "Stains") ;
+
+    }
+
+    @Test
     public void should_distinguish_road_references_and_destinations_references() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si4.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp4.dbf").getPath());
