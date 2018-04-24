@@ -253,27 +253,4 @@ public class SignPosts extends TomtomDbfReader {
                 .collect(toSet());
     }
 
-    public static void main(String[] args) {
-        String strs[] = {"2" , "2 Kremlin-Bicêtre", "10.1" , "10.1 Strie", "6b" , "6b Villejuif"};
-        for (String str : strs) {
-            System.out.println(str + " => " + getExitNumber(str) + "   |" + getExitLabel(str));
-        }
-    }
-
-    private static String getExitNumber(String s) {
-        Matcher matcher = EXIT_NUMBER_PATTERN.matcher(s);
-        if(matcher.find()){
-            return matcher.group(1) ;
-        }
-        return null;
-    }
-
-    private static String getExitLabel(String s) {
-        Matcher matcher = EXIT_LABEL_PATTERN.matcher(s);
-        if(matcher.find()){
-            return matcher.group(2) ;
-        }
-        return null;
-    }
-
 }
