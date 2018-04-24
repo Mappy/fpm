@@ -1,0 +1,517 @@
+From 9b07b53c573afc8d04aed13bc14fbc2a98aedbc3 Mon Sep 17 00:00:00 2001
+From: Ulrich VACHON <ulrich.vachon.ext@mappy.com>
+Date: Tue, 24 Apr 2018 12:28:38 +0200
+Subject: [PATCH] toll - refactoring aims to avoid the creating of new instance
+ per zone of toll info map
+
+---
+ .../com/mappy/fpm/batches/GenerateFullPbf.java     | 13 ++--
+ .../mappy/fpm/batches/tomtom/Tomtom2OsmModule.java |  7 ++-
+ .../com/mappy/fpm/batches/tomtom/TomtomFolder.java |  6 +-
+ .../fpm/batches/tomtom/helpers/TollProvider.java   | 64 +++++++++++++++++++
+ .../fpm/batches/tomtom/helpers/TollReader.java     | 71 ----------------------
+ .../fpm/batches/tomtom/helpers/TollTagger.java     | 13 ++--
+ .../fpm/batches/tomtom/helpers/TollsFactory.java   | 15 +++++
+ .../fpm/batches/tomtom/helpers/RoadTaggerIT.java   |  3 +-
+ .../batches/tomtom/helpers/TollProviderTest.java   | 46 ++++++++++++++
+ .../fpm/batches/tomtom/helpers/TollReaderTest.java | 61 -------------------
+ .../fpm/batches/utils/OsmosisSerializerIT.java     |  3 +-
+ 11 files changed, 146 insertions(+), 156 deletions(-)
+ create mode 100644 src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollProvider.java
+ delete mode 100644 src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollReader.java
+ create mode 100644 src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollsFactory.java
+ create mode 100644 src/test/java/com/mappy/fpm/batches/tomtom/helpers/TollProviderTest.java
+ delete mode 100644 src/test/java/com/mappy/fpm/batches/tomtom/helpers/TollReaderTest.java
+
+diff --git a/src/main/java/com/mappy/fpm/batches/GenerateFullPbf.java b/src/main/java/com/mappy/fpm/batches/GenerateFullPbf.java
+index faf5f85..15049ed 100644
+--- a/src/main/java/com/mappy/fpm/batches/GenerateFullPbf.java
++++ b/src/main/java/com/mappy/fpm/batches/GenerateFullPbf.java
+@@ -4,6 +4,8 @@ import com.google.common.annotations.VisibleForTesting;
+ import com.mappy.fpm.batches.merge.pbf.OsmMerger;
+ import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
+ import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
++import com.mappy.fpm.batches.tomtom.helpers.TollTagger;
++import com.mappy.fpm.batches.tomtom.helpers.TollsFactory;
+ import lombok.extern.slf4j.Slf4j;
+ import org.apache.commons.lang3.StringUtils;
+ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+@@ -41,6 +43,7 @@ public class GenerateFullPbf {
+     private final String outputDirectoryPath;
+     private final String outputFileName;
+     private final ExecutorService executorService;
++    private final TollTagger tollTagger;
+ 
+     public GenerateFullPbf(OsmMerger osmMerger, String inputDirectoryPath, String outputDirectoryPath, String outputFileName, int nbThreads) {
+         this.osmMerger = osmMerger;
+@@ -49,6 +52,7 @@ public class GenerateFullPbf {
+         this.outputFileName = outputFileName;
+         BasicThreadFactory threadFactory = new Builder().namingPattern("mappy-GenerateFullPbf-%d").daemon(false).build();
+         executorService = new ThreadPoolExecutor(nbThreads, nbThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), threadFactory);
++        tollTagger = TollsFactory.create(inputDirectoryPath);
+     }
+ 
+     public static void main(String[] args) {
+@@ -74,7 +78,6 @@ public class GenerateFullPbf {
+         try {
+             List<String> countryPbfFiles = countries.stream().map(this::generateCountry).collect(toList());
+             mergePbfFiles(countryPbfFiles, outputDirectoryPath + "/" + outputFileName, newArrayList());
+-
+         } finally {
+             log.info("Shutting down service...");
+             executorService.shutdown();
+@@ -107,20 +110,18 @@ public class GenerateFullPbf {
+             log.error(msg);
+             throw new IllegalArgumentException(msg);
+         }
+-
+         List<String> zonePbfFiles = newArrayList();
+         List<Future<?>> zonesFutures = newArrayList();
+ 
+         for (String zoneFileName : of(file.list()).filter(f -> f.endsWith(TOWN_SUFFIX) || f.endsWith(ROAD_SUFFIX) || f.endsWith(FERRY_SUFFIX) || f.endsWith(COUNTRY_SUFFIX)).collect(toList())) {
+-
+             String zone = zoneFileName.replace(TOWN_SUFFIX, "").replace(ROAD_SUFFIX, "").replace(FERRY_SUFFIX, "").replace(COUNTRY_SUFFIX, "");
+ 
+             Tomtom2Osm instance = createInjector(new Tomtom2OsmModule(
+                     inputDirectoryPath + "/" + country + "/",
+                     outputDirectoryPath + "/" + country + "/pbfFiles",
+                     outputDirectoryPath + "/splitter",
+-                    zone)
+-            ).getInstance(Tomtom2Osm.class);
++                    tollTagger,
++                    zone)).getInstance(Tomtom2Osm.class);
+ 
+             Future<?> zoneFuture = executorService.submit(() -> {
+                 try {
+@@ -154,7 +155,7 @@ public class GenerateFullPbf {
+         tasks.forEach(t -> {
+             try {
+                 t.get();
+-            } catch (ExecutionException|InterruptedException e) {
++            } catch (ExecutionException | InterruptedException e) {
+                 propagate(e);
+             }
+         });
+diff --git a/src/main/java/com/mappy/fpm/batches/tomtom/Tomtom2OsmModule.java b/src/main/java/com/mappy/fpm/batches/tomtom/Tomtom2OsmModule.java
+index 52e00ac..1c921ab 100644
+--- a/src/main/java/com/mappy/fpm/batches/tomtom/Tomtom2OsmModule.java
++++ b/src/main/java/com/mappy/fpm/batches/tomtom/Tomtom2OsmModule.java
+@@ -2,21 +2,23 @@ package com.mappy.fpm.batches.tomtom;
+ 
+ import com.google.inject.AbstractModule;
+ import com.google.inject.name.Names;
++import com.mappy.fpm.batches.tomtom.helpers.TollTagger;
+ 
+ import java.io.File;
+ 
+ public class Tomtom2OsmModule extends AbstractModule {
+-
+     private final String inputFolder;
+     private final String output;
+     private final String zone;
+     private final String splitterFolder;
++    private final TollTagger tollTagger;
+ 
+-    public Tomtom2OsmModule(String inputFolder, String output, String splitterFolder, String zone) {
++    public Tomtom2OsmModule(String inputFolder, String output, String splitterFolder, TollTagger tollTagger, String zone) {
+         this.inputFolder = inputFolder;
+         this.output = output;
+         this.splitterFolder = splitterFolder;
+         this.zone = zone;
++        this.tollTagger = tollTagger;
+     }
+ 
+     @Override
+@@ -26,5 +28,6 @@ public class Tomtom2OsmModule extends AbstractModule {
+         bindConstant().annotatedWith(Names.named("com.mappy.fpm.tomtom.zone")).to(zone);
+         bindConstant().annotatedWith(Names.named("com.mappy.fpm.serializer.output")).to(output + File.separator + zone);
+         bindConstant().annotatedWith(Names.named("com.mappy.fpm.serializer.username")).to("Tomtom");
++        bind(TollTagger.class).toInstance(tollTagger);
+     }
+ }
+diff --git a/src/main/java/com/mappy/fpm/batches/tomtom/TomtomFolder.java b/src/main/java/com/mappy/fpm/batches/tomtom/TomtomFolder.java
+index 01c4ef6..4f9e0a7 100644
+--- a/src/main/java/com/mappy/fpm/batches/tomtom/TomtomFolder.java
++++ b/src/main/java/com/mappy/fpm/batches/tomtom/TomtomFolder.java
+@@ -27,13 +27,9 @@ public class TomtomFolder {
+         return inputFolder + zone + "___________" + name;
+     }
+ 
+-    public String getTollsFile() {
+-        return inputFolder + "tolls.json";
+-    }
+-
+     public List<String> getSMFiles() {
+         File file = new File(inputFolder);
+ 
+-        return Stream.of(file.listFiles()).filter(f -> f.getName().startsWith(zone) && f.getName().endsWith("sm.shp")).map(f ->inputFolder + f.getName()).collect(toList());
++        return Stream.of(file.listFiles()).filter(f -> f.getName().startsWith(zone) && f.getName().endsWith("sm.shp")).map(f -> inputFolder + f.getName()).collect(toList());
+     }
+ }
+\ No newline at end of file
+diff --git a/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollProvider.java b/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollProvider.java
+new file mode 100644
+index 0000000..7116276
+--- /dev/null
++++ b/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollProvider.java
+@@ -0,0 +1,64 @@
++package com.mappy.fpm.batches.tomtom.helpers;
++
++import com.google.common.annotations.VisibleForTesting;
++import lombok.Data;
++import lombok.extern.slf4j.Slf4j;
++import org.apache.commons.io.FilenameUtils;
++import org.apache.commons.io.IOUtils;
++import org.codehaus.jettison.json.JSONArray;
++import org.codehaus.jettison.json.JSONException;
++import org.codehaus.jettison.json.JSONObject;
++
++import java.io.File;
++import java.io.IOException;
++import java.util.Map;
++import java.util.Optional;
++
++import static com.google.common.base.Charsets.UTF_8;
++import static com.google.common.base.Throwables.propagate;
++import static com.google.common.collect.Maps.newHashMap;
++import static java.util.Optional.ofNullable;
++
++@Slf4j
++public class TollProvider {
++    private final Map<Long, Toll> tolls = newHashMap();
++
++    public TollProvider(String tollsPath) {
++        this(tollsPath, "tolls.json");
++    }
++
++    @VisibleForTesting
++    public TollProvider(String tollsPath, String file) {
++        read(tollsPath, file);
++    }
++
++    public Optional<Toll> byId(Long id) {
++        return ofNullable(tolls.get(id));
++    }
++
++    private void read(String tollsPath, String tollsFileName) {
++        File tollsFile = new File(tollsPath, tollsFileName);
++        if (!tollsFile.exists() && FilenameUtils.isExtension("", "")) {
++            log.info("Tolls file not found={} parsing skipped", tollsFile.getAbsolutePath());
++            return;
++        }
++        try {
++            JSONArray array = new JSONArray(IOUtils.toString(tollsFile.toURI(), UTF_8));
++            for (int i = 0; i < array.length(); i++) {
++                JSONObject json = array.getJSONObject(i);
++                tolls.put(json.getLong("tomtomId"), new Toll(json.getInt("id"), json.getString("name"), json.getString("tollcode1"), json.optString("tollcode2")));
++            }
++            log.info("Loaded {} tolls", this.tolls.size());
++        } catch (IOException | JSONException e) {
++            throw propagate(e);
++        }
++    }
++
++    @Data
++    public static class Toll {
++        private final Integer id;
++        private final String name;
++        private final String tollCode1;
++        private final String tollCode2;
++    }
++}
+diff --git a/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollReader.java b/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollReader.java
+deleted file mode 100644
+index 57edfeb..0000000
+--- a/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollReader.java
++++ /dev/null
+@@ -1,71 +0,0 @@
+-package com.mappy.fpm.batches.tomtom.helpers;
+-
+-import com.google.inject.Inject;
+-import com.google.inject.Singleton;
+-import com.mappy.fpm.batches.tomtom.TomtomFolder;
+-import lombok.Data;
+-import lombok.extern.slf4j.Slf4j;
+-import org.apache.commons.io.IOUtils;
+-import org.codehaus.jettison.json.JSONArray;
+-import org.codehaus.jettison.json.JSONException;
+-import org.codehaus.jettison.json.JSONObject;
+-
+-import java.io.File;
+-import java.io.IOException;
+-import java.util.Map;
+-import java.util.Optional;
+-
+-import static com.google.common.base.Charsets.UTF_8;
+-import static com.google.common.base.Throwables.propagate;
+-import static com.google.common.collect.Maps.newHashMap;
+-import static java.util.Optional.ofNullable;
+-
+-@Singleton
+-@Slf4j
+-public class TollReader {
+-
+-    private final Map<Long, Toll> tollsByTomtomId;
+-
+-    @Inject
+-    public TollReader(TomtomFolder tomtomFolder) {
+-        tollsByTomtomId = read(tomtomFolder.getTollsFile());
+-    }
+-
+-    public Optional<Toll> tollForTomtomId(Long id) {
+-        return ofNullable(tollsByTomtomId.get(id));
+-    }
+-
+-    private Map<Long, Toll> read(String tollsFile) {
+-        try {
+-            Map<Long, Toll> tolls = newHashMap();
+-
+-            File file = new File(tollsFile);
+-
+-            if (file.exists()) {
+-                JSONArray array = new JSONArray(IOUtils.toString(file.toURI(), UTF_8));
+-                for (int i = 0; i < array.length(); i++) {
+-                    JSONObject json = array.getJSONObject(i);
+-                    tolls.put(json.getLong("tomtomId"), new Toll(json.getInt("id"), json.getString("name"), json.getString("tollcode1"), json.optString("tollcode2")));
+-                }
+-
+-                log.info("Loaded {} tolls", tolls.size());
+-
+-            } else {
+-                log.info("File not found : {}", file.getAbsolutePath());
+-            }
+-
+-            return tolls;
+-        }
+-        catch (IOException|JSONException e) {
+-            throw propagate(e);
+-        }
+-    }
+-
+-    @Data
+-    public static class Toll {
+-        private final Integer id;
+-        private final String name;
+-        private final String tollCode1;
+-        private final String tollCode2;
+-    }
+-}
+diff --git a/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollTagger.java b/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollTagger.java
+index 6d51e7f..e9365d3 100644
+--- a/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollTagger.java
++++ b/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollTagger.java
+@@ -1,10 +1,9 @@
+ package com.mappy.fpm.batches.tomtom.helpers;
+ 
+ import com.google.common.collect.ImmutableMap;
+-import com.mappy.fpm.batches.tomtom.helpers.TollReader.Toll;
++import com.mappy.fpm.batches.tomtom.helpers.TollProvider.Toll;
+ import lombok.extern.slf4j.Slf4j;
+ 
+-import javax.inject.Inject;
+ import java.util.Map;
+ 
+ import static com.google.common.collect.ImmutableMap.of;
+@@ -12,16 +11,14 @@ import static java.lang.String.valueOf;
+ 
+ @Slf4j
+ public class TollTagger {
++    private final TollProvider tollProvider;
+ 
+-    private final TollReader tollReader;
+-
+-    @Inject
+-    public TollTagger(TollReader tollReader) {
+-        this.tollReader = tollReader;
++    public TollTagger(TollProvider tollProvider) {
++        this.tollProvider = tollProvider;
+     }
+ 
+     public Map<String, String> tag(long id) {
+-        return tollReader.tollForTomtomId(id).map(TollTagger::tags).orElse(of());
++        return tollProvider.byId(id).map(TollTagger::tags).orElse(of());
+     }
+ 
+     private static ImmutableMap<String, String> tags(Toll t) {
+diff --git a/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollsFactory.java b/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollsFactory.java
+new file mode 100644
+index 0000000..83c46a5
+--- /dev/null
++++ b/src/main/java/com/mappy/fpm/batches/tomtom/helpers/TollsFactory.java
+@@ -0,0 +1,15 @@
++package com.mappy.fpm.batches.tomtom.helpers;
++
++import lombok.extern.slf4j.Slf4j;
++
++@Slf4j
++public class TollsFactory {
++
++    private TollsFactory() {
++    }
++
++    public static TollTagger create(String tollsDirectory) {
++        log.info("Creating tolls tagger with following path file={}", tollsDirectory);
++        return new TollTagger(new TollProvider(tollsDirectory));
++    }
++}
+diff --git a/src/test/java/com/mappy/fpm/batches/tomtom/helpers/RoadTaggerIT.java b/src/test/java/com/mappy/fpm/batches/tomtom/helpers/RoadTaggerIT.java
+index 4153d62..d29d7c9 100644
+--- a/src/test/java/com/mappy/fpm/batches/tomtom/helpers/RoadTaggerIT.java
++++ b/src/test/java/com/mappy/fpm/batches/tomtom/helpers/RoadTaggerIT.java
+@@ -24,12 +24,11 @@ import static java.util.stream.Collectors.groupingBy;
+ import static org.assertj.core.api.Assertions.assertThat;
+ 
+ public class RoadTaggerIT extends AbstractTest {
+-
+     private static PbfContent pbfContent;
+ 
+     @BeforeClass
+     public static void getGeneratedPbf() throws IOException {
+-        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target/tests", "target/tests/splitter", "andand")).getInstance(Tomtom2Osm.class);
++        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target/tests", "target/tests/splitter", TollsFactory.create("src/test/resources/osmgenerator"), "andand")).getInstance(Tomtom2Osm.class);
+         launcher.run();
+         pbfContent = read(new File("target/tests/andand.osm.pbf"));
+     }
+diff --git a/src/test/java/com/mappy/fpm/batches/tomtom/helpers/TollProviderTest.java b/src/test/java/com/mappy/fpm/batches/tomtom/helpers/TollProviderTest.java
+new file mode 100644
+index 0000000..71121b2
+--- /dev/null
++++ b/src/test/java/com/mappy/fpm/batches/tomtom/helpers/TollProviderTest.java
+@@ -0,0 +1,46 @@
++package com.mappy.fpm.batches.tomtom.helpers;
++
++import com.mappy.fpm.batches.tomtom.helpers.TollProvider.Toll;
++import org.junit.Test;
++
++import static java.util.Optional.empty;
++import static java.util.Optional.of;
++import static org.assertj.core.api.Assertions.assertThat;
++
++public class TollProviderTest {
++
++    @Test
++    public void should_return_empty_with_missing_file() {
++        TollProvider tollProvider = new TollProvider("src/test/resources/toll/", "missing_file.json");
++
++        assertThat(tollProvider.byId(9999999999999L)).isEqualTo(empty());
++    }
++
++    @Test(expected = RuntimeException.class)
++    public void should_fail_with_malformed_file() {
++        TollProvider tollProvider = new TollProvider("src/test/resources/toll/", "malformed_file.json");
++
++        tollProvider.byId(12500001097987L);
++    }
++
++    @Test(expected = RuntimeException.class)
++    public void should_fail_with_missing_tomtomId_key() {
++        TollProvider tollProvider = new TollProvider("src/test/resources/toll/", "without_tomtomId.json");
++
++        tollProvider.byId(12500001097987L);
++    }
++
++    @Test
++    public void should_return_empty_with_unknown_id() {
++        TollProvider tollProvider = new TollProvider("src/test/resources/toll/", "tolls.json");
++
++        assertThat(tollProvider.byId(9999999999999L)).isEqualTo(empty());
++    }
++
++    @Test
++    public void should_return_tolls() {
++        TollProvider tollProvider = new TollProvider("src/test/resources/toll/", "tolls.json");
++
++        assertThat(tollProvider.byId(12500001097987L)).isEqualTo(of(new Toll(1, "Péage d'Aigrefeuille", "4556", "4557")));
++    }
++}
+diff --git a/src/test/java/com/mappy/fpm/batches/tomtom/helpers/TollReaderTest.java b/src/test/java/com/mappy/fpm/batches/tomtom/helpers/TollReaderTest.java
+deleted file mode 100644
+index bb930bd..0000000
+--- a/src/test/java/com/mappy/fpm/batches/tomtom/helpers/TollReaderTest.java
++++ /dev/null
+@@ -1,61 +0,0 @@
+-package com.mappy.fpm.batches.tomtom.helpers;
+-
+-import com.mappy.fpm.batches.tomtom.TomtomFolder;
+-import com.mappy.fpm.batches.tomtom.helpers.TollReader.Toll;
+-import org.junit.Test;
+-
+-import static java.util.Optional.empty;
+-import static java.util.Optional.of;
+-import static org.assertj.core.api.Assertions.assertThat;
+-import static org.mockito.Mockito.mock;
+-import static org.mockito.Mockito.when;
+-
+-public class TollReaderTest {
+-
+-    private final TomtomFolder tomtomFolder = mock(TomtomFolder.class);
+-
+-    @Test
+-    public void should_return_empty_with_missing_file() {
+-        when(tomtomFolder.getTollsFile()).thenReturn("src/test/resources/toll/missing_file.json");
+-
+-        TollReader tollReader = new TollReader(tomtomFolder);
+-
+-        assertThat(tollReader.tollForTomtomId(9999999999999L)).isEqualTo(empty());
+-    }
+-
+-    @Test(expected = RuntimeException.class)
+-    public void should_fail_with_malformed_file() {
+-        when(tomtomFolder.getTollsFile()).thenReturn("src/test/resources/toll/malformed_file.json");
+-
+-        TollReader tollReader = new TollReader(tomtomFolder);
+-
+-        tollReader.tollForTomtomId(12500001097987L);
+-    }
+-
+-    @Test(expected = RuntimeException.class)
+-    public void should_fail_with_missing_tomtomId_key() {
+-        when(tomtomFolder.getTollsFile()).thenReturn("src/test/resources/toll/without_tomtomId.json");
+-
+-        TollReader tollReader = new TollReader(tomtomFolder);
+-
+-        tollReader.tollForTomtomId(12500001097987L);
+-    }
+-
+-    @Test
+-    public void should_return_empty_with_unknown_id() {
+-        when(tomtomFolder.getTollsFile()).thenReturn("src/test/resources/toll/tolls.json");
+-
+-        TollReader tollReader = new TollReader(tomtomFolder);
+-
+-        assertThat(tollReader.tollForTomtomId(9999999999999L)).isEqualTo(empty());
+-    }
+-
+-    @Test
+-    public void should_return_tolls() {
+-        when(tomtomFolder.getTollsFile()).thenReturn("src/test/resources/toll/tolls.json");
+-
+-        TollReader tollReader = new TollReader(tomtomFolder);
+-
+-        assertThat(tollReader.tollForTomtomId(12500001097987L)).isEqualTo(of(new Toll(1, "Péage d'Aigrefeuille", "4556", "4557")));
+-    }
+-}
+diff --git a/src/test/java/com/mappy/fpm/batches/utils/OsmosisSerializerIT.java b/src/test/java/com/mappy/fpm/batches/utils/OsmosisSerializerIT.java
+index 10880c8..d9284b2 100644
+--- a/src/test/java/com/mappy/fpm/batches/utils/OsmosisSerializerIT.java
++++ b/src/test/java/com/mappy/fpm/batches/utils/OsmosisSerializerIT.java
+@@ -4,6 +4,7 @@ import com.google.inject.Guice;
+ import com.mappy.fpm.batches.AbstractTest;
+ import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
+ import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
++import com.mappy.fpm.batches.tomtom.helpers.TollsFactory;
+ import org.junit.Test;
+ import org.openstreetmap.osmosis.osmbinary.Osmformat.HeaderBlock;
+ import org.openstreetmap.osmosis.pbf2.v0_6.impl.PbfRawBlob;
+@@ -20,7 +21,7 @@ public class OsmosisSerializerIT extends AbstractTest {
+ 
+     @Test
+     public void should_generate_building_file() throws Exception {
+-        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target/tests", "target/tests/splitter", "rennes")).getInstance(Tomtom2Osm.class);
++        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target/tests", "target/tests/splitter", TollsFactory.create("src/test/resources/osmgenerator"), "rennes")).getInstance(Tomtom2Osm.class);
+         launcher.run();
+ 
+         PbfStreamSplitter splitter = new PbfStreamSplitter(new DataInputStream(new FileInputStream("target/tests/rennes.osm.pbf")));
+-- 
+2.11.0
+

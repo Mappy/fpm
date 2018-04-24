@@ -4,6 +4,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.mappy.fpm.batches.merge.pbf.OsmMerger;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
+import com.mappy.fpm.batches.tomtom.helpers.TollTagger;
+import com.mappy.fpm.batches.tomtom.helpers.TollsFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -41,6 +43,7 @@ public class GenerateFullPbf {
     private final String outputDirectoryPath;
     private final String outputFileName;
     private final ExecutorService executorService;
+    private final TollTagger tollTagger;
 
     public GenerateFullPbf(OsmMerger osmMerger, String inputDirectoryPath, String outputDirectoryPath, String outputFileName, int nbThreads) {
         this.osmMerger = osmMerger;
@@ -49,6 +52,7 @@ public class GenerateFullPbf {
         this.outputFileName = outputFileName;
         BasicThreadFactory threadFactory = new Builder().namingPattern("mappy-GenerateFullPbf-%d").daemon(false).build();
         executorService = new ThreadPoolExecutor(nbThreads, nbThreads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), threadFactory);
+        tollTagger = TollsFactory.create(inputDirectoryPath);
     }
 
     public static void main(String[] args) {
@@ -74,7 +78,6 @@ public class GenerateFullPbf {
         try {
             List<String> countryPbfFiles = countries.stream().map(this::generateCountry).collect(toList());
             mergePbfFiles(countryPbfFiles, outputDirectoryPath + "/" + outputFileName, newArrayList());
-
         } finally {
             log.info("Shutting down service...");
             executorService.shutdown();
@@ -107,20 +110,18 @@ public class GenerateFullPbf {
             log.error(msg);
             throw new IllegalArgumentException(msg);
         }
-
         List<String> zonePbfFiles = newArrayList();
         List<Future<?>> zonesFutures = newArrayList();
 
         for (String zoneFileName : of(file.list()).filter(f -> f.endsWith(TOWN_SUFFIX) || f.endsWith(ROAD_SUFFIX) || f.endsWith(FERRY_SUFFIX) || f.endsWith(COUNTRY_SUFFIX)).collect(toList())) {
-
             String zone = zoneFileName.replace(TOWN_SUFFIX, "").replace(ROAD_SUFFIX, "").replace(FERRY_SUFFIX, "").replace(COUNTRY_SUFFIX, "");
 
             Tomtom2Osm instance = createInjector(new Tomtom2OsmModule(
                     inputDirectoryPath + "/" + country + "/",
                     outputDirectoryPath + "/" + country + "/pbfFiles",
                     outputDirectoryPath + "/splitter",
-                    zone)
-            ).getInstance(Tomtom2Osm.class);
+                    tollTagger,
+                    zone)).getInstance(Tomtom2Osm.class);
 
             Future<?> zoneFuture = executorService.submit(() -> {
                 try {
@@ -154,7 +155,7 @@ public class GenerateFullPbf {
         tasks.forEach(t -> {
             try {
                 t.get();
-            } catch (ExecutionException|InterruptedException e) {
+            } catch (ExecutionException | InterruptedException e) {
                 propagate(e);
             }
         });
