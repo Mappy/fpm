@@ -14,6 +14,9 @@ import org.jamel.dbf.structure.DbfRow;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Joiner.on;
 
@@ -25,7 +28,9 @@ import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Towards;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
+import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.*;
+import static java.util.stream.Stream.empty;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 @Slf4j
@@ -37,6 +42,8 @@ public class SignPosts extends TomtomDbfReader {
     private static final Predicate<SignPost> onlyDestination = onlyDestinationRefTowards.or(onlyDestinationLabel);
     private static final Predicate<SignPost> onlySymbol = signPost -> signPost.getInfotyp() == Pictogram;
     private static final Predicate<SignPost> onlyExit = signPost -> Exit.equals(signPost.getContyp())  && signPost.getInfotyp() == Exit_Number;
+    private static final Pattern EXIT_NUMBER_PATTERN = compile("((\\d|\\.)+\\w{0,1})(.*)") ;
+    private static final Pattern EXIT_LABEL_PATTERN = compile("(\\d|\\.)+\\w{0,1} (.*)") ;
 
     private final ListMultimap<Long, SignPost> si = ArrayListMultimap.create();
     private final Map<Long, Long> sg = newHashMap();
@@ -152,7 +159,10 @@ public class SignPosts extends TomtomDbfReader {
 
     @VisibleForTesting
     List<String> signPostContentFor(long tomtomId) {
-        return refFor(tomtomId, onlyDestination).stream().map(SignPost::getTxtcont).collect(toList());
+        Stream<String> stringStream = refFor(tomtomId, onlyDestination)
+                .stream()
+                .map(SignPost::getTxtcont);
+        return Stream.concat(stringStream, exitLabelFor(tomtomId).map(Stream::of).orElse(empty())).collect(toList());
     }
 
     @VisibleForTesting
@@ -191,11 +201,28 @@ public class SignPosts extends TomtomDbfReader {
                 .orElse("none");
     }
 
+    @VisibleForTesting
     Optional<String> exitRefFor(long tomtomId) {
+        return getExitText(tomtomId)
+                .map(EXIT_NUMBER_PATTERN::matcher)
+                .filter(Matcher::find)
+                .map(matcher -> matcher.group(1))
+                .findFirst();
+    }
+
+    @VisibleForTesting
+    Optional<String> exitLabelFor(long tomtomId) {
+        return getExitText(tomtomId)
+                .map(EXIT_LABEL_PATTERN::matcher)
+                .filter(Matcher::find)
+                .map(matcher -> matcher.group(2))
+                .findFirst();
+    }
+
+    private Stream<String> getExitText(long tomtomId) {
         return lastWayOfPath.get(tomtomId).stream().flatMap(a -> si.get(a).stream())
                 .filter(onlyExit)
-                .map(SignPost::getTxtcont)
-                .findFirst();
+                .map(SignPost::getTxtcont);
     }
 
     private List<SignPost> refFor(long tomtomId, Predicate<SignPost> filter) {
