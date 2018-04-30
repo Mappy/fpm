@@ -35,8 +35,8 @@ public class NameProvider extends TomtomDbfReader {
         readFile(filename, dbfRow -> getAlternateNames(alternateNames, dbfRow));
     }
 
-    public void loadAlternateCityNames(String filename) {
-        readFile(filename, dbfRow -> getAlternateNames(alternateCityNames, dbfRow));
+    public void loadAlternateCityNames() {
+        readFile("smnm.dbf", dbfRow -> getAlternateNames(alternateCityNames, dbfRow));
     }
 
     public Map<String, String> getAlternateCityNames(Long tomtomId) {
