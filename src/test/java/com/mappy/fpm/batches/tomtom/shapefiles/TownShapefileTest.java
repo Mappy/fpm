@@ -27,9 +27,9 @@ public class TownShapefileTest extends AbstractTest {
         when(tomtomFolder.getFile("sm.shp")).thenReturn("src/test/resources/tomtom/town/Anderlecht___________sm.shp");
 
         NameProvider nameProvider = mock(NameProvider.class);
-        when(nameProvider.getAlternateCityNames(356376363L)) //
+        when(nameProvider.getAlternateNames(356376363L)) //
                 .thenReturn(of("name", "Hamlet", "name:nl", "gehuchten", "name:fr", "hameaux"));
-        when(nameProvider.getAlternateCityNames(10560000407632L)) //
+        when(nameProvider.getAlternateNames(10560000407632L)) //
                 .thenReturn(of("name", "Scherdemaal", "name:nl", "neighbourhood", "name:fr", "quartier"));
 
         TownShapefile shapefile = new TownShapefile(tomtomFolder, nameProvider);

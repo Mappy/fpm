@@ -41,7 +41,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
         this.townTagger = townTagger;
 
         if (new File(folder.getFile("bu.shp")).exists()) {
-            nameProvider.loadAlternateCityNames();
+            nameProvider.loadAlternateNames("smnm.dbf");
         }
     }
 
@@ -84,7 +84,7 @@ public class BuiltUpShapefile extends TomtomShapefile {
 
     private Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, String name, Centroid cityCenter) {
 
-        Map<String, String> adminTags = nameProvider.getAlternateCityNames(cityCenter.getId());
+        Map<String, String> adminTags = nameProvider.getAlternateNames(cityCenter.getId());
         adminTags.put("name", name);
         adminTags.put("place", cityCenter.getPlace());
         ofNullable(cityCenter.getPostcode()).ifPresent(code -> adminTags.put("addr:postcode", code));

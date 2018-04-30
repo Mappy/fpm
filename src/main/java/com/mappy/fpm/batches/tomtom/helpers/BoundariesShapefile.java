@@ -137,7 +137,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         String capital = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
         tags.put("capital", "2".equals(capital) ? "yes" : capital);
 
-        tags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
+        tags.putAll(nameProvider.getAlternateNames(cityCenter.getId()));
 
         Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), tags);
         return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_centre"));
