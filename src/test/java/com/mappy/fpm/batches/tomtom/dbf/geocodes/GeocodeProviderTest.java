@@ -31,11 +31,11 @@ public class GeocodeProviderTest {
     }
 
     @Test
-    public void should_concat_alternative_road_names() {
+    public void should_concat_alternative_road_names_with_natural_order() {
         Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000003569L);
         assertThat(tags).hasSize(2);
         assertThat(tags.get("name:ca")).isEqualTo("Carrer de la Unió");
-        assertThat(tags.get("alt_name:ca")).isEqualTo("Carrer Maria Pla;Avinguda Carlemany;Carrer dels Paraires");
+        assertThat(tags.get("alt_name:ca")).isEqualTo("Avinguda Carlemany;Carrer Maria Pla;Carrer dels Paraires");
     }
 
     @Test
@@ -63,21 +63,21 @@ public class GeocodeProviderTest {
     @Test
     public void should_add_alternative_road_names_with_unknow_language() {
         Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000001935L);
-        assertThat(tags).hasSize(1).containsEntry("alt_name" , "Carrer Maria Pla");
+        assertThat(tags).hasSize(1).containsEntry("alt_name", "Carrer Maria Pla");
     }
 
     @Test
-    public void should_joining_alternative_road_names_with_unknow_language() {
+    public void should_joining_alternative_road_names_with_unknow_language_with_natural_order() {
         Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000005856L);
-        assertThat(tags).hasSize(1).containsEntry("alt_name" , "Carrer de les Nacions Unides;Carrer de La Unió");
+        assertThat(tags).hasSize(1).containsEntry("alt_name", "Carrer de La Unió;Carrer de les Nacions Unides");
     }
 
     @Test
     public void should_add_alternative_road_names_with_unknow_language_left_and_right() {
         Map<String, String> tags = geocodeProvider.getNamesAndAlternateNamesWithSide(10200000005857L);
         assertThat(tags).hasSize(2)
-                .containsEntry("alt_name:left" , "Carrer de les Nacions Unides")
-                .containsEntry("alt_name:right" , "Avinguda del Fener");
+                .containsEntry("alt_name:left", "Carrer de les Nacions Unides")
+                .containsEntry("alt_name:right", "Avinguda del Fener");
     }
 
     @Test
@@ -100,7 +100,7 @@ public class GeocodeProviderTest {
         Optional<String> postcodesLeft = geocodeProvider.getLeftPostalCode(10200000001935L);
         Optional<String> postcodesRight = geocodeProvider.getRightPostalCode(10200000001935L);
         assertThat(postcodesLeft).contains("AD500");
-        assertThat(postcodesRight).isEmpty() ;
+        assertThat(postcodesRight).isEmpty();
     }
 
     @Test
@@ -115,7 +115,7 @@ public class GeocodeProviderTest {
     public void should_add_an_interpolation_only_on_right() {
         Optional<String> postcodesLeft = geocodeProvider.getInterpolationsAddressLeft(10200000000143L);
         Optional<String> postcodesRight = geocodeProvider.getInterpolationsAddressRight(10200000000143L);
-        assertThat(postcodesLeft).isEmpty() ;
+        assertThat(postcodesLeft).isEmpty();
         assertThat(postcodesRight).contains("odd");
     }
 
@@ -132,7 +132,7 @@ public class GeocodeProviderTest {
         Optional<String> postcodesLeft = geocodeProvider.getInterpolationsAddressLeft(10200000001935L);
         Optional<String> postcodesRight = geocodeProvider.getInterpolationsAddressRight(10200000001935L);
         assertThat(postcodesLeft).contains("even");
-        assertThat(postcodesRight).isEmpty() ;
+        assertThat(postcodesRight).isEmpty();
     }
 
     @Test
@@ -156,14 +156,15 @@ public class GeocodeProviderTest {
         Map<String, String> interpolationAdress = geocodeProvider.getInterpolations(10200000000143L);
         assertThat(interpolationAdress)
                 .containsOnlyKeys("interpolation:right")
-                .containsEntry("interpolation:right" , "117;111") ;
+                .containsEntry("interpolation:right", "117;111");
     }
+
     @Test
     public void should_add_interpolation_left_and_right() {
         Map<String, String> interpolationAdress = geocodeProvider.getInterpolations(10200000002234L);
         assertThat(interpolationAdress)
                 .containsOnlyKeys("interpolation:left", "interpolation:right")
-                .containsEntry("interpolation:left" , "60;64")
-                .containsEntry("interpolation:right" , "109;107") ;
+                .containsEntry("interpolation:left", "60;64")
+                .containsEntry("interpolation:right", "109;107");
     }
 }

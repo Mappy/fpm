@@ -73,7 +73,7 @@ public class GeocodeProvider extends TomtomDbfReader {
 
         return getGeocodings(tomtomId)
                 .filter(alternativeName -> alternativeName.getSideOfLine() != null)
-                .sorted(Comparator.comparing(this::getMinBitMask))
+                .sorted(Comparator.comparing(Geocode::getName))
                 .collect(groupingBy(this::getKeyAlternativeNameWithSide, mapping(Geocode::getName, joining(";"))));
     }
 
