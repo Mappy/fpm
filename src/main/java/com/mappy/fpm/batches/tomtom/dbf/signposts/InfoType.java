@@ -22,4 +22,5 @@ public enum InfoType {
     public static boolean isaRouteNumber(InfoType infoType) {
         return infoType == Route_Number_on_Shield || infoType == Route_Number;
     }
+
 }

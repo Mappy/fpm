@@ -19,13 +19,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Joiner.on;
-
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.WHITE;
+import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.getColorByCode;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.InfoType.*;
-import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Branch;
-import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Exit;
-import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.Towards;
+import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.*;
 import static java.util.Arrays.asList;
 import static java.util.Comparator.comparing;
 import static java.util.regex.Pattern.compile;
@@ -36,14 +35,15 @@ import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 @Slf4j
 public class SignPosts extends TomtomDbfReader {
 
-    private static final Predicate<SignPost> onlyDestinationRefTowards = signPost -> isaRouteNumber(signPost.getInfotyp()) && signPost.getContyp() == Towards;
-    private static final Predicate<SignPost> onlyDestinationRefBranch = signPost -> isaRouteNumber(signPost.getInfotyp()) && signPost.getContyp() == Branch;
-    private static final Predicate<SignPost> onlyDestinationLabel = signPost -> asList(Place_Name, Other_Destination, Exit_Name).contains(signPost.getInfotyp()) ;
+    private static final Predicate<SignPost> onlyDestinationRefTowards = signPost -> isaRouteNumber(signPost.getInfotyp()) && Towards.equals(signPost.getContyp());
+    private static final Predicate<SignPost> onlyDestinationRefBranch = signPost -> isaRouteNumber(signPost.getInfotyp()) && Branch.equals(signPost.getContyp());
+    private static final Predicate<SignPost> onlyDestinationLabel = signPost -> asList(Place_Name, Other_Destination, Exit_Name).contains(signPost.getInfotyp());
     private static final Predicate<SignPost> onlyDestination = onlyDestinationRefTowards.or(onlyDestinationLabel);
-    private static final Predicate<SignPost> onlySymbol = signPost -> signPost.getInfotyp() == Pictogram;
-    private static final Predicate<SignPost> onlyExit = signPost -> Exit.equals(signPost.getContyp())  && signPost.getInfotyp() == Exit_Number;
-    private static final Pattern EXIT_NUMBER_PATTERN = compile("((\\d|\\.)+\\w{0,1})(.*)") ;
-    private static final Pattern EXIT_LABEL_PATTERN = compile("(\\d|\\.)+\\w{0,1} (.*)") ;
+    private static final Predicate<SignPost> onlyColours = signPost -> Route_Number_Type.equals(signPost.getInfotyp());
+    private static final Predicate<SignPost> onlySymbol = signPost -> Pictogram.equals(signPost.getInfotyp());
+    private static final Predicate<SignPost> onlyExit = signPost -> Exit.equals(signPost.getContyp()) && Exit_Number.equals(signPost.getInfotyp());
+    private static final Pattern EXIT_NUMBER_PATTERN = compile("((\\d|\\.)+\\w{0,1})(.*)");
+    private static final Pattern EXIT_LABEL_PATTERN = compile("(\\d|\\.)+\\w{0,1} (.*)");
 
     private final ListMultimap<Long, SignPost> si = ArrayListMultimap.create();
     private final Map<Long, Long> sg = newHashMap();
@@ -122,6 +122,11 @@ public class SignPosts extends TomtomDbfReader {
             tags.put(destinationTag + ":symbol", on(";").join(symbolRefFor));
         }
 
+        List<String> signPostColourFor = signPostColourFor(tomtomId);
+        if (isNotEmpty(signPostColourFor)) {
+            tags.put(destinationTag + ":colour", on(";").join(signPostColourFor));
+        }
+
         exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", exitRef));
         return tags;
     }
@@ -152,7 +157,8 @@ public class SignPosts extends TomtomDbfReader {
 
     @VisibleForTesting
     List<String> signPostHeaderFor(long tomtomId) {
-        return refFor(tomtomId, onlyDestinationRefBranch).stream()
+        return refFor(tomtomId, onlyDestinationRefBranch)
+                .stream()
                 .map(SignPost::getTxtcont)
                 .collect(toList());
     }
@@ -166,20 +172,34 @@ public class SignPosts extends TomtomDbfReader {
     }
 
     @VisibleForTesting
+    List<String> signPostColourFor(long tomtomId) {
+
+        Collection<List<SignPost>> signPostsBySeqnr = getSignPostsBySequentialNumber(tomtomId, onlyColours);
+
+        List<String> colors = getColourOnlyForDestination(signPostsBySeqnr);
+
+        if (colors.stream().anyMatch(colour -> !WHITE.value.equals(colour))) {
+            return colors;
+        }
+        return newArrayList();
+
+    }
+
+    @VisibleForTesting
     List<String> symbolRefFor(long tomtomId) {
 
-        Collection<List<SignPost>> signPostsBySeqnr = getSignPostsBySequentialNumber(tomtomId);
+        Collection<List<SignPost>> signPostsBySeqnr = getSignPostsBySequentialNumber(tomtomId, onlySymbol);
 
         List<String> symbols = getSymbolOnlyForDestination(signPostsBySeqnr);
 
-        if (symbols.stream().anyMatch(s -> !"none".equals(s))) {
+        if (symbols.stream().anyMatch(symbol -> !"none".equals(symbol))) {
             return symbols;
         }
         return newArrayList();
     }
 
-    private Collection<List<SignPost>> getSignPostsBySequentialNumber(long tomtomId) {
-        return refFor(tomtomId, onlySymbol.or(onlyDestination))
+    private Collection<List<SignPost>> getSignPostsBySequentialNumber(Long tomtomId, Predicate<SignPost> onlyType) {
+        return refFor(tomtomId, onlyType.or(onlyDestination))
                 .stream()
                 .collect(groupingBy(SignPost::getSeqnr))
                 .values();
@@ -193,12 +213,28 @@ public class SignPosts extends TomtomDbfReader {
                 .collect(toList());
     }
 
+    private List<String> getColourOnlyForDestination(Collection<List<SignPost>> signPostsBySeqnr) {
+        return signPostsBySeqnr.stream()
+                .flatMap(signPosts -> signPosts.stream()
+                        .filter(onlyDestination)
+                        .map(signPost -> getColourOrWhite(signPosts)))
+                .collect(toList());
+    }
+
     private String getSymbolOrNone(List<SignPost> signs) {
         return signs.stream()
                 .filter(onlySymbol)
                 .findFirst()
                 .map(sp -> PictogramType.name(sp.getTxtcont()))
                 .orElse("none");
+    }
+
+    private String getColourOrWhite(List<SignPost> signs) {
+        return signs.stream()
+                .filter(onlyColours)
+                .findFirst()
+                .map(sp -> getColorByCode(sp.getTxtcont()))
+                .orElse(WHITE.value);
     }
 
     @VisibleForTesting
@@ -210,8 +246,7 @@ public class SignPosts extends TomtomDbfReader {
                 .findFirst();
     }
 
-    @VisibleForTesting
-    Optional<String> exitLabelFor(long tomtomId) {
+    private Optional<String> exitLabelFor(long tomtomId) {
         return getExitText(tomtomId)
                 .map(EXIT_LABEL_PATTERN::matcher)
                 .filter(Matcher::find)
@@ -252,5 +287,4 @@ public class SignPosts extends TomtomDbfReader {
                 .flatMap(aLong -> sp.get(aLong).stream().map(SignPostPath::getTomtomId))
                 .collect(toSet());
     }
-
 }

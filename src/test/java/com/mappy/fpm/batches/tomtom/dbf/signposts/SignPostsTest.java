@@ -27,6 +27,7 @@ public class SignPostsTest {
 
         assertThat(signPosts.signPostContentFor(12500001485141L)).isEmpty();
         assertThat(signPosts.signPostContentFor(12500001658893L)).containsExactly("A10", "Bordeaux", "Nantes", "Quai d'Issy");
+        assertThat(signPosts.signPostColourFor(12500001658893L)).containsExactly("red", "red", "red", "white");
     }
 
     @Test
@@ -37,7 +38,8 @@ public class SignPostsTest {
         SignPosts signPosts = new SignPosts(folder);
 
         assertThat(signPosts.getTags(12500001485141L, true, 0L, 0L)).isEmpty();
-        assertThat(signPosts.getTags(12500001658893L, true, 0L, 0L)).contains(entry("destination", "A10;Bordeaux;Nantes;Quai d'Issy"));
+        assertThat(signPosts.getTags(12500001658893L, true, 0L, 0L))
+                .contains(entry("destination", "A10;Bordeaux;Nantes;Quai d'Issy"), entry("destination:colour", "red;red;red;white"));
     }
 
     @Test
@@ -48,7 +50,8 @@ public class SignPostsTest {
         SignPosts signPosts = new SignPosts(folder);
 
         assertThat(signPosts.getTags(12500001658893L, false, 0L, 12500002912860L)).contains(entry("destination:forward", "A10;Bordeaux;Nantes;Quai d'Issy"));
-        assertThat(signPosts.getTags(12500001658893L, false, 12500002912860L, 12500002912861L)).contains(entry("destination:backward", "A10;Bordeaux;Nantes;Quai d'Issy"));
+        assertThat(signPosts.getTags(12500001658893L, false, 12500002912860L, 12500002912861L))
+                .contains(entry("destination:backward", "A10;Bordeaux;Nantes;Quai d'Issy"), entry("destination:backward:colour", "red;red;red;white"));
     }
 
    @Test
@@ -66,7 +69,7 @@ public class SignPostsTest {
        assertThat(tags).isEmpty();
 
        tags = signPosts.getTags(14700000021236L, false, 14700000025680L, 14700000025681L);
-       assertThat(tags).containsExactly(entry("destination:forward", "Sliema;Gzira"));
+       assertThat(tags).contains(entry("destination:forward", "Sliema;Gzira"), entry("destination:forward:colour", "red;yellow"));
    }
 
     @Test
@@ -80,13 +83,49 @@ public class SignPostsTest {
     }
 
     @Test
-    public void should_load_exits() {
+    public void should_load_pictogramme() {
         when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si3.dbf").getPath());
         when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp3.dbf").getPath());
 
         SignPosts signPosts = new SignPosts(folder);
 
         assertThat(signPosts.exitRefFor(10560001774691L)).contains("17");
+        assertThat(signPosts.symbolRefFor(10560001774691L)).containsExactly("none", "none", "none", "industrial");
+        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactly("Brussel", "Bruxelles-Centre", "Brussel-Centrum", "Anderlecht");
+    }
+
+    @Test
+    public void should_distinguish_road_references_and_destinations_references() {
+        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si4.dbf").getPath());
+        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp4.dbf").getPath());
+
+        SignPosts signPosts = new SignPosts(folder);
+
+        assertThat(signPosts.signPostHeaderFor(10560001579633L)).containsExactly("E19");
+        assertThat(signPosts.signPostContentFor(10560001579633L)).containsExactly("Bruxelles", "Liège", "Mons", "E42");
+        assertThat(signPosts.signPostColourFor(10560001579633L)).containsExactly("white", "white", "white", "green", "green");
+    }
+
+    @Test
+    public void should_load_road_references_on_shield() {
+        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si5.dbf").getPath());
+        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp5.dbf").getPath());
+
+        SignPosts signPosts = new SignPosts(folder);
+
+        assertThat(signPosts.signPostHeaderFor(12500058400359L)).containsExactly("A2", "E19");
+        assertThat(signPosts.signPostContentFor(12500058400359L)).containsExactly("Cambrai", "Valenciennes", "Bruxelles", "Liège");
+    }
+
+    @Test
+    public void should_load_signpost_content_with_picto() {
+        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si6.dbf").getPath());
+        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp6.dbf").getPath());
+
+        SignPosts signPosts = new SignPosts(folder);
+
+        assertThat(signPosts.symbolRefFor(12500001165986L)).containsExactly("none", "airport", "none", "none", "none", "none");
+        assertThat(signPosts.signPostContentFor(12500001165986L)).containsExactly("Sarcelles", "Charles de Gaulle", "Lille", "Saint-Denis-Universités", "Pierrefitte-sur-Seine", "Stains");
     }
 
     @Test
@@ -105,69 +144,5 @@ public class SignPostsTest {
         assertThat(signPosts.exitRefFor(30560001774400L)).contains("4a");
         assertThat(signPosts.signPostContentFor(30560001774400L)).containsExactlyInAnyOrder("Garges-lès-Gonesse" , "Stains") ;
 
-    }
-
-    @Test
-    public void should_distinguish_road_references_and_destinations_references() {
-        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si4.dbf").getPath());
-        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp4.dbf").getPath());
-
-        SignPosts signPosts = new SignPosts(folder);
-
-        assertThat(signPosts.signPostHeaderFor(10560001579633L)).containsExactly("E19");
-        assertThat(signPosts.signPostContentFor(10560001579633L)).containsExactly("Bruxelles", "Liège", "Mons", "E42");
-    }
-
-    @Test
-    public void should_load_road_references_on_shield() {
-        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si5.dbf").getPath());
-        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp5.dbf").getPath());
-
-        SignPosts signPosts = new SignPosts(folder);
-
-        assertThat(signPosts.signPostHeaderFor(12500058400359L)).containsExactly("A2", "E19");
-        assertThat(signPosts.signPostContentFor(12500058400359L)).containsExactly("Cambrai", "Valenciennes", "Bruxelles", "Liège");
-    }
-
-    @Test
-    public void should_load_pictogramme() {
-        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si3.dbf").getPath());
-        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp3.dbf").getPath());
-
-        SignPosts signPosts = new SignPosts(folder);
-
-        assertThat(signPosts.symbolRefFor(10560001774691L)).containsExactly("none", "none", "none", "industrial");
-        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactly("Brussel", "Bruxelles-Centre", "Brussel-Centrum", "Anderlecht");
-    }
-
-    @Test
-    public void should_load_signpost_header() {
-        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si5.dbf").getPath());
-        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp5.dbf").getPath());
-
-        SignPosts signPosts = new SignPosts(folder);
-
-        assertThat(signPosts.signPostHeaderFor(12500058400359L)).containsExactly("A2", "E19");
-    }
-
-    @Test
-    public void should_load_signpost_content() {
-        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si4.dbf").getPath());
-        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp4.dbf").getPath());
-
-        SignPosts signPosts = new SignPosts(folder);
-
-        assertThat(signPosts.signPostContentFor(10560001579633L)).containsExactly("Bruxelles", "Liège", "Mons", "E42");
-    }
-
-    @Test
-    public void should_load_signpost_content_with_picto() {
-        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/si6.dbf").getPath());
-        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/sp6.dbf").getPath());
-
-        SignPosts signPosts = new SignPosts(folder);
-
-        assertThat(signPosts.symbolRefFor(12500001165986L)).containsExactly("none", "airport", "none", "none", "none", "none");
-        assertThat(signPosts.signPostContentFor(12500001165986L)).containsExactly("Sarcelles", "Charles de Gaulle", "Lille", "Saint-Denis-Universités", "Pierrefitte-sur-Seine", "Stains");
     }
 }
