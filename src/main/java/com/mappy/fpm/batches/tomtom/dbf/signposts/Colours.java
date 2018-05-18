@@ -15,8 +15,11 @@ public enum Colours {
         this.value = value;
     }
 
-    public static String getColorByCode(String code) {
-        return Stream.of(Colours.values()).filter(colours -> code.equals(colours.code)).findFirst().get().value;
+    public static String getColorOrWhite(String code) {
+        return Stream.of(Colours.values())
+                .filter(colours -> code.equals(colours.code))
+                .findFirst()
+                .orElse(WHITE).value;
     }
 
 

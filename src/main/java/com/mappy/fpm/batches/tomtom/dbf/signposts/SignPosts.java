@@ -22,7 +22,7 @@ import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.WHITE;
-import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.getColorByCode;
+import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.getColorOrWhite;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.InfoType.*;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.*;
 import static java.util.Arrays.asList;
@@ -233,7 +233,7 @@ public class SignPosts extends TomtomDbfReader {
         return signs.stream()
                 .filter(onlyColours)
                 .findFirst()
-                .map(sp -> getColorByCode(sp.getTxtcont()))
+                .map(sp -> getColorOrWhite(sp.getTxtcont()))
                 .orElse(WHITE.value);
     }
 

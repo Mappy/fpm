@@ -1,13 +1,15 @@
 package com.mappy.fpm.batches.tomtom.dbf.signposts;
 
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
-
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class SignPostsTest {
     private final TomtomFolder folder = mock(TomtomFolder.class);
@@ -54,23 +56,23 @@ public class SignPostsTest {
                 .contains(entry("destination:backward", "A10;Bordeaux;Nantes;Quai d'Issy"), entry("destination:backward:colour", "red;red;red;white"));
     }
 
-   @Test
-   public void should_generate_tag_for_signpost_on_intermediate_junction() {
-       when(folder.getFile("sg.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_sg.dbf").getPath());
-       when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_si.dbf").getPath());
-       when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_sp.dbf").getPath());
+    @Test
+    public void should_generate_tag_for_signpost_on_intermediate_junction() {
+        when(folder.getFile("sg.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_sg.dbf").getPath());
+        when(folder.getFile("si.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_si.dbf").getPath());
+        when(folder.getFile("sp.dbf")).thenReturn(getClass().getResource("/tomtom/signposts/sign_on_3_ways_sp.dbf").getPath());
 
-       SignPosts signPosts = new SignPosts(folder);
+        SignPosts signPosts = new SignPosts(folder);
 
-       Map<String, String> tags = signPosts.getTags(14700000013542L, false, 14700000005231L, 14700000005138L);
-       assertThat(tags).isEmpty();
+        Map<String, String> tags = signPosts.getTags(14700000013542L, false, 14700000005231L, 14700000005138L);
+        assertThat(tags).isEmpty();
 
-       tags = signPosts.getTags(14700000023315L, false, 14700000005231L, 14700000025680L);
-       assertThat(tags).isEmpty();
+        tags = signPosts.getTags(14700000023315L, false, 14700000005231L, 14700000025680L);
+        assertThat(tags).isEmpty();
 
-       tags = signPosts.getTags(14700000021236L, false, 14700000025680L, 14700000025681L);
-       assertThat(tags).contains(entry("destination:forward", "Sliema;Gzira"), entry("destination:forward:colour", "red;yellow"));
-   }
+        tags = signPosts.getTags(14700000021236L, false, 14700000025680L, 14700000025681L);
+        assertThat(tags).contains(entry("destination:forward", "Sliema;Gzira"), entry("destination:forward:colour", "white;yellow"));
+    }
 
     @Test
     public void should_prefer_large_sign() {
@@ -136,13 +138,12 @@ public class SignPostsTest {
         SignPosts signPosts = new SignPosts(folder);
 
         assertThat(signPosts.exitRefFor(10560001774691L)).contains("2");
-        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactlyInAnyOrder("Villejuif" , "Arcueil" , "Le Kremlin-Bicêtre") ;
+        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactlyInAnyOrder("Villejuif", "Arcueil", "Le Kremlin-Bicêtre");
 
         assertThat(signPosts.exitRefFor(20560001774200L)).contains("10.1");
-        assertThat(signPosts.signPostContentFor(20560001774200L)).containsExactlyInAnyOrder("Eurocentre" , "Grenade") ;
+        assertThat(signPosts.signPostContentFor(20560001774200L)).containsExactlyInAnyOrder("Eurocentre", "Grenade");
 
         assertThat(signPosts.exitRefFor(30560001774400L)).contains("4a");
-        assertThat(signPosts.signPostContentFor(30560001774400L)).containsExactlyInAnyOrder("Garges-lès-Gonesse" , "Stains") ;
-
+        assertThat(signPosts.signPostContentFor(30560001774400L)).containsExactlyInAnyOrder("Garges-lès-Gonesse", "Stains");
     }
 }
