@@ -50,6 +50,6 @@ public class TownShapefile extends TomtomShapefile {
     }
 
     private boolean hasNoGeometry(Feature feature) {
-        return !feature.getInteger("ADMINCLASS").equals(feature.getInteger("AXEORDER")) && feature.getLong("BUAID") == null;
+        return !feature.getInteger("ADMINCLASS").equals(feature.getInteger("AXORDER")) && feature.getLong("BUAID") == null;
     }
 }
