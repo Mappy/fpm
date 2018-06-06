@@ -33,10 +33,10 @@ public class BuiltUpShapefileTest extends AbstractTest {
     @BeforeClass
     public static void setup() {
         NameProvider nameProvider = mock(NameProvider.class);
-        when(nameProvider.getAlternateNames(12500001063055L)).thenReturn(newHashMap(of("name:fr", "Rougnat_fr")));
-        when(nameProvider.getAlternateNames(12500001060481L)).thenReturn(newHashMap(of("name:fr", "Auzances_fr")));
-        when(nameProvider.getAlternateNames(12500001067545L)).thenReturn(newHashMap(of("name:fr", "La Chaux-Bourdue_fr")));
-        when(nameProvider.getAlternateNames(112500001060737L)).thenReturn(newHashMap(of("name:fr", "Le Montely_fr")));
+        when(nameProvider.getAlternateCityNames(12500001063055L)).thenReturn(newHashMap(of("name:fr", "Rougnat_fr")));
+        when(nameProvider.getAlternateCityNames(12500001060481L)).thenReturn(newHashMap(of("name:fr", "Auzances_fr")));
+        when(nameProvider.getAlternateCityNames(12500001067545L)).thenReturn(newHashMap(of("name:fr", "La Chaux-Bourdue_fr")));
+        when(nameProvider.getAlternateCityNames(112500001060737L)).thenReturn(newHashMap(of("name:fr", "Le Montely_fr")));
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("bu.shp")).thenReturn("src/test/resources/tomtom/boundaries/bu/rougnat___________bu.shp");
@@ -115,6 +115,7 @@ public class BuiltUpShapefileTest extends AbstractTest {
                 .collect(toList());
 
         assertThat(tags).hasSize(4);
+        assertThat(tags.get(0)).hasSize(2);
         assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("12500001063055", "12500001060481", "12500001067545", "12500001060737");
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Rougnat", "Auzances", "La Chaux-Bourdue", "Le Montely");
     }

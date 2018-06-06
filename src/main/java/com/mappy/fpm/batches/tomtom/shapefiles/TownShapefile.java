@@ -22,7 +22,7 @@ public class TownShapefile extends TomtomShapefile {
         super(folder.getFile("sm.shp"));
         this.nameProvider = nameProvider;
         if (new File(folder.getFile("sm.shp")).exists()) {
-            nameProvider.loadAlternateNames("smnm.dbf");
+            nameProvider.loadAlternateCityNames();
         }
     }
 
@@ -38,7 +38,7 @@ public class TownShapefile extends TomtomShapefile {
             HashMap<String, String> tags = newHashMap();
 
             tags.put("name", feature.getString("NAME"));
-            tags.putAll(nameProvider.getAlternateNames(feature.getLong("ID")));
+            tags.putAll(nameProvider.getAlternateCityNames(feature.getLong("ID")));
             tags.put("place", CityType.getOsmValue(feature.getInteger("CITYTYP"), feature.getInteger("DISPCLASS")));
 
             serializer.writePoint(feature.getPoint(), tags);

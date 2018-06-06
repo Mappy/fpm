@@ -24,6 +24,7 @@ import static java.util.Optional.ofNullable;
 public class NameProvider extends TomtomDbfReader {
 
     private final Map<Long, List<AlternativeName>> alternateNames = newHashMap();
+    private final Map<Long, List<AlternativeName>> alternateCityNames = newHashMap();
 
     @Inject
     public NameProvider(TomtomFolder folder) {
@@ -32,6 +33,14 @@ public class NameProvider extends TomtomDbfReader {
 
     public void loadAlternateNames(String filename) {
         readFile(filename, dbfRow -> getAlternateNames(alternateNames, dbfRow));
+    }
+
+    public void loadAlternateCityNames() {
+        readFile("smnm.dbf", dbfRow -> getAlternateNames(alternateCityNames, dbfRow));
+    }
+
+    public Map<String, String> getAlternateCityNames(Long tomtomId) {
+        return getAlternateNames(tomtomId, alternateCityNames);
     }
 
     public Map<String, String> getAlternateNames(Long tomtomId) {

@@ -44,11 +44,11 @@ public class BoundariesA8ShapefileTest extends AbstractTest {
         when(nameProvider.getAlternateNames(10560000000263L)) //
                 .thenReturn(of("name", "Vorst", "name:nl", "VorstNL", "name:fr", "VorstFR"));
 
-        when(nameProvider.getAlternateNames(10560000718742L)) //
+        when(nameProvider.getAlternateCityNames(10560000718742L)) //
                 .thenReturn(of("name", "Anderlecht", "name:nl", "AnderlechtCNL", "name:fr", "AnderlechtCFR"));
-        when(nameProvider.getAlternateNames(10560000388234L)) //
+        when(nameProvider.getAlternateCityNames(10560000388234L)) //
                 .thenReturn(of("name", "Sint-Gillis", "name:nl", "Sint-GillisCNL", "name:fr", "Sint-GillisCFR"));
-        when(nameProvider.getAlternateNames(10560000455427L)) //
+        when(nameProvider.getAlternateCityNames(10560000455427L)) //
                 .thenReturn(of("name", "Vorst", "name:nl", "VorstCNL", "name:fr", "VorstCFR"));
 
         OsmLevelGenerator osmLevelGenerator = mock(OsmLevelGenerator.class);
