@@ -39,8 +39,8 @@ public class NameProviderTest {
 
     @Test
     public void should_add_alternative_city_names() {
-        nameProvider.loadAlternateNames("smnm.dbf");
-        Map<String, String> tags = nameProvider.getAlternateNames(10200000000008L);
+        nameProvider.loadAlternateCityNames();
+        Map<String, String> tags = nameProvider.getAlternateCityNames(10200000000008L);
         assertThat(tags).hasSize(7);
         assertThat(tags.get("name:ca")).isEqualTo("Andorra_cat");
         assertThat(tags.get("name:fr")).isEqualTo("Andorre");

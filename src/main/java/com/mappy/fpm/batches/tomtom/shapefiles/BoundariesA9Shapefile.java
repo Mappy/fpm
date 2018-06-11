@@ -19,7 +19,7 @@ public class BoundariesA9Shapefile extends BoundariesShapefile {
     public BoundariesA9Shapefile(TomtomFolder folder, TownTagger townTagger, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(folder.getFile("a9.shp"), 9, null, townTagger, nameProvider, osmLevelGenerator);
         if(new File(folder.getFile("a9.shp")).exists()) {
-            nameProvider.loadAlternateNames("smnm.dbf");
+            nameProvider.loadAlternateCityNames();
         }
     }
 
