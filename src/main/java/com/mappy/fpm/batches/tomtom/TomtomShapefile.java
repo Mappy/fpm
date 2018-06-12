@@ -62,7 +62,7 @@ public abstract class TomtomShapefile {
     private OsmosisSerializer getSerializer(String outputDirectory) {
         outputFile = outputDirectory + separator + getOutputFileName() + OSM_SUFFIX;
         try {
-            return new OsmosisSerializer(new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(outputFile), false)), "Tomtom", DateTime.now().toDate());
+            return new OsmosisSerializer(outputFile, new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(outputFile), false)), "Tomtom", DateTime.now().toDate());
         } catch (FileNotFoundException e) {
             log.error("Unable to create output directory {}", outputDirectory, e);
             throw propagate(e);

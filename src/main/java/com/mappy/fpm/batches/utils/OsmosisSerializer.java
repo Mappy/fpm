@@ -36,8 +36,10 @@ public class OsmosisSerializer implements GeometrySerializer {
     private final Set<Long> pointTracker = new LongOpenHashSet();
     private final Set<Long> wayTracker = new LongOpenHashSet();
     private final Set<Long> relationTracker = new LongOpenHashSet();
+    private String outputFilename;
 
-    public OsmosisSerializer(Sink sink, String userName, Date date) {
+    public OsmosisSerializer(String filename, Sink sink, String userName, Date date) {
+        this.outputFilename = filename;
         this.sink = sink;
         this.date = date;
         this.user = new OsmUser(1, userName);
@@ -45,7 +47,7 @@ public class OsmosisSerializer implements GeometrySerializer {
 
     @Inject
     public OsmosisSerializer(@Named("com.mappy.fpm.serializer.output") String filename, @Named("com.mappy.fpm.serializer.username") String userName) throws FileNotFoundException {
-        this(new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(filename), false)), userName, DateTime.now().toDate());
+        this(filename, new BoundComputerAndSorterSink(new PbfSink(new FileOutputStream(filename), false)), userName, DateTime.now().toDate());
     }
 
     @Override
@@ -189,7 +191,7 @@ public class OsmosisSerializer implements GeometrySerializer {
     private Long wayId(Geometry geometry) {
         long id = geohash(0, geometry.getCentroid().getCoordinate());
         while (wayTracker.contains(id)) {
-            log.debug("Collision on way with {}", id);
+            // log.debug("Collision on way with {}", id);
             id++;
         }
         wayTracker.add(id);
@@ -198,9 +200,9 @@ public class OsmosisSerializer implements GeometrySerializer {
 
 
     private long relationId(long memberId, int layer) {
-        long id = memberId + layer;
+        long id = memberId + layer + this.outputFilename.hashCode();
         while (relationTracker.contains(id)) {
-            log.debug("Collision on relation with {}", id);
+            // log.debug("Collision on relation with {}", id);
             id++;
         }
         relationTracker.add(id);
