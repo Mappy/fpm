@@ -25,7 +25,7 @@ public class OsmosisSerializerTest {
     private static final GeometryFactory gf = new GeometryFactory();
     private static final Date timestamp = new Date();
     private final MemorySink sink = new MemorySink();
-    private final OsmosisSerializer serializer = new OsmosisSerializer(sink, "user", timestamp);
+    private final OsmosisSerializer serializer = new OsmosisSerializer("test", sink, "user", timestamp);
 
     @Test
     public void should_write_points() {
@@ -97,9 +97,7 @@ public class OsmosisSerializerTest {
                 new RelationMember(1525972802595573L, Way, "to"),
                 new RelationMember(1525972802595572L, Way, "from")), newHashMap());
 
-        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).containsExactly(
-                1525972802595572L,
-                1525972802595573L);
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).hasSize(2);
     }
 
     @Test
@@ -110,9 +108,7 @@ public class OsmosisSerializerTest {
         serializer.write(newArrayList(
                 new RelationMember(1525972802595573L, Way, "to")), newHashMap());
 
-        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).containsExactly(
-                1525972802595572L,
-                1525972802595573L);
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).hasSize(2);
     }
 
     @Test
@@ -123,9 +119,7 @@ public class OsmosisSerializerTest {
         serializer.write(newArrayList(
                 new RelationMember(1525972802595572L, Way, "to")), ImmutableMap.of("layer", "2"));
 
-        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).containsExactly(
-                1525972802595572L,
-                1525972802595575L);
+        assertThat(sink.getEntities()).filteredOn(e -> e instanceof Relation).extracting(Entity::getId).hasSize(2);
     }
 
     @Test
