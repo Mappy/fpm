@@ -60,7 +60,7 @@ public class TownTagger {
             String name = feature.getString("NAME");
 
             if ((!axname.isPresent() || !axname.get().equals(name)) && buaname.equals(name)) {
-                ofNullable(feature.getLong("BUAID")).ifPresent(buaid -> centroidsBuiltUp.put(buaid, centroid.withId(buaid)));
+                ofNullable(feature.getLong("BUAID")).ifPresent(buaid -> centroidsBuiltUp.put(buaid, centroid.withId(feature.getLong("ID"))));
             }
         });
     }
