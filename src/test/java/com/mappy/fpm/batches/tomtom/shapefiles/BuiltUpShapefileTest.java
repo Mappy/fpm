@@ -29,6 +29,8 @@ import static org.mockito.Mockito.when;
 public class BuiltUpShapefileTest extends AbstractTest {
 
     private static PbfContent pbfContent;
+    private static PbfContent pbfContentWalkden;
+
 
     @BeforeClass
     public static void setup() {
@@ -62,6 +64,18 @@ public class BuiltUpShapefileTest extends AbstractTest {
 
         pbfContent = read(new File("target/tests/bu.osm.pbf"));
         assertThat(pbfContent.getRelations()).hasSize(4);
+
+
+
+        TomtomFolder tomtomFolderWalkden = mock(TomtomFolder.class);
+        when(tomtomFolderWalkden.getFile("bu.shp")).thenReturn("src/test/resources/tomtom/boundaries/bu/Walkden___________bu.shp");
+        when(tomtomFolderWalkden.getFile("sm.shp")).thenReturn("src/test/resources/tomtom/boundaries/bu/Walkden___________sm.shp");
+        when(tomtomFolderWalkden.getFile("smnm.dbf")).thenReturn("src/test/resources/tomtom/boundaries/bu/Walkden___________smnm.dbf");
+        NameProvider nameProviderWalkden = new NameProvider(tomtomFolderWalkden);
+        TownTagger townTaggerWalkden = new TownTagger(tomtomFolderWalkden);
+        BuiltUpShapefile shapefileWalkden = new BuiltUpShapefile(tomtomFolderWalkden, nameProviderWalkden, townTaggerWalkden);
+        shapefileWalkden.serialize("target/tests/");
+        pbfContentWalkden = read(new File("target/tests/bu.osm.pbf"));
     }
 
     @Test
@@ -119,4 +133,17 @@ public class BuiltUpShapefileTest extends AbstractTest {
         assertThat(tags).extracting(t -> t.get("ref:tomtom")).containsOnly("12500001063055", "12500001060481", "12500001067545", "12500001060737");
         assertThat(tags).extracting(t -> t.get("name")).containsOnly("Rougnat", "Auzances", "La Chaux-Bourdue", "Le Montely");
     }
+
+    @Test
+    public void should_have_all_anames_for_walkden() {
+        List<Tags> tags = pbfContentWalkden.getRelations().stream()
+                .flatMap(r -> r.getMembers().stream())
+                .filter(m -> "admin_centre".equals(m.getRole()))
+                .collect(toList()).stream()
+                .map(m -> m.getEntity().getTags()).collect(toList());
+
+        assertThat(tags).extracting(t -> t.get("name")).containsOnly("Walkden");
+        assertThat(tags).extracting(t -> t.get("name:en")).containsOnly("Walkden");
+    }
+
 }

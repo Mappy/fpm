@@ -38,7 +38,7 @@ public class TownTaggerTest extends AbstractTest {
     @Test
     public void should_load_centroids_when_secondary_sherdemaal_city_hamlet() {
         Centroid hamlet = townTagger.getBuiltUpCentroid(10560001000188L);
-        assertCentroid(hamlet, 10560001000188L, "Scherdemaal", 10, 12, 64, new Double[]{4.2895269, 50.8310562});
+        assertCentroid(hamlet, 10560000407632L, "Scherdemaal", 10, 12, 64, new Double[]{4.2895269, 50.8310562});
     }
 
     @Test
