@@ -24,12 +24,11 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RoadTaggerIT extends AbstractTest {
-
     private static PbfContent pbfContent;
 
     @BeforeClass
     public static void getGeneratedPbf() throws IOException {
-        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target/tests", "target/tests/splitter", "andand")).getInstance(Tomtom2Osm.class);
+        Tomtom2Osm launcher = Guice.createInjector(new Tomtom2OsmModule("src/test/resources/osmgenerator/", "target/tests", "target/tests/splitter", TollsFactory.create("src/test/resources/osmgenerator"), "andand")).getInstance(Tomtom2Osm.class);
         launcher.run();
         pbfContent = read(new File("target/tests/andand.osm.pbf"));
     }

@@ -27,13 +27,9 @@ public class TomtomFolder {
         return inputFolder + zone + "___________" + name;
     }
 
-    public String getTollsFile() {
-        return inputFolder + "tolls.json";
-    }
-
     public List<String> getSMFiles() {
         File file = new File(inputFolder);
 
-        return Stream.of(file.listFiles()).filter(f -> f.getName().startsWith(zone) && f.getName().endsWith("sm.shp")).map(f ->inputFolder + f.getName()).collect(toList());
+        return Stream.of(file.listFiles()).filter(f -> f.getName().startsWith(zone) && f.getName().endsWith("sm.shp")).map(f -> inputFolder + f.getName()).collect(toList());
     }
 }
