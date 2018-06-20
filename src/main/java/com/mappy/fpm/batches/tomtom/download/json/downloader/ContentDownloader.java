@@ -23,7 +23,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 public class ContentDownloader implements Function<Release, Stream<Content>> {
-
     public static final Pattern PATTERN = Pattern.compile("^(.*?)-shp(.?)-(.*?)-(.*?)-(.*?)\\.7z\\.001");
     private static final Set<String> NEEDED = newHashSet(newArrayList("2dcmnb", "mn", "sp"));
 

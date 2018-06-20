@@ -10,7 +10,7 @@ public class TomtomCountriesTest {
 
     @Test
     public void should_have_all_european_countries() {
-        assertThat(countries()).extracting("id").containsOnly("ALB", "AND", "AUT", "BEL", "BGR", "BIH",
+        assertThat(countries()).extracting("id").contains("ALB", "AND", "AUT", "BEL", "BGR", "BIH",
                 "BLR", "CHE", "CYP", "CZE", "DEU", "DNK", "ESP", "EST", "FIN", "FRA", "GBR", "GRC", "HRV", "HUN", "IRL",
                 "ISL", "ITA", "LTU", "LUX", "LVA", "MDA", "MKD", "MLT", "MNE", "NLD", "NOR", "POL", "PRT", "ROU", "RUS",
                 "SMR", "SRB", "SVK", "SVN", "SWE", "TUR", "UKR", "GLP", "GUF", "REU");
@@ -18,7 +18,7 @@ public class TomtomCountriesTest {
 
     @Test
     public void should_have_all_outer_world_countries() {
-        assertThat(outerworld()).extracting("id").containsOnly("OAT", "OIN", "OBE", "OCP", "ODE", "ODK",
+        assertThat(outerworld()).extracting("id").contains("OAT", "OIN", "OBE", "OCP", "ODE", "ODK",
                 "OES", "OFI", "OFR", "OGB", "OGR", "OIE", "OIT", "ONL", "ONO", "OPL", "OPT", "ORU", "OSE", "OTR");
     }
 }

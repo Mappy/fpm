@@ -14,6 +14,7 @@ public class MapContentDownloader {
     private final ProductsDownloader productsDownloader;
     private final ReleaseDownloader releaseDownloader;
     private final ContentDownloader contentDownloader;
+    private final DirectUrlDownloader directUrlDownloader;
     private final ArchiveDownloader archiveDownloader;
     private final ShapefileExtractor shapefileExtractor;
     private final File outputFolder;
@@ -21,12 +22,13 @@ public class MapContentDownloader {
     @Inject
     public MapContentDownloader(FamiliesDownloader familiesDownloader, ProductsDownloader productsDownloader, //
                                 ReleaseDownloader releaseDownloader, ContentDownloader contentDownloader, //
-                                ArchiveDownloader archiveDownloader, ShapefileExtractor shapefileExtractor, //
-                                @Named("outputFolder") File outputFolder) {
+                                DirectUrlDownloader directUrlDownloader, ArchiveDownloader archiveDownloader, //
+                                ShapefileExtractor shapefileExtractor, @Named("outputFolder") File outputFolder) {
         this.familiesDownloader = familiesDownloader;
         this.productsDownloader = productsDownloader;
         this.releaseDownloader = releaseDownloader;
         this.contentDownloader = contentDownloader;
+        this.directUrlDownloader = directUrlDownloader;
         this.archiveDownloader = archiveDownloader;
         this.shapefileExtractor = shapefileExtractor;
         this.outputFolder = outputFolder;
@@ -46,6 +48,7 @@ public class MapContentDownloader {
                 .flatMap(productsDownloader)//
                 .flatMap(releaseDownloader)//
                 .flatMap(contentDownloader)//
+                .map(directUrlDownloader)//
                 .map(archiveDownloader)//
                 .forEach(file -> shapefileExtractor.decompress(outputFolder, file));
     }

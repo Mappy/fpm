@@ -15,7 +15,6 @@ import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 @Slf4j
 public class ArchiveDownloader implements Function<Content, File> {
-
     private final File outputFolder;
     private final HttpClient client;
     private final String token;
