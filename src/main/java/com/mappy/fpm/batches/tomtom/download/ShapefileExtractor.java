@@ -39,7 +39,12 @@ public class ShapefileExtractor {
                 if (outerworld().stream().anyMatch(c -> c.getLabel().equals(countryCode)) && "ax".equals(matcher.group(5))) {
                     return;
                 }
-                country = COUNTRIES.stream().filter(c -> c.getId().equals(countryCode)).findFirst().get().getLabel();
+                try {
+                    country = COUNTRIES.stream().filter(c -> c.getId().equals(countryCode)).findFirst().get().getLabel();
+                } catch (java.util.NoSuchElementException e) {
+                    log.error("Unknown country with countryCode: " + countryCode);
+                    country = countryCode;
+                }
             }
 
             SevenZArchiveEntry entry;

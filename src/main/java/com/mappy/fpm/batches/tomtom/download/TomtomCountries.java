@@ -24,7 +24,9 @@ public class TomtomCountries {
         Set<TomtomCountry> countries = newHashSet();
         countries.add(new TomtomCountry("ALB", "Albania"));
         countries.add(new TomtomCountry("AND", "Andorra"));
+        countries.add(new TomtomCountry("ARM", "Armenia"));
         countries.add(new TomtomCountry("AUT", "Austria"));
+        countries.add(new TomtomCountry("AZE", "Azerbaijan"));
         countries.add(new TomtomCountry("BEL", "Belgium"));
         countries.add(new TomtomCountry("BGR", "Bulgaria"));
         countries.add(new TomtomCountry("BIH", "Bosnia-Herzegovina"));
