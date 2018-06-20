@@ -68,10 +68,15 @@ public class MapContentDownloaderIT {
                     return response;
                 };
 
-                client.onGet("https://api.test/contents/3121").doAction(file);
-                client.onGet("https://api.test/contents/3211").doAction(file);
-                client.onGet("https://api.test/contents/4111").doAction(file);
-                client.onGet("https://api.test/contents/5111").doAction(file);
+                client.onGet("https://api.test/contents/3121/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/3121'}");
+                client.onGet("https://api.test/contents/3211/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/3211'}");
+                client.onGet("https://api.test/contents/4111/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/4111'}");
+                client.onGet("https://api.test/contents/5111/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/5111'}");
+
+                client.onGet("https://redirect.test/contents/3121").doAction(file);
+                client.onGet("https://redirect.test/contents/3211").doAction(file);
+                client.onGet("https://redirect.test/contents/4111").doAction(file);
+                client.onGet("https://redirect.test/contents/5111").doAction(file);
 
             } catch (Exception e) {
                 fail();

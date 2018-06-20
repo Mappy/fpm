@@ -22,6 +22,7 @@ public class MapContentDownloaderTest {
     private final ProductsDownloader productsDownloader = mock(ProductsDownloader.class);
     private final ReleaseDownloader releaseDownloader = mock(ReleaseDownloader.class);
     private final ContentDownloader contentDownloader = mock(ContentDownloader.class);
+    private final DirectUrlDownloader directUrlDownloader = mock(DirectUrlDownloader.class);
     private final ArchiveDownloader archiveDownloader = mock(ArchiveDownloader.class);
     private final ShapefileExtractor shapefileExtractor = mock(ShapefileExtractor.class);
     private final File outputDirectory = mock(File.class);
@@ -41,12 +42,17 @@ public class MapContentDownloaderTest {
         when(contentDownloader.apply(new Release("2016_09", "loc7"))).thenReturn(newArrayList(new Content("content2", "loc10"), new Content("content3", "loc11")).stream());
         when(contentDownloader.apply(new Release("2016_09", "loc8"))).thenReturn(newArrayList(new Content("content4", "loc12")).stream());
 
-        when(archiveDownloader.apply(new Content("content1", "loc9"))).thenReturn(mock(File.class));
-        when(archiveDownloader.apply(new Content("content2", "loc10"))).thenReturn(mock(File.class));
-        when(archiveDownloader.apply(new Content("content3", "loc11"))).thenReturn(mock(File.class));
-        when(archiveDownloader.apply(new Content("content4", "loc12"))).thenReturn(mock(File.class));
+        when(directUrlDownloader.apply(new Content("content1", "loc9"))).thenReturn(new Content("content1", "locd9"));
+        when(directUrlDownloader.apply(new Content("content2", "loc10"))).thenReturn(new Content("content2", "locd10"));
+        when(directUrlDownloader.apply(new Content("content3", "loc11"))).thenReturn(new Content("content3", "locd11"));
+        when(directUrlDownloader.apply(new Content("content4", "loc12"))).thenReturn(new Content("content4", "locd12"));
 
-        mapContentDownloader = new MapContentDownloader(familiesDownloader, productsDownloader, releaseDownloader, contentDownloader, archiveDownloader, shapefileExtractor, outputDirectory);
+        when(archiveDownloader.apply(new Content("content1", "locd9"))).thenReturn(mock(File.class));
+        when(archiveDownloader.apply(new Content("content2", "locd10"))).thenReturn(mock(File.class));
+        when(archiveDownloader.apply(new Content("content3", "locd11"))).thenReturn(mock(File.class));
+        when(archiveDownloader.apply(new Content("content4", "locd12"))).thenReturn(mock(File.class));
+
+        mapContentDownloader = new MapContentDownloader(familiesDownloader, productsDownloader, releaseDownloader, contentDownloader, directUrlDownloader, archiveDownloader, shapefileExtractor, outputDirectory);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -75,11 +81,16 @@ public class MapContentDownloaderTest {
         verify(contentDownloader).apply(new Release("2016_09", "loc6"));
         verify(contentDownloader).apply(new Release("2016_09", "loc7"));
         verify(contentDownloader).apply(new Release("2016_09", "loc8"));
+        verify(directUrlDownloader, times(4)).apply(any(Content.class));
+        verify(directUrlDownloader).apply(new Content("content1", "loc9"));
+        verify(directUrlDownloader).apply(new Content("content2", "loc10"));
+        verify(directUrlDownloader).apply(new Content("content3", "loc11"));
+        verify(directUrlDownloader).apply(new Content("content4", "loc12"));
         verify(archiveDownloader, times(4)).apply(any(Content.class));
-        verify(archiveDownloader).apply(new Content("content1", "loc9"));
-        verify(archiveDownloader).apply(new Content("content2", "loc10"));
-        verify(archiveDownloader).apply(new Content("content3", "loc11"));
-        verify(archiveDownloader).apply(new Content("content4", "loc12"));
+        verify(archiveDownloader).apply(new Content("content1", "locd9"));
+        verify(archiveDownloader).apply(new Content("content2", "locd10"));
+        verify(archiveDownloader).apply(new Content("content3", "locd11"));
+        verify(archiveDownloader).apply(new Content("content4", "locd12"));
         verify(shapefileExtractor, times(4)).decompress(eq(outputDirectory), any(File.class));
     }
 }
