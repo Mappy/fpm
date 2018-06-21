@@ -29,7 +29,7 @@ public class SignPostsTest {
 
         assertThat(signPosts.signPostContentFor(12500001485141L)).isEmpty();
         assertThat(signPosts.signPostContentFor(12500001658893L)).containsExactly("A10", "Bordeaux", "Nantes", "Quai d'Issy");
-        assertThat(signPosts.signPostColourFor(12500001658893L)).containsExactly("red", "red", "red", "white");
+        assertThat(signPosts.signPostColourFor(12500001658893L)).isEmpty();
     }
 
     @Test
@@ -41,7 +41,7 @@ public class SignPostsTest {
 
         assertThat(signPosts.getTags(12500001485141L, true, 0L, 0L)).isEmpty();
         assertThat(signPosts.getTags(12500001658893L, true, 0L, 0L))
-                .contains(entry("destination", "A10;Bordeaux;Nantes;Quai d'Issy"), entry("destination:colour", "red;red;red;white"));
+                .contains(entry("destination", "A10;Bordeaux;Nantes;Quai d'Issy"));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class SignPostsTest {
 
         assertThat(signPosts.getTags(12500001658893L, false, 0L, 12500002912860L)).contains(entry("destination:forward", "A10;Bordeaux;Nantes;Quai d'Issy"));
         assertThat(signPosts.getTags(12500001658893L, false, 12500002912860L, 12500002912861L))
-                .contains(entry("destination:backward", "A10;Bordeaux;Nantes;Quai d'Issy"), entry("destination:backward:colour", "red;red;red;white"));
+                .contains(entry("destination:backward", "A10;Bordeaux;Nantes;Quai d'Issy"));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class SignPostsTest {
         assertThat(tags).isEmpty();
 
         tags = signPosts.getTags(14700000021236L, false, 14700000025680L, 14700000025681L);
-        assertThat(tags).contains(entry("destination:forward", "Sliema;Gzira"), entry("destination:forward:colour", "white;yellow"));
+        assertThat(tags).contains(entry("destination:forward", "Sliema;Gzira"));
     }
 
     @Test
@@ -105,7 +105,7 @@ public class SignPostsTest {
 
         assertThat(signPosts.signPostHeaderFor(10560001579633L)).containsExactly("E19");
         assertThat(signPosts.signPostContentFor(10560001579633L)).containsExactly("Bruxelles", "Liège", "Mons", "E42");
-        assertThat(signPosts.signPostColourFor(10560001579633L)).containsExactly("white", "white", "white", "green", "green");
+        assertThat(signPosts.signPostColourFor(10560001579633L)).containsExactly("green");
     }
 
     @Test
