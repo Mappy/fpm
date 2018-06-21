@@ -31,8 +31,7 @@ public class DirectUrlDownloader implements Function<Content, Content> {
         HttpGet get = new HttpGet(content.getLocation() + "/download-url");
         get.addHeader("Authorization", token);
 
-        try {
-            InputStream response = client.execute(get).getEntity().getContent();
+        try (InputStream response = client.execute(get).getEntity().getContent()) {
             String directUrl = new JSONObject(IOUtils.toString(response, "UTF-8")).getString("url");
             return new Content(content.getName(), directUrl);
         } catch (IOException|JSONException e) {
