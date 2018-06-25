@@ -34,13 +34,15 @@ public class FamiliesDownloaderTest {
     }
 
     @Test
-    public void should_only_download_mn_sp_2dcm_families() {
+    public void should_only_download_useful_families() {
 
         Stream<Family> families = familiesDownloader.get();
 
         assertThat(families).containsOnly(//
+                new Family("MNAP", "https://api.test/families/200"),//
                 new Family("MN", "https://api.test/families/300"), //
                 new Family("SP", "https://api.test/families/400"),//
-                new Family("2DCM", "https://api.test/families/500"));
+                new Family("2DCM", "https://api.test/families/500"),//
+                new Family("MNPOI", "https://api.test/families/600"));
     }
 }

@@ -41,7 +41,6 @@ public class ContentDownloader implements Function<Release, Stream<Content>> {
         get.addHeader("Authorization", token);
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
-
             return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Contents.class).getContents().stream()
                     .filter(c -> {
                         Matcher matcher = PATTERN.matcher(c.getName());

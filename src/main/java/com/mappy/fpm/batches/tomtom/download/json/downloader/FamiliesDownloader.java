@@ -39,7 +39,6 @@ public class FamiliesDownloader {
         get.addHeader("Authorization", token);
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
-
             return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Families.class).getContent().stream() //
                     .filter(f -> ALLOWED.contains(f.getAbbreviation()));
         } catch (IOException e) {

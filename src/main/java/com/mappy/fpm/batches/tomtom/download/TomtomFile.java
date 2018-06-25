@@ -52,8 +52,36 @@ public enum TomtomFile {
     NETWORK_PROFILE_LINK("sp", "_hsnp."),
     HISTORICAL_SPEED_PROFILES("sp", "_hspr."),
 
+    // FIXME: Use and filter
     HIGH_QUALITY_LANDUSE("2dcmnb", "_2dtb."),
     BUILDING("2dcmnb", "_2dtb."),
+    HIGH_QUALITY_LANDUSE_STANDARD("2dcm", "_2dtb."),
+    BUILDING_STANDARD("2dcm", "_2dtb."),
+
+    // FIXME: Use and filter
+    POI("mnpoi", "_pi."),
+    POI_ADDRESS("mnpoi", "_piad."),
+    POI_ATTRIBUTE_SET("mnpoi", "_pias."),
+    POI_ATTRIBUTE_VALUE("mnpoi", "_piav."),
+    POI_CODE("mnpoi", "_picd."),
+    POI_CONVERSION_RECORDS("mnpoi", "_picn."),
+    POI_NAME("mnpoi", "_pinm."),
+    POI_RELATIONSHIP("mnpoi", "_pipr."),
+    POI_SERVICE_IN_AREA("mnpoi", "_pisa."),
+    POI_XML_OBJECT_REFERENCE("mnpoi", "_pixo."),
+    POI_CITY_CENTER("mnpoi", "_sm."),
+    POI_SETTLEMENT_CENTER_EXTENDED_ATTRIBUTES("mnpoi", "_smea."),
+    POI_CITY_CENTER_NAMES("mnpoi", "_smnm."),
+
+    // FIXME: Use and filter
+    ANCHOR_POINT("mnap", "_at."),
+    ADDRESS("mnap", "_atad."),
+    ADDRESS_COMPONENT("atac", "_atac."),
+    NAME_COMPONENT("mnap", "_atnc."),
+    FEATURE_ASSOCIATED_WITH_ANCHOR_POINT("mnap", "_atat."),
+    COMPONENT_FORMAT("mnap", "_atcf."),
+    ANCHOR_POINT_ALONG_TRANSPORTATION_ELEMENT("mnap", "_atte."),
+
 
     OUTERWORLD("outerworld", "nw.");
 

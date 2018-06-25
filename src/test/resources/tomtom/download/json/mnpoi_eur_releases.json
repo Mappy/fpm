@@ -3,12 +3,12 @@
     {
       "deliveryType": "full",
       "dueDate": "2018-03-01T00:00:00Z",
-      "id": 511,
+      "id": 611,
       "iterationType": "commercial",
-      "location": "https://api.test/releases/511",
+      "location": "https://api.test/releases/611",
       "product": {
-        "id": 510,
-        "location": "https://api.test/products/510"
+        "id": 610,
+        "location": "https://api.test/products/610"
       },
       "state": {
         "date": "2018-02-26T15:07:19.988Z",

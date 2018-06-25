@@ -37,7 +37,6 @@ public class ProductsDownloader implements Function<Family, Stream<Product>> {
         get.addHeader("Authorization", token);
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
-
             return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Products.class).getContent().stream();
         } catch (IOException e) {
             throw propagate(e);
