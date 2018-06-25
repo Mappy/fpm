@@ -22,7 +22,7 @@ import static com.google.common.collect.Lists.newArrayList;
 public class FamiliesDownloader {
 
     private static final String FAMILIES_URL = "https://api.tomtom.com/mcapi/families";
-    private static final List<String> ALLOWED = newArrayList("2DCM", "MN", "SP");
+    private static final List<String> ALLOWED = newArrayList("2DCM", "MN", "SP", "MNPOI", "MNAP");
 
     private final HttpClient client;
     private final String token;
