@@ -44,19 +44,25 @@ public class MapContentDownloaderIT {
             try {
                 client.onGet("https://api.tomtom.com/mcapi/families").doReturnJSON(getFile("families.json"));
 
+                client.onGet("https://api.test/families/200/products").doReturnJSON(getFile("mnap_products.json"));
                 client.onGet("https://api.test/families/300/products").doReturnJSON(getFile("mn_products.json"));
                 client.onGet("https://api.test/families/400/products").doReturnJSON(getFile("sp_products.json"));
                 client.onGet("https://api.test/families/500/products").doReturnJSON(getFile("2dcm_products.json"));
+                client.onGet("https://api.test/families/600/products").doReturnJSON(getFile("mnpoi_products.json"));
 
+                client.onGet("https://api.test/products/210/releases").doReturnJSON(getFile("mnap_eur_releases.json"));
                 client.onGet("https://api.test/products/310/releases").doReturnJSON(getFile("mn_eur_releases.json"));
                 client.onGet("https://api.test/products/320/releases").doReturnJSON(getFile("mn_lam_releases.json"));
                 client.onGet("https://api.test/products/410/releases").doReturnJSON(getFile("sp_eur_releases.json"));
                 client.onGet("https://api.test/products/510/releases").doReturnJSON(getFile("2dcm_eur_releases.json"));
+                client.onGet("https://api.test/products/610/releases").doReturnJSON(getFile("mnpoi_eur_releases.json"));
 
+                client.onGet("https://api.test/releases/211?label=shpd").doReturnJSON(getFile("mnap_eur_2016.09_contents.json"));
                 client.onGet("https://api.test/releases/312?label=shpd").doReturnJSON(getFile("mn_eur_2016.09_contents.json"));
                 client.onGet("https://api.test/releases/322?label=shpd").doReturnJSON(getFile("mn_lam_2016.09_contents.json"));
                 client.onGet("https://api.test/releases/411?label=shpd").doReturnJSON(getFile("sp_eur_2016.09_contents.json"));
                 client.onGet("https://api.test/releases/511?label=shpd").doReturnJSON(getFile("2dcm_eur_2016.09_contents.json"));
+                client.onGet("https://api.test/releases/611?label=shpd").doReturnJSON(getFile("mnpoi_eur_2016.09_contents.json"));
 
                 Action file = r -> {
                     BasicHttpResponse response = new BasicHttpResponse(new ProtocolVersion("http", 1, 1), 200, "ok");
@@ -68,15 +74,19 @@ public class MapContentDownloaderIT {
                     return response;
                 };
 
+                client.onGet("https://api.test/contents/2111/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/2111'}");
                 client.onGet("https://api.test/contents/3121/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/3121'}");
                 client.onGet("https://api.test/contents/3211/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/3211'}");
                 client.onGet("https://api.test/contents/4111/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/4111'}");
                 client.onGet("https://api.test/contents/5111/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/5111'}");
+                client.onGet("https://api.test/contents/6111/download-url").doReturnJSON("{'url': 'https://redirect.test/contents/6111'}");
 
+                client.onGet("https://redirect.test/contents/2111").doAction(file);
                 client.onGet("https://redirect.test/contents/3121").doAction(file);
                 client.onGet("https://redirect.test/contents/3211").doAction(file);
                 client.onGet("https://redirect.test/contents/4111").doAction(file);
                 client.onGet("https://redirect.test/contents/5111").doAction(file);
+                client.onGet("https://redirect.test/contents/6111").doAction(file);
 
             } catch (Exception e) {
                 fail();

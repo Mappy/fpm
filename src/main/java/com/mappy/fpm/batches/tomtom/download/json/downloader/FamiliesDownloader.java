@@ -22,7 +22,7 @@ import static com.google.common.collect.Lists.newArrayList;
 public class FamiliesDownloader {
 
     private static final String FAMILIES_URL = "https://api.tomtom.com/mcapi/families";
-    private static final List<String> ALLOWED = newArrayList("2DCM", "MN", "SP");
+    private static final List<String> ALLOWED = newArrayList("2DCM", "MN", "SP", "MNPOI", "MNAP");
 
     private final HttpClient client;
     private final String token;
@@ -39,7 +39,6 @@ public class FamiliesDownloader {
         get.addHeader("Authorization", token);
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
-
             return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Families.class).getContent().stream() //
                     .filter(f -> ALLOWED.contains(f.getAbbreviation()));
         } catch (IOException e) {

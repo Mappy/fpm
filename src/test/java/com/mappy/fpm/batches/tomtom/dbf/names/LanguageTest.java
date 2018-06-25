@@ -70,8 +70,8 @@ public class LanguageTest {
     }
 
     @Test
-    public void should_tags_tomtom_montenegro_cyrillic_with_osm_sh() {
-        assertEquals(Language.valueOf("SMC").getValue(), "sh");
+    public void should_tags_tomtom_montenegro_cyrillic_with_osm_cnr() {
+        assertEquals(Language.valueOf("SMC").getValue(), "cnr");
     }
 
     @Test

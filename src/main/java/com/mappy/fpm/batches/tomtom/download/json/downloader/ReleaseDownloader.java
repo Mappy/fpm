@@ -40,7 +40,6 @@ public class ReleaseDownloader implements Function<Product, Stream<Release>> {
         get.addHeader("Authorization", token);
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
-
             return new Gson().fromJson(IOUtils.toString(response, "UTF-8"), Releases.class).getContent().stream() //
                     .filter(r -> version.equals(r.getVersion()))
                     .filter(Objects::nonNull);

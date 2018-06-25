@@ -10,8 +10,8 @@
     {
       "abbreviation": "MNPOI",
       "description": null,
-      "id": 651,
-      "location": "https://api.test/families/651",
+      "id": 600,
+      "location": "https://api.test/families/600",
       "name": "Points of Interest - MultiNet"
     },
     {
@@ -27,6 +27,13 @@
       "id": 500,
       "location": "https://api.test/families/500",
       "name": "2D City Maps"
+    },
+    {
+      "abbreviation": "MNAP",
+      "description": null,
+      "id": 200,
+      "location": "https://api.test/families/200",
+      "name": "Address Points - MultiNet"
     }
   ],
   "first": true,

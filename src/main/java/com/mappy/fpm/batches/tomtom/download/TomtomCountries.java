@@ -40,7 +40,9 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("EST", "Estonia"));
         countries.add(new TomtomCountry("FIN", "Finland"));
         countries.add(new TomtomCountry("FRA", "France"));
+        countries.add(new TomtomCountry("FRO", "Faroe-Islands"));
         countries.add(new TomtomCountry("GBR", "UK"));
+        countries.add(new TomtomCountry("GEO", "Georgia"));
         countries.add(new TomtomCountry("GRC", "Greece"));
         countries.add(new TomtomCountry("HRV", "Croatia"));
         countries.add(new TomtomCountry("HUN", "Hungary"));
@@ -75,10 +77,11 @@ public class TomtomCountries {
 
     public static Set<TomtomCountry> outerworld() {
         Set<TomtomCountry> countries = newHashSet();
+        countries.add(new TomtomCountry("OAS", "Outerworld-Australia", true));
         countries.add(new TomtomCountry("OAT", "Outerworld-Atlantic", true));
-        countries.add(new TomtomCountry("OIN", "Outerworld-Indian", true));
+        countries.add(new TomtomCountry("OCA", "Outerworld-Canada-Atlantic-Ocean", true));
         countries.add(new TomtomCountry("OBE", "Outerworld-Belgium", true));
-        countries.add(new TomtomCountry("OCP", "Outerworld-Canada-Ocean-Pacific", true));
+        countries.add(new TomtomCountry("OCP", "Outerworld-Canada-Pacific-Ocean", true));
         countries.add(new TomtomCountry("ODE", "Outerworld-Germany", true));
         countries.add(new TomtomCountry("ODK", "Outerworld-Denmark", true));
         countries.add(new TomtomCountry("OES", "Outerworld-Spain", true));
@@ -88,13 +91,18 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("OGR", "Outerworld-Greece", true));
         countries.add(new TomtomCountry("OIE", "Outerworld-Ireland", true));
         countries.add(new TomtomCountry("OIT", "Outerworld-Italy", true));
+        countries.add(new TomtomCountry("OIN", "Outerworld-Indian", true));
+        countries.add(new TomtomCountry("OMX", "Outerworld-Mexico", true));
         countries.add(new TomtomCountry("ONL", "Outerworld-Netherlands", true));
         countries.add(new TomtomCountry("ONO", "Outerworld-Norway", true));
+        countries.add(new TomtomCountry("OPA", "Outerworld-Pacific-Ocean", true));
         countries.add(new TomtomCountry("OPL", "Outerworld-Poland", true));
         countries.add(new TomtomCountry("OPT", "Outerworld-Portugal", true));
         countries.add(new TomtomCountry("ORU", "Outerworld-Russia", true));
         countries.add(new TomtomCountry("OSE", "Outerworld-Sweden", true));
-        countries.add(new TomtomCountry("OTR", "Outerworld-Turkey", true));
+        countries.add(new TomtomCountry("OTR", "Outerworld-Turkey", true));;
+        countries.add(new TomtomCountry("OUA", "Outerworld-USA-Atlantic-Ocean", true));
+        countries.add(new TomtomCountry("OUP", "Outerworld-USA-Pacific-Ocean", true));
         return countries;
     }
 }
