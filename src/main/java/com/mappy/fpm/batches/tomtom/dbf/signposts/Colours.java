@@ -15,11 +15,11 @@ public enum Colours {
         this.value = value;
     }
 
-    public static String getColorOrWhite(String code) {
+    public static String getColourOrGreen(String code) {
         return Stream.of(Colours.values())
                 .filter(colours -> code.equals(colours.code))
                 .findFirst()
-                .orElse(WHITE).value;
+                .orElse(GREEN).value;
     }
 
 

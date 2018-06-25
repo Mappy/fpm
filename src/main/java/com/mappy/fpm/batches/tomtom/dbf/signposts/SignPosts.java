@@ -21,8 +21,9 @@ import java.util.stream.Stream;
 import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.GREEN;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.WHITE;
-import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.getColorOrWhite;
+import static com.mappy.fpm.batches.tomtom.dbf.signposts.Colours.getColourOrGreen;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.InfoType.*;
 import static com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.ConnectionType.*;
 import static java.util.Arrays.asList;
@@ -39,6 +40,7 @@ public class SignPosts extends TomtomDbfReader {
     private static final Predicate<SignPost> onlyDestinationRefBranch = signPost -> isaRouteNumber(signPost.getInfotyp()) && Branch.equals(signPost.getContyp());
     private static final Predicate<SignPost> onlyDestinationLabel = signPost -> asList(Place_Name, Other_Destination, Exit_Name).contains(signPost.getInfotyp());
     private static final Predicate<SignPost> onlyDestination = onlyDestinationRefTowards.or(onlyDestinationLabel);
+    private static final Predicate<SignPost> onlyShield = signPost -> isaShieldNumber(signPost.getInfotyp());
     private static final Predicate<SignPost> onlyColours = signPost -> Route_Number_Type.equals(signPost.getInfotyp());
     private static final Predicate<SignPost> onlySymbol = signPost -> Pictogram.equals(signPost.getInfotyp());
     private static final Predicate<SignPost> onlyExit = signPost -> Exit.equals(signPost.getContyp()) && Exit_Number.equals(signPost.getInfotyp());
@@ -176,7 +178,7 @@ public class SignPosts extends TomtomDbfReader {
 
         Collection<List<SignPost>> signPostsBySeqnr = getSignPostsBySequentialNumber(tomtomId, onlyColours);
 
-        List<String> colors = getColourOnlyForDestination(signPostsBySeqnr);
+        List<String> colors = getColourOnlyForShield(signPostsBySeqnr);
 
         if (colors.stream().anyMatch(colour -> !WHITE.value.equals(colour))) {
             return colors;
@@ -213,11 +215,11 @@ public class SignPosts extends TomtomDbfReader {
                 .collect(toList());
     }
 
-    private List<String> getColourOnlyForDestination(Collection<List<SignPost>> signPostsBySeqnr) {
+    private List<String> getColourOnlyForShield(Collection<List<SignPost>> signPostsBySeqnr) {
         return signPostsBySeqnr.stream()
                 .flatMap(signPosts -> signPosts.stream()
-                        .filter(onlyDestination)
-                        .map(signPost -> getColourOrWhite(signPosts)))
+                        .filter(onlyShield)
+                        .map(signPost -> getColourOrGreen(signPosts)))
                 .collect(toList());
     }
 
@@ -229,12 +231,12 @@ public class SignPosts extends TomtomDbfReader {
                 .orElse("none");
     }
 
-    private String getColourOrWhite(List<SignPost> signs) {
+    private String getColourOrGreen(List<SignPost> signs) {
         return signs.stream()
                 .filter(onlyColours)
                 .findFirst()
-                .map(sp -> getColorOrWhite(sp.getTxtcont()))
-                .orElse(WHITE.value);
+                .map(sp -> Colours.getColourOrGreen(sp.getTxtcont()))
+                .orElse(GREEN.value);
     }
 
     @VisibleForTesting
