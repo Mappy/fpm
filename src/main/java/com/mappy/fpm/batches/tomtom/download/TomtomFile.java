@@ -55,8 +55,7 @@ public enum TomtomFile {
     // FIXME: Use and filter
     HIGH_QUALITY_LANDUSE("2dcmnb", "_2dtb."),
     BUILDING("2dcmnb", "_2dtb."),
-    HIGH_QUALITY_LANDUSE_STANDARD("2dcm", "_2dtb."),
-    BUILDING_STANDARD("2dcm", "_2dtb."),
+    BUILDING_FOOTPRINT("2dcm", "_2dbf."),
 
     // FIXME: Use and filter
     POI("mnpoi", "_pi."),
