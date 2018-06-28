@@ -5,11 +5,10 @@ import com.mappy.fpm.batches.tomtom.dbf.names.NameProvider;
 import com.mappy.fpm.batches.tomtom.helpers.BoundariesShapefile;
 import com.mappy.fpm.batches.tomtom.helpers.CapitalProvider;
 import com.mappy.fpm.batches.tomtom.helpers.OsmLevelGenerator;
-import com.neovisionaries.i18n.CountryCode;
+import com.mappy.fpm.batches.utils.Feature;
 
 import javax.inject.Inject;
 
-import static java.lang.String.valueOf;
 
 public class BoundariesA0Shapefile extends BoundariesShapefile {
 
@@ -24,11 +23,21 @@ public class BoundariesA0Shapefile extends BoundariesShapefile {
     }
 
     @Override
-    protected String getInseeWithAlpha3(String alpha3) {
-        String alpha32 = alpha3;
-        if (CountryCode.getByCode(alpha3) == null) {
-            alpha32 = alpha3.substring(0, alpha3.length() - 1);
+    protected String getNationalCode(Feature feature) {
+        return getIso3166Numeric(feature);
+    }
+
+    @Override
+    protected String getIso3166Numeric(Feature feature) {
+        String id = feature.getLong("ID").toString();
+        if (id != null) {
+            return id.substring(1, 4);
         }
-        return CountryCode.getByCode(alpha32) == null ? alpha3 : valueOf(CountryCode.getByCode(alpha32).getNumeric());
+        return null;
+    }
+
+    @Override
+    protected String getIso3166Alpha3(Feature feature) {
+        return feature.getString("ORDER00");
     }
 }
