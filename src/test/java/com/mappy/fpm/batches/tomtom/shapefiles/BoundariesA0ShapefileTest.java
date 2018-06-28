@@ -61,14 +61,15 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
         assertThat(relations).hasSize(1);
 
         Tags tags = relations.get(0).getTags();
-        assertThat(tags.size()).isEqualTo(8);
+        assertThat(tags.size()).isGreaterThanOrEqualTo(9);
         assertThat(tags.get("ref:tomtom")).isEqualTo("10200000000008");
         assertThat(tags.get("boundary")).isEqualTo("administrative");
         assertThat(tags.get("admin_level")).isEqualTo("2");
         assertThat(tags.get("layer")).isEqualTo("2");
         assertThat(tags.get("name")).isEqualTo("Andorra");
         assertThat(tags.get("name:fr")).isEqualTo("Andorre");
-        assertThat(tags.get("ref:INSEE")).isEqualTo("20");
+        assertThat(tags.get("ISO3166-1:numeric")).isEqualTo("020");
+        assertThat(tags.get("ISO3166-1:alpha3")).isEqualTo("AND");
         assertThat(tags.get("type")).isEqualTo("boundary");
     }
 
@@ -99,10 +100,11 @@ public class BoundariesA0ShapefileTest extends AbstractTest {
         assertThat(labels).hasSize(1);
 
         Tags tags = labels.get(0).getEntity().getTags();
-        assertThat(tags.size()).isEqualTo(4);
+        assertThat(tags.size()).isGreaterThanOrEqualTo(5);
         assertThat(tags.get("name")).isEqualTo("Andorra");
         assertThat(tags.get("name:fr")).isEqualTo("Andorre");
-        assertThat(tags.get("ref:INSEE")).isEqualTo("20");
+        assertThat(tags.get("ISO3166-1:numeric")).isEqualTo("020");
+        assertThat(tags.get("ISO3166-1:alpha3")).isEqualTo("AND");
         assertThat(tags.get("ref:tomtom")).isEqualTo("10200000000008");
     }
 
