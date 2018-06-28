@@ -28,7 +28,7 @@ public class SignPostsTest {
         SignPosts signPosts = new SignPosts(folder);
 
         assertThat(signPosts.signPostContentFor(12500001485141L)).isEmpty();
-        assertThat(signPosts.signPostContentFor(12500001658893L)).containsExactly("A10", "Bordeaux", "Nantes", "Quai d'Issy");
+        assertThat(signPosts.signPostContentFor(12500001658893L)).containsExactly("A10 Bordeaux Nantes", "Quai d'Issy");
         assertThat(signPosts.signPostColourFor(12500001658893L)).isEmpty();
     }
 
@@ -41,7 +41,7 @@ public class SignPostsTest {
 
         assertThat(signPosts.getTags(12500001485141L, true, 0L, 0L)).isEmpty();
         assertThat(signPosts.getTags(12500001658893L, true, 0L, 0L))
-                .contains(entry("destination", "A10;Bordeaux;Nantes;Quai d'Issy"));
+                .contains(entry("destination", "A10 Bordeaux Nantes;Quai d'Issy"));
     }
 
     @Test
@@ -51,9 +51,9 @@ public class SignPostsTest {
 
         SignPosts signPosts = new SignPosts(folder);
 
-        assertThat(signPosts.getTags(12500001658893L, false, 0L, 12500002912860L)).contains(entry("destination:forward", "A10;Bordeaux;Nantes;Quai d'Issy"));
+        assertThat(signPosts.getTags(12500001658893L, false, 0L, 12500002912860L)).contains(entry("destination:forward", "A10 Bordeaux Nantes;Quai d'Issy"));
         assertThat(signPosts.getTags(12500001658893L, false, 12500002912860L, 12500002912861L))
-                .contains(entry("destination:backward", "A10;Bordeaux;Nantes;Quai d'Issy"));
+                .contains(entry("destination:backward", "A10 Bordeaux Nantes;Quai d'Issy"));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class SignPostsTest {
 
         assertThat(signPosts.exitRefFor(10560001774691L)).contains("17");
         assertThat(signPosts.symbolRefFor(10560001774691L)).containsExactly("none", "none", "none", "industrial");
-        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactly("Brussel", "Bruxelles-Centre", "Brussel-Centrum", "Anderlecht");
+        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactly("Brussel", "Bruxelles-Centre Brussel-Centrum", "Anderlecht");
     }
 
     @Test
@@ -138,7 +138,7 @@ public class SignPostsTest {
         SignPosts signPosts = new SignPosts(folder);
 
         assertThat(signPosts.exitRefFor(10560001774691L)).contains("2");
-        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactlyInAnyOrder("Villejuif", "Arcueil", "Le Kremlin-Bicêtre");
+        assertThat(signPosts.signPostContentFor(10560001774691L)).containsExactlyInAnyOrder("Arcueil Villejuif", "Le Kremlin-Bicêtre");
 
         assertThat(signPosts.exitRefFor(20560001774200L)).contains("10.1");
         assertThat(signPosts.signPostContentFor(20560001774200L)).containsExactlyInAnyOrder("Eurocentre", "Grenade");
