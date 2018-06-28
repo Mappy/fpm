@@ -68,7 +68,9 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         relationTags.putAll(nameProvider.getAlternateNames(extId));
         relationTags.put("ref:tomtom", String.valueOf(extId));
 
-        ofNullable(feature.getString("ORDER0" + tomtomLevel)).ifPresent(alpha3 -> relationTags.put("ref:INSEE", getInseeWithAlpha3(alpha3)));
+        ofNullable(getIso3166Numeric(feature)).ifPresent(isoCode -> relationTags.put("ISO3166-1:numeric", isoCode));
+        ofNullable(getIso3166Alpha3(feature)).ifPresent(alpha3 -> relationTags.put("ISO3166-1:alpha3", alpha3));
+        ofNullable(getNationalCode(feature)).ifPresent(code -> relationTags.put("ref:INSEE", code));
         ofNullable(feature.getLong("POP")).filter(pop -> pop > 0).ifPresent(pop -> relationTags.put("population", String.valueOf(pop)));
 
         List<RelationMember> members = newArrayList();
@@ -96,8 +98,16 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         tags.put("layer", osmLevel);
     }
 
-    protected String getInseeWithAlpha3(String alpha3) {
-        return alpha3;
+    protected String getNationalCode(Feature feature) {
+        return feature.getString("ORDER0" + tomtomLevel);
+    }
+
+    protected String getIso3166Numeric(Feature feature) {
+        return null;
+    }
+
+    protected String getIso3166Alpha3(Feature feature) {
+        return null;
     }
 
     protected Optional<RelationMember> getAdminCenter(GeometrySerializer serializer, Feature feature) {

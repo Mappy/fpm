@@ -55,7 +55,7 @@ public enum TomtomFile {
     // FIXME: Use and filter
     HIGH_QUALITY_LANDUSE("2dcmnb", "_2dtb."),
     BUILDING("2dcmnb", "_2dtb."),
-    BUILDING_FOOTPRINT("2dcm", "_2dbf."),
+    /*BUILDING_FOOTPRINT("2dcm", "_2dbf."),
 
     // FIXME: Use and filter
     POI("mnpoi", "_pi."),
@@ -79,7 +79,7 @@ public enum TomtomFile {
     NAME_COMPONENT("mnap", "_atnc."),
     FEATURE_ASSOCIATED_WITH_ANCHOR_POINT("mnap", "_atat."),
     COMPONENT_FORMAT("mnap", "_atcf."),
-    ANCHOR_POINT_ALONG_TRANSPORTATION_ELEMENT("mnap", "_atte."),
+    ANCHOR_POINT_ALONG_TRANSPORTATION_ELEMENT("mnap", "_atte."),*/
 
 
     OUTERWORLD("outerworld", "nw.");
