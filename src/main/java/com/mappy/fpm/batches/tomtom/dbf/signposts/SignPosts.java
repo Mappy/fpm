@@ -1,10 +1,7 @@
 package com.mappy.fpm.batches.tomtom.dbf.signposts;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
+import com.google.common.collect.*;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.TomtomDbfReader;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPost.PictogramType;
@@ -158,7 +155,7 @@ public class SignPosts extends TomtomDbfReader {
     }
 
     @VisibleForTesting
-    List<String> signPostHeaderFor(long tomtomId) {
+    List<String> signPostHeaderFor(Long tomtomId) {
         return refFor(tomtomId, onlyDestinationRefBranch)
                 .stream()
                 .map(SignPost::getTxtcont)
@@ -166,15 +163,27 @@ public class SignPosts extends TomtomDbfReader {
     }
 
     @VisibleForTesting
-    List<String> signPostContentFor(long tomtomId) {
-        Stream<String> stringStream = refFor(tomtomId, onlyDestination)
-                .stream()
-                .map(SignPost::getTxtcont);
-        return Stream.concat(stringStream, exitLabelFor(tomtomId).map(Stream::of).orElse(empty())).collect(toList());
+    List<String> signPostContentFor(Long tomtomId) {
+        Map<Integer, List<List<SignPost>>> signPosts = getSignPostsByDestinationSequentialNumber(tomtomId, onlyDestination);
+
+        List<String> content = new ArrayList<String>();
+        for (List<List<SignPost>> signsBySeq : signPosts.values()) {
+            String lineStr = new String();
+            for (List<SignPost> signsByDestSeq : signsBySeq) {
+                for (SignPost item : signsByDestSeq) {
+                    lineStr = lineStr.concat(item.getTxtcont()).concat(" ");
+                }
+            }
+            content.add(lineStr.trim());
+        }
+        Optional<String> exitLabel = exitLabelFor(tomtomId);
+        if (exitLabel.isPresent())
+            content.add(exitLabel.get());
+        return content;
     }
 
     @VisibleForTesting
-    List<String> signPostColourFor(long tomtomId) {
+    List<String> signPostColourFor(Long tomtomId) {
 
         Collection<List<SignPost>> signPostsBySeqnr = getSignPostsBySequentialNumber(tomtomId, onlyColours);
 
@@ -188,7 +197,7 @@ public class SignPosts extends TomtomDbfReader {
     }
 
     @VisibleForTesting
-    List<String> symbolRefFor(long tomtomId) {
+    List<String> symbolRefFor(Long tomtomId) {
 
         Collection<List<SignPost>> signPostsBySeqnr = getSignPostsBySequentialNumber(tomtomId, onlySymbol);
 
@@ -198,6 +207,14 @@ public class SignPosts extends TomtomDbfReader {
             return symbols;
         }
         return newArrayList();
+    }
+
+    private Map<Integer, List<List<SignPost>>> getSignPostsByDestinationSequentialNumber(Long tomtomId, Predicate<SignPost> onlyType) {
+        return refFor(tomtomId, onlyType.or(onlyDestination))
+                .stream()
+                .collect(groupingBy(SignPost::getSeqnr,
+                        collectingAndThen(groupingBy(SignPost::getDestseq),
+                                m -> new ArrayList<>(m.values()))));
     }
 
     private Collection<List<SignPost>> getSignPostsBySequentialNumber(Long tomtomId, Predicate<SignPost> onlyType) {
