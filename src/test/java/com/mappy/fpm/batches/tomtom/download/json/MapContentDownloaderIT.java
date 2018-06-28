@@ -33,7 +33,7 @@ public class MapContentDownloaderIT {
                 .run();
 
         assertThat(list(get(OUTPUT_FOLDER))) //
-                .containsExactly(get(OUTPUT_FOLDER, "Andorra"));
+                .containsExactly(get(OUTPUT_FOLDER, "Andorra"), get(OUTPUT_FOLDER, "eur2016_09"));
     }
 
     private static class MapContentModuleIT extends AbstractModule {

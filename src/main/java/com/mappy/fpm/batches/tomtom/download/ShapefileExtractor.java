@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
@@ -49,18 +50,31 @@ public class ShapefileExtractor {
 
             SevenZArchiveEntry entry;
             while ((entry = archive.getNextEntry()) != null) {
+                if (entry.isDirectory() || !entry.getName().contains(".gz")) {
+                    continue;
+                }
                 String filename = Paths.get(entry.getName()).getFileName().toString();
+                log.info("Extracting {}", filename);
+                File currentFile = new File(outputDirectory, entry.getName().replace(".gz", ""));
+                File parent = currentFile.getParentFile();
+                if (!parent.exists()) {
+                    parent.mkdirs();
+                }
+                byte[] content = new byte[(int) entry.getSize()];
+                archive.read(content, 0, content.length);
+                try (GZIPInputStream input = new GZIPInputStream(new ByteArrayInputStream(content)); FileOutputStream output = new FileOutputStream(currentFile)) {
+                    IOUtils.copy(input, output);
+                }
 
-                if (tablesNeeded(type).stream().anyMatch(filename::contains)) {
-                    log.info("Extracting {}", filename);
-                    byte[] content = new byte[(int) entry.getSize()];
-                    archive.read(content, 0, content.length);
+                // Creating a symlink to the files that fpm uses
+                if (allTomtomFiles(type).stream().anyMatch(filename::contains)) {
                     File countryDirectory = new File(outputDirectory, country);
                     countryDirectory.mkdirs();
                     File outputFile = new File(countryDirectory, filename.replace(".gz", ""));
-                    try (GZIPInputStream input = new GZIPInputStream(new ByteArrayInputStream(content)); FileOutputStream output = new FileOutputStream(outputFile)) {
-                        IOUtils.copy(input, output);
+                    if (outputFile.exists()) {
+                        outputFile.delete();
                     }
+                    Files.createSymbolicLink(outputFile.toPath(), Paths.get(currentFile.getAbsolutePath()));
                 }
             }
             archive.close();
@@ -69,14 +83,5 @@ public class ShapefileExtractor {
         } finally {
             file.delete();
         }
-    }
-
-    private static List<String> tablesNeeded(String type) {
-        List<String> allTomtomFiles = allTomtomFiles(type);
-
-        if (allTomtomFiles.isEmpty()) {
-            throw new IllegalStateException();
-        }
-        return allTomtomFiles;
     }
 }
