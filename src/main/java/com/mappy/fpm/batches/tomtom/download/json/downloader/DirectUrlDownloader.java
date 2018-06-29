@@ -34,7 +34,10 @@ public class DirectUrlDownloader implements Function<Content, Content> {
         try (InputStream response = client.execute(get).getEntity().getContent()) {
             String directUrl = new JSONObject(IOUtils.toString(response, "UTF-8")).getString("url");
             return new Content(content.getName(), directUrl);
-        } catch (IOException|JSONException e) {
+        } catch (IOException e) {
+            throw propagate(e);
+        } catch(JSONException e) {
+            log.error("No direct url for: " + content.getLocation() + "/download-url");
             throw propagate(e);
         }
     }
