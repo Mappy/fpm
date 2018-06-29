@@ -71,10 +71,8 @@ public class ShapefileExtractor {
                     File countryDirectory = new File(outputDirectory, country);
                     countryDirectory.mkdirs();
                     File outputFile = new File(countryDirectory, filename.replace(".gz", ""));
-                    if (outputFile.exists()) {
-                        outputFile.delete();
-                    }
-                    Files.createSymbolicLink(outputFile.toPath(), Paths.get(currentFile.getAbsolutePath()));
+                    outputFile.delete();
+                    Files.createSymbolicLink(outputFile.toPath(), Paths.get("../" + entry.getName().replace(".gz", "")));
                 }
             }
             archive.close();
