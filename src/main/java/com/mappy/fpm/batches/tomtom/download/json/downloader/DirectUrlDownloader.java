@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Function;
 
-import static com.google.common.base.Throwables.propagate;
-
 @Slf4j
 public class DirectUrlDownloader implements Function<Content, Content> {
     private final HttpClient client;
@@ -31,14 +29,14 @@ public class DirectUrlDownloader implements Function<Content, Content> {
         HttpGet get = new HttpGet(content.getLocation() + "/download-url");
         get.addHeader("Authorization", token);
 
-        try (InputStream response = client.execute(get).getEntity().getContent()) {
-            String directUrl = new JSONObject(IOUtils.toString(response, "UTF-8")).getString("url");
-            return new Content(content.getName(), directUrl);
-        } catch (IOException e) {
-            throw propagate(e);
-        } catch(JSONException e) {
-            log.error("No direct url for: " + content.getLocation() + "/download-url");
-            throw propagate(e);
+        for (int i = 0; i < 3; i++) {
+            try (InputStream response = client.execute(get).getEntity().getContent()) {
+                String directUrl = new JSONObject(IOUtils.toString(response, "UTF-8")).getString("url");
+                return new Content(content.getName(), directUrl);
+            } catch (IOException|JSONException e) {
+                log.error("Retrying.. ", e);
+            }
         }
+        throw new RuntimeException("Too many retries: " + content.getLocation() + "/download-url");
     }
 }
