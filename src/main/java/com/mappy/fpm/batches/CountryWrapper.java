@@ -4,12 +4,14 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;
 
-class CountryWapper {
+class CountryWrapper {
 
     static final Set<String> ALL_COUNTRIES = new ImmutableSet.Builder<String>()
             .add("Albania")
             .add("Andorra") //
+            .add("Armenia") //
             .add("Austria") //
+            .add("Azerbaijan") //
             .add("Belgium") //
             .add("Bulgaria") //
             .add("Bosnia-Herzegovina") //
@@ -21,8 +23,10 @@ class CountryWapper {
             .add("Denmark") //
             .add("Spain") //
             .add("Estonia") //
+            .add("Faroe-Islands") //
             .add("Finland") //
             .add("France") //
+            .add("Georgia") //
             .add("UK") //
             .add("Greece") //
             .add("Croatia") //
@@ -53,25 +57,32 @@ class CountryWapper {
             .add("French-Guiana") //
             .add("Poland") //
             .add("Ukraine") //
+            .add("Outerworld-Atlantic") //
+            .add("Outerworld-Australia") //
             .add("Outerworld-Belgium") //
-            .add("Outerworld-Canada-Ocean-Pacific") //
-            .add("Outerworld-Germany") //
+            .add("Outerworld-Canada-Atlantic-Ocean") //
+            .add("Outerworld-Canada-Ocean-Pacific") // for backward compatibility
+            .add("Outerworld-Canada-Pacific-Ocean") //
             .add("Outerworld-Denmark") //
-            .add("Outerworld-Spain") //
             .add("Outerworld-Finland") //
             .add("Outerworld-France") //
-            .add("Outerworld-UK") //
+            .add("Outerworld-Germany") //
+            .add("Outerworld-Greece") //
+            .add("Outerworld-Indian") //
             .add("Outerworld-Ireland") //
             .add("Outerworld-Italy") //
+            .add("Outerworld-Mexico") //
             .add("Outerworld-Netherlands") //
             .add("Outerworld-Norway") //
+            .add("Outerworld-Pacific-Ocean") //
             .add("Outerworld-Poland") //
             .add("Outerworld-Portugal") //
-            .add("Outerworld-Indian") //
-            .add("Outerworld-Atlantic") //
             .add("Outerworld-Russia") //
+            .add("Outerworld-Spain") //
             .add("Outerworld-Sweden") //
             .add("Outerworld-Turkey") //
-            .add("Outerworld-Greece") //
+            .add("Outerworld-UK") //
+            .add("Outerworld-USA-Atlantic-Ocean") //
+            .add("Outerworld-USA-Pacific-Ocean") //
             .build();
 }
