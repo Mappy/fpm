@@ -36,10 +36,17 @@ public class GenerateFullPbfTest {
                 .containsExactly("Albania" , "Andorra") ;
     }
 
+    /*
     @Test
     public void should_get_all_valid_countries_when_input_country_list_is_empty(){
         assertThat(GenerateFullPbf.checkAndValidCountries(" "))
                 .containsAll(ALL_COUNTRIES);
+    }
+    */
+
+    @Test(expected=IllegalArgumentException.class)
+    public void should_throw_exception_when_input_country_list_is_empty(){
+        GenerateFullPbf.checkAndValidCountries(" ");
     }
 
     @Test
