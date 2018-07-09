@@ -21,7 +21,7 @@ import static com.google.common.base.Splitter.on;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.inject.Guice.createInjector;
-import static com.mappy.fpm.batches.CountryWapper.ALL_COUNTRIES;
+import static com.mappy.fpm.batches.CountryWrapper.ALL_COUNTRIES;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.joining;
@@ -92,7 +92,10 @@ public class GenerateFullPbf {
                 "\n" + ALL_COUNTRIES.stream().collect(joining(", ", "Valid countries [", "]")));
 
         if (countries.isEmpty()) {
-            return ALL_COUNTRIES.stream().collect(toList());
+            // return ALL_COUNTRIES.stream().collect(toList());
+            String msg = "No country provided.\nPlease list the countries to process in " + ALL_COUNTRIES.stream().collect(joining(", ", "[", "]"));
+            log.error(msg);
+            throw new IllegalArgumentException(msg);
         }
         return countries;
     }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.mappy.fpm.batches.CountryWapper.ALL_COUNTRIES;
+import static com.mappy.fpm.batches.CountryWrapper.ALL_COUNTRIES;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
