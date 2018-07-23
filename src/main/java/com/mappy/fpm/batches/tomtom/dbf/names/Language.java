@@ -61,7 +61,7 @@ public enum Language {
     TUR("tr"),
     UKL("uk-Latn"),
     UKR("uk"),
-    VAL("oc"),  // unknown language code, interpreted as occitan
+    VAL("ca"),  // unknown language code, interpreted as valencian
     WEL("cy"),
     UND(null);
 
