@@ -66,7 +66,6 @@ public class TimeDomainsParser {
             return getOpeningHours(compoundDurationMatcher, true);
 
         } else {
-            log.warn("Unable to parse '{}'", domain);
             throw new IllegalArgumentException("Unable to parse '" + domain + "'");
         }
     }
