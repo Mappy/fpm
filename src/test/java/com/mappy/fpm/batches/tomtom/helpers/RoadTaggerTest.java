@@ -334,8 +334,7 @@ public class RoadTaggerTest {
     public void should_have_mountain_pass() {
         when(poiProvider.getPoiNameByType(any(Long.class), eq(FeatureType.MOUNTAIN_PASS.getValue()))).thenReturn(of("everest"));
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "NAME", "not everest", "F_ELEV", "0", "T_ELEV", "0", "FOW", "20", "NET2CLASS", "6"))))
-                .containsEntry("mountain_pass", "yes")
-                .containsEntry("name", "everest");
+                .containsEntry("mountain_pass", "everest");
     }
 
     @Test
