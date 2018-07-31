@@ -163,8 +163,7 @@ public class RoadTagger {
         tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
 
         poiProvider.getPoiNameByType(id, FeatureType.MOUNTAIN_PASS.getValue()).ifPresent(value -> {
-            tags.put("mountain_pass", "yes");
-            tags.put("name", value);
+            tags.put("mountain_pass", value);
         });
     }
 
