@@ -58,7 +58,6 @@ public class RestrictionsAccumulator {
                 serializer.write(members(restriction), tomtomMembers(restriction));
             }
             catch (IllegalArgumentException e) {
-                log.error(e.getMessage());
                 log.error("Ignoring restriction {}", restriction);
                 ignored++;
             }
