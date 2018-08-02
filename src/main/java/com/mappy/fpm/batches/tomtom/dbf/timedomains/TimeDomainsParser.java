@@ -2,6 +2,8 @@ package com.mappy.fpm.batches.tomtom.dbf.timedomains;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import spark.utils.StringUtils;
+import sun.management.counter.StringCounter;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -37,7 +39,7 @@ public class TimeDomainsParser {
     }
 
     public String parse(Collection<TimeDomains> tomtomTimesDomains) {
-        return tomtomTimesDomains.stream().map(this::parse).filter(Objects::nonNull).collect(joining(", "));
+        return tomtomTimesDomains.stream().map(this::parse).filter(StringUtils::isNotEmpty).collect(joining(", "));
     }
 
     private String parse(TimeDomains timeDomains) {
