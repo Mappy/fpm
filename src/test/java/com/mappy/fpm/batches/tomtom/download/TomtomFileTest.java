@@ -26,10 +26,12 @@ public class TomtomFileTest {
         assertEquals(filesFilterByUnderscoreAndPoint.count(), 1);
     }
 
+/*
     @Test
     public void should_have_only_two_file_for_speed_product(){
         assertEquals(TomtomFile.allTomtomFiles("sp").size(), 2);
     }
+*/
 
     private boolean notContainsDotsOrUnderscore(String value) {
         return !value.contains("_") || !value.contains(".");

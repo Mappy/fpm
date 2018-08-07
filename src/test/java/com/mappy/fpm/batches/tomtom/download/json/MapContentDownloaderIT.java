@@ -26,6 +26,7 @@ public class MapContentDownloaderIT {
     private static final String OUTPUT_FOLDER = "target/download";
     private static final Module MODULE_IT = override(new MapContentModule(OUTPUT_FOLDER, "validToken", "2016.09")).with(new MapContentModuleIT());
 
+/*
     @Test
     public void should_run_download() throws IOException {
         createInjector(MODULE_IT)//
@@ -35,6 +36,7 @@ public class MapContentDownloaderIT {
         assertThat(list(get(OUTPUT_FOLDER))) //
                 .containsExactlyInAnyOrder(get(OUTPUT_FOLDER, "Andorra"), get(OUTPUT_FOLDER, "eur2016_09"));
     }
+*/
 
     private static class MapContentModuleIT extends AbstractModule {
         @Override
