@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 
 public enum TomtomFile {
-    NETWORK("mn", "_nw."),
+    /* NETWORK("mn", "_nw."),
     ROAD_RESTRICTIONS("mn", "_rs."),
     MANEUVER("mn", "_mn."),
     MANEUVER_PRIORITY("mn", "_mp."),
@@ -51,10 +51,11 @@ public enum TomtomFile {
 
     NETWORK_PROFILE_LINK("sp", "_hsnp."),
     HISTORICAL_SPEED_PROFILES("sp", "_hspr."),
+    */
 
     // FIXME: Use and filter
-    HIGH_QUALITY_LANDUSE("2dcmnb", "_2dtb."),
-    BUILDING("2dcmnb", "_2dtb."),
+    HIGH_QUALITY_LANDUSE("2dcm", "_2dtb."),
+    BUILDING("2dcm", "_2dtb."),
     /*BUILDING_FOOTPRINT("2dcm", "_2dbf."),
 
     // FIXME: Use and filter
