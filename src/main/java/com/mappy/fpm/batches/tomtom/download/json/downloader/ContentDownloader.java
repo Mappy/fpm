@@ -38,7 +38,7 @@ public class ContentDownloader implements Function<Release, Stream<Content>> {
 
     @Override
     public Stream<Content> apply(Release release) {
-        HttpGet get = new HttpGet(release.getLocation() + "?label=shpd");
+        HttpGet get = new HttpGet(release.getLocation() + "?label=shp");
         get.addHeader("Authorization", token);
 
         try (InputStream response = client.execute(get).getEntity().getContent()) {
