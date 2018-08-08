@@ -4,34 +4,40 @@ import com.google.common.annotations.VisibleForTesting;
 import com.mappy.fpm.batches.merge.pbf.OsmMerger;
 import com.mappy.fpm.batches.tomtom.Tomtom2Osm;
 import com.mappy.fpm.batches.tomtom.Tomtom2OsmModule;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory;
-import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Splitter.on;
-import static com.google.common.base.Throwables.propagate;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.inject.Guice.createInjector;
-import static com.mappy.fpm.batches.CountryWrapper.ALL_COUNTRIES;
-import static java.lang.Integer.parseInt;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory.Builder;
+import org.jetbrains.annotations.NotNull;
+
+import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Splitter.*;
+import static com.google.common.base.Throwables.*;
+import static com.google.common.collect.Lists.*;
+import static com.google.inject.Guice.*;
+import static com.mappy.fpm.batches.CountryWrapper.*;
+import static java.lang.Integer.*;
 import static java.lang.String.format;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.of;
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Stream.*;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class GenerateFullPbf {
     public static final String OSM_SUFFIX = ".osm.pbf";
-    private static final String TOWN_SUFFIX = "_2dbd.shp";
+    private static final String TOWN_SUFFIX = "_2dtb.shp";
     private static final String COUNTRY_SUFFIX = "______________a0.shp";
     private static final String FERRY_SUFFIX = "___________fe.shp";
     private static final String ROAD_SUFFIX = "___________nw.shp";
@@ -75,7 +81,8 @@ public class GenerateFullPbf {
             List<String> countryPbfFiles = countries.stream().map(this::generateCountry).collect(toList());
             mergePbfFiles(countryPbfFiles, outputDirectoryPath + "/" + outputFileName, newArrayList());
 
-        } finally {
+        }
+        finally {
             log.info("Shutting down service...");
             executorService.shutdown();
         }
@@ -84,12 +91,8 @@ public class GenerateFullPbf {
     @VisibleForTesting
     static List<String> checkAndValidCountries(String countryList) {
         List<String> countries = on(",").trimResults().splitToList(countryList).stream().filter(StringUtils::isNotBlank).collect(toList());
-        String invalidCountries = countries.stream()
-                .filter(StringUtils::isNotBlank)
-                .filter(country -> !ALL_COUNTRIES.contains(country))
-                .collect(joining(", "));
-        checkArgument(invalidCountries.isEmpty(), "Invalid countries : " + invalidCountries +
-                "\n" + ALL_COUNTRIES.stream().collect(joining(", ", "Valid countries [", "]")));
+        String invalidCountries = countries.stream().filter(StringUtils::isNotBlank).filter(country -> !ALL_COUNTRIES.contains(country)).collect(joining(", "));
+        checkArgument(invalidCountries.isEmpty(), "Invalid countries : " + invalidCountries + "\n" + ALL_COUNTRIES.stream().collect(joining(", ", "Valid countries [", "]")));
 
         if (countries.isEmpty()) {
             // return ALL_COUNTRIES.stream().collect(toList());
@@ -117,19 +120,16 @@ public class GenerateFullPbf {
         for (String zoneFileName : of(file.list()).filter(f -> f.endsWith(TOWN_SUFFIX) || f.endsWith(ROAD_SUFFIX) || f.endsWith(FERRY_SUFFIX) || f.endsWith(COUNTRY_SUFFIX)).collect(toList())) {
 
             String zone = zoneFileName.replace(TOWN_SUFFIX, "").replace(ROAD_SUFFIX, "").replace(FERRY_SUFFIX, "").replace(COUNTRY_SUFFIX, "");
-
-            Tomtom2Osm instance = createInjector(new Tomtom2OsmModule(
-                    inputDirectoryPath + "/" + country + "/",
-                    outputDirectoryPath + "/" + country + "/pbfFiles",
-                    outputDirectoryPath + "/splitter",
-                    zone)
-            ).getInstance(Tomtom2Osm.class);
+            Tomtom2Osm instance = createInjector(
+                    new Tomtom2OsmModule(inputDirectoryPath + "/" + country + "/", outputDirectoryPath + "/" + country + "/pbfFiles", outputDirectoryPath + "/splitter", zone))
+                            .getInstance(Tomtom2Osm.class);
 
             Future<?> zoneFuture = executorService.submit(() -> {
                 try {
                     Optional<String> OSMZone = instance.run();
                     OSMZone.ifPresent(zonePbfFiles::add);
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     log.info("Error when generating zone: {}", zone, e);
                     propagate(e);
                 }
@@ -148,7 +148,8 @@ public class GenerateFullPbf {
         try {
             waitAllDone(tasksToWaitFor);
             osmMerger.merge(inputPbfFiles, outputFile);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             propagate(e);
         }
     }
@@ -157,7 +158,8 @@ public class GenerateFullPbf {
         tasks.forEach(t -> {
             try {
                 t.get();
-            } catch (ExecutionException|InterruptedException e) {
+            }
+            catch (ExecutionException | InterruptedException e) {
                 propagate(e);
             }
         });
