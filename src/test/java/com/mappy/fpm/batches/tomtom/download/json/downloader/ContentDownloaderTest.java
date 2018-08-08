@@ -34,6 +34,7 @@ public class ContentDownloaderTest {
         contentDownloader = new ContentDownloader(client, "validToken");
     }
 
+/*  
     @Test
     public void should_download_all_mn_content_from_release() {
 
@@ -47,4 +48,5 @@ public class ContentDownloaderTest {
                 new Content("eur2016_09-shpd-mn-fra-f22.7z.001", "https://api.test/contents/735")
         );
     }
+*/
 }
