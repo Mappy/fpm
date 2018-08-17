@@ -14,7 +14,6 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.mappy.fpm.batches.tomtom.helpers.FormOfWay.PARKING_GARAGE_BUILDING;
 import static com.mappy.fpm.batches.tomtom.helpers.RoadTagger.isReversed;
 
 public class RoadShapefile extends TomtomShapefile {
@@ -36,14 +35,11 @@ public class RoadShapefile extends TomtomShapefile {
 
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
-
-        if (!PARKING_GARAGE_BUILDING.is(feature.getInteger("FOW"))) {
-            LineString raw = geom(feature);
-            LineString geom = isReversed(feature) ? (LineString) raw.reverse() : raw;
-            Map<String, String> tags = roadTagger.tag(feature);
-            Way way = serializer.write(geom, tags);
-            restrictions.register(feature, way);
-        }
+        LineString raw = geom(feature);
+        LineString geom = isReversed(feature) ? (LineString) raw.reverse() : raw;
+        Map<String, String> tags = roadTagger.tag(feature);
+        Way way = serializer.write(geom, tags);
+        restrictions.register(feature, way);
     }
 
     private static LineString geom(Feature feature) {
