@@ -3,7 +3,6 @@ package com.mappy.fpm.batches.tomtom.dbf.timedomains;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import spark.utils.StringUtils;
-import sun.management.counter.StringCounter;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -22,7 +21,7 @@ public class TimeDomainsParser {
     private static final Pattern COMPOUND_DURATION_PATTERN = Pattern.compile("^\\[\\[\\((\\w+)\\)\\{(\\w+)\\}\\]\\*\\[\\((\\w+)\\)\\{(\\w+)\\}\\]\\]$");
 
     // week:w, particular day:f/l, seconds:s, fuzzy:z, are not supported by now
-    private static final Pattern MOTIF_PATTERN = Pattern.compile("(y\\d{4}|[M,d,t,h,m]\\d{1,2})");
+    private static final Pattern MOTIF_PATTERN = Pattern.compile("(y\\d{1,4}|[M,d,t,h,m]\\d{1,2})");
 
     private enum Month {
         Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
@@ -142,18 +141,19 @@ public class TimeDomainsParser {
         if (beginYear > 0) {
             year = format("%s", beginYear);
             if (endYear > 0 && endYear != beginYear) {
-                year += format("-%s", endYear);
-                if (!isDuration) {
-                    return format(
-                        "%s %s %s-%s %s %s off",
-                        beginYear,
-                        Month.values()[beginMonth - 1],
-                        beginDay,
-                        endYear,
-                        Month.values()[endMonth - 1],
-                        endDay
-                    ).trim().replaceAll("\\s+", " ");
+                if (isDuration) {
+                    endDay = endDay == 0 ? beginDay : endDay;
+                    endMonth = endMonth == 0 ? beginMonth : endMonth;
                 }
+                return format(
+                    "%s %s %s-%s %s %s off",
+                    beginYear,
+                    Month.values()[beginMonth - 1],
+                    beginDay,
+                    endYear,
+                    Month.values()[endMonth - 1],
+                    endDay
+                ).trim().replaceAll("\\s+", " ");
             }
         }
 
