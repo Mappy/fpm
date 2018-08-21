@@ -123,6 +123,20 @@ public class TimeDomainsParserTest {
     }
 
     @Test
+    public void should_translate_year_duration(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(y2015M3d4){y2}]");
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+        assertThat(osmTimeDomain).isEqualTo("2015 Mar 4-2017 Mar 4 off");
+    }
+
+    @Test
+    public void should_translate_year_month_duration(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(y2015M3d4){y2M1}]");
+        String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
+        assertThat(osmTimeDomain).isEqualTo("2015 Mar 4-2017 Apr 4 off");
+    }
+
+    @Test
     public void should_translate_weekday_with_hour_duration(){
         TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, "[(t1){h1}]");
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
