@@ -62,5 +62,4 @@ public class TownShapefileTest extends AbstractTest {
         Node hamlet = pbfContent.getNodes().stream().filter(node -> node.getTags().hasKeyValue("place", "town")).findFirst().get();
         assertThat(hamlet.getTags().get("name")).isEqualTo("Sint-Gillis");
     }
-
 }
