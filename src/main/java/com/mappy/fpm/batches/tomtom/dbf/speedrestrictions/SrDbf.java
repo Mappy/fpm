@@ -33,7 +33,7 @@ public class SrDbf {
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
-                SpeedRestriction restriction = new SpeedRestriction(row.getLong("ID"), row.getInt("SPEED"), Validity.values()[row.getInt("VALDIR") - 1], VehicleType.fromId(row.getInt("VT")));
+                SpeedRestriction restriction = new SpeedRestriction(row.getLong("ID"), row.getInt("SEQNR"), row.getInt("SPEED"), Validity.values()[row.getInt("VALDIR") - 1], VehicleType.fromId(row.getInt("VT")));
                 restrictions.put(restriction.getId(), restriction);
             }
         }

@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class SpeedRestriction {
     private final long id;
+    private final int sequenceNumber;
     private final int speed;
     private final Validity validity;
     private final VehicleType vehicleType;

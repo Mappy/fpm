@@ -18,10 +18,10 @@ public class SrDbfTest {
         SrDbf srDbf = new SrDbf(folder);
 
         assertThat(srDbf.getSpeedRestrictions(12500067305696L)).containsExactly(
-                new SpeedRestriction(12500067305696L, 30, positive, VehicleType.passengerCars),
-                new SpeedRestriction(12500067305696L, 50, negative, VehicleType.passengerCars));
+                new SpeedRestriction(12500067305696L, 1, 30, positive, VehicleType.passengerCars),
+                new SpeedRestriction(12500067305696L, 2, 50, negative, VehicleType.passengerCars));
 
         assertThat(srDbf.getSpeedRestrictions(12500067332646L)).containsExactly(
-                new SpeedRestriction(12500067332646L, 30, both, VehicleType.passengerCars));
+                new SpeedRestriction(12500067332646L, 1, 30, both, VehicleType.passengerCars));
     }
 }
