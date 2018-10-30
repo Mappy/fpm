@@ -122,7 +122,7 @@ public class RoadTaggerTest {
 
     @Test
     public void should_not_tag_motor_vehicle_no_when_restriction_speed() {
-        List<TimeDomains> timeDomainList = newArrayList(new TimeDomains(1L, null));
+        List<TimeDomains> timeDomainList = newArrayList(new TimeDomains(1L, 1, null));
         when(timeDomainsData.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
 
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))) //
@@ -229,8 +229,8 @@ public class RoadTaggerTest {
 
     @Test
     public void should_add_opening_hours_tag() {
-        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
-        TimeDomains domainTomtom2 = new TimeDomains(789, "domainetomtom2");
+        TimeDomains domainTomtom = new TimeDomains(456, 1, "domainetomtom");
+        TimeDomains domainTomtom2 = new TimeDomains(789, 1, "domainetomtom2");
         List<TimeDomains> timeDomains = newArrayList(domainTomtom, domainTomtom2);
         when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenReturn("10:00-14:00 off, 22:00-06:00 off");
@@ -241,7 +241,7 @@ public class RoadTaggerTest {
 
     @Test
     public void should_ignore_non_meaning_time_domain() {
-        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
+        TimeDomains domainTomtom = new TimeDomains(456, 1, "domainetomtom");
         List<TimeDomains> timeDomains = newArrayList(domainTomtom);
         when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenReturn("");
@@ -252,7 +252,7 @@ public class RoadTaggerTest {
 
     @Test
     public void should_ignore_non_parsable_time_domain() {
-        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
+        TimeDomains domainTomtom = new TimeDomains(456, 1, "domainetomtom");
         List<TimeDomains> timeDomains = newArrayList(domainTomtom);
         when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenThrow(new IllegalArgumentException("Test exception"));
