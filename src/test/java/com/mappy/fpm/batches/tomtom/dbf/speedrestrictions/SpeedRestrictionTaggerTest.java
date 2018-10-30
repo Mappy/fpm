@@ -7,6 +7,7 @@ import org.junit.Test;
 import static com.google.common.collect.ImmutableMap.*;
 import static com.google.common.collect.Lists.*;
 import static com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.Validity.*;
+import static com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.VehicleType;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -16,7 +17,7 @@ public class SpeedRestrictionTaggerTest {
 
     @Test
     public void should_tag_maxspeed() {
-        when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(new SpeedRestriction(123, 50, both)));
+        when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(new SpeedRestriction(123, 50, both, VehicleType.all)));
 
         assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
                 .containsEntry("maxspeed", "50");
@@ -32,8 +33,8 @@ public class SpeedRestrictionTaggerTest {
     @Test
     public void should_tag_maxspeed_for_each_side() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
-                new SpeedRestriction(123, 30, positive),
-                new SpeedRestriction(123, 60, negative)));
+                new SpeedRestriction(123, 30, positive, VehicleType.all),
+                new SpeedRestriction(123, 60, negative, VehicleType.all)));
 
         assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
                 .containsEntry("maxspeed:forward", "30")
@@ -43,8 +44,8 @@ public class SpeedRestrictionTaggerTest {
     @Test
     public void should_invert_if_needed() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
-                new SpeedRestriction(123, 30, positive),
-                new SpeedRestriction(123, 60, negative)));
+                new SpeedRestriction(123, 30, positive, VehicleType.all),
+                new SpeedRestriction(123, 60, negative, VehicleType.all)));
 
         assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123", "ONEWAY", "TF"))))
                 .containsEntry("maxspeed:forward", "60")
@@ -54,7 +55,7 @@ public class SpeedRestrictionTaggerTest {
     @Test
     public void should_handle_both_side() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
-                new SpeedRestriction(123, 80, both)));
+                new SpeedRestriction(123, 80, both, VehicleType.all)));
 
         assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
                 .containsEntry("maxspeed", "80");
@@ -63,8 +64,40 @@ public class SpeedRestrictionTaggerTest {
     @Test
     public void should_handle_multiple_speeds() {
         when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
-                new SpeedRestriction(123, 80, both),
-                new SpeedRestriction(123, 90, both)));
+                new SpeedRestriction(123, 80, both, VehicleType.all),
+                new SpeedRestriction(123, 90, both, VehicleType.all)));
+
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+                .containsEntry("maxspeed", "90");
+    }
+
+    @Test
+    public void should_refuse_forbidden_vehicle_types() {
+        when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
+                new SpeedRestriction(123, 90, both, VehicleType.taxi),
+                new SpeedRestriction(123, 80, both, VehicleType.publicBus),
+                new SpeedRestriction(123, 70, both, VehicleType.residentialVehicles),
+                new SpeedRestriction(123, 60, both, VehicleType.passengerCars)));
+
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+                .containsEntry("maxspeed", "60");
+    }
+
+    @Test
+    public void should_give_priority_to_passenger_cars_vehicle_type() {
+        when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
+                new SpeedRestriction(123, 90, both, VehicleType.all),
+                new SpeedRestriction(123, 80, both, VehicleType.passengerCars)));
+
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+                .containsEntry("maxspeed", "80");
+    }
+
+    @Test
+    public void should_refuse_all_vehicle_type_if_there_is_a_passenger_cars_one() {
+        when(dbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
+                new SpeedRestriction(123, 80, both, VehicleType.passengerCars),
+                new SpeedRestriction(123, 90, both, VehicleType.all)));
 
         assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
                 .containsEntry("maxspeed", "80");
