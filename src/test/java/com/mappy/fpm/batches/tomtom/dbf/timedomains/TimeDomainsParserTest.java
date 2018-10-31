@@ -111,7 +111,6 @@ public class TimeDomainsParserTest {
     @Test
     public void should_translate_month_duration(){
         TimeDomains tomtomTimesDomains = new TimeDomains(14420000000590L, 1, "[(M3){M5}]");
-
         String osmTimeDomain = parser.parse(newHashSet(tomtomTimesDomains));
         assertThat(osmTimeDomain).isEqualTo("Mar-Aug off");
     }
