@@ -23,7 +23,7 @@ public class TimeDomainsProviderTest {
     @Test
     public void should_read_time_domain_restriction() {
         assertThat(timeDomainsProvider.getTimeDomains(14420000000590L)).containsExactly(
-                new TimeDomains(14420000000590L, "[(h11){h7}]"),
-                new TimeDomains(14420000000590L, "[(h22){h8}]"));
+                new TimeDomains(14420000000590L, 2, "[(h11){h7}]"),
+                new TimeDomains(14420000000590L, 3, "[(h22){h8}]"));
     }
 }
