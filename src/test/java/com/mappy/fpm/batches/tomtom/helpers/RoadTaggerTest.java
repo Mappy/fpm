@@ -338,6 +338,18 @@ public class RoadTaggerTest {
     }
 
     @Test
+    public void should_have_a_functional_road_class() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FRC", "7", "FOW", "11", "NET2CLASS", "6"))))
+                .containsEntry("frc:tomtom", "7");
+    }
+
+    @Test
+    public void should_have_a_form_of_way() {
+        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
+                .containsEntry("fow:tomtom", "11");
+    }
+
+    @Test
     public void should_add_Alternate_RoadNames_With_Side() {
         assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
                 .containsEntry("name:left:fr", "name_left_fr")
