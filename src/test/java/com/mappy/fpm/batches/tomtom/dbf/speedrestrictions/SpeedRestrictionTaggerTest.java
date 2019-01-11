@@ -4,12 +4,12 @@ import com.mappy.fpm.utils.MemoryFeature;
 
 import com.mappy.fpm.batches.tomtom.dbf.speedtimedomains.StDbf;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
+import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
 import org.junit.Test;
 
 import static com.google.common.collect.ImmutableMap.*;
 import static com.google.common.collect.Lists.*;
 import static com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.Validity.*;
-import static com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.VehicleType;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

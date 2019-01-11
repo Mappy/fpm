@@ -2,10 +2,10 @@ package com.mappy.fpm.batches.tomtom.dbf.speedrestrictions;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.TreeMultimap;
-import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.VehicleType;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.Validity;
 import com.mappy.fpm.batches.tomtom.dbf.speedtimedomains.StDbf;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
+import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
 import com.mappy.fpm.batches.utils.Feature;
 
 import javax.inject.Inject;

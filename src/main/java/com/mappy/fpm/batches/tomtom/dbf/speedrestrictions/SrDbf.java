@@ -3,7 +3,7 @@ package com.mappy.fpm.batches.tomtom.dbf.speedrestrictions;
 import com.google.common.collect.ArrayListMultimap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.Validity;
-import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.VehicleType;
+import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
