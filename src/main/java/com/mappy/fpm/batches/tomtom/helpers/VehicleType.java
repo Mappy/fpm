@@ -1,10 +1,12 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 public enum VehicleType {
-    all, passengerCars, residentialVehicles, taxi, publicBus;
+    notApplicable, all, passengerCars, residentialVehicles, taxi, publicBus;
 
     public static VehicleType fromId(int id) {
         switch(id) {
+            case -1:
+                return notApplicable;
             case 0:
                 return all;
             case 11:
