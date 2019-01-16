@@ -9,7 +9,6 @@ import java.util.Map;
 import static com.google.common.base.Joiner.on;
 import static com.google.common.collect.Lists.reverse;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.mappy.fpm.batches.tomtom.helpers.RoadTagger.isReversed;
 
 public class LaneTagger {
 
@@ -20,11 +19,11 @@ public class LaneTagger {
         this.ldDbf = ldDbf;
     }
 
-    public Map<String, String> lanesFor(Feature feature) {
+    public Map<String, String> lanesFor(Feature feature, Boolean isReversed) {
         Map<String, String> tags = newHashMap();
 
         if (ldDbf.containsKey(feature.getLong("ID"))) {
-            tags.put("turn:lanes", on("|").join(reorder(feature)));
+            tags.put("turn:lanes", on("|").join(reorder(feature, isReversed)));
         }
 
         Integer lanes = feature.getInteger("LANES");
@@ -35,9 +34,9 @@ public class LaneTagger {
         return tags;
     }
 
-    private List<String> reorder(Feature feature) {
+    private List<String> reorder(Feature feature, Boolean isReversed) {
         List<String> parts = ldDbf.get(feature.getLong("ID"));
-        if (isReversed(feature)) {
+        if (isReversed) {
             return parts;
         }
         return reverse(parts);

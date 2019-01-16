@@ -28,7 +28,8 @@ public class RailwayShapefile extends TomtomShapefile {
         Map<String, String> tags = Maps.newHashMap();
         tags.put("ref:tomtom", String.valueOf(feature.getLong("ID")));
         tags.put("railway", "rail");
-        tags.putAll(level(feature));
+        Boolean isReversed = "TF".equals(feature.getString("ONEWAY"));
+        tags.putAll(level(feature, isReversed));
         addTagIf("tunnel", "yes", TUNNEL.equals(feature.getInteger("PARTSTRUC")), tags);
         addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);
         serializer.write(feature.getMultiLineString(), tags);
