@@ -1,10 +1,10 @@
 package com.mappy.fpm.batches.tomtom.dbf.speedrestrictions;
 
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
 import org.junit.Test;
 
 import static com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.Validity.*;
-import static com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.VehicleType;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

@@ -21,7 +21,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.helpers.FormOfWay.PARKING_GARAGE_BUILDING;
-import static com.mappy.fpm.batches.tomtom.helpers.RoadTagger.isReversed;
 import static java.util.stream.Collectors.joining;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
@@ -41,11 +40,11 @@ public class RestrictionsAccumulator {
         this.maneuvers = maneuvers;
     }
 
-    public void register(Feature feature, Way way) {
+    public void register(Feature feature, Way way, Boolean isReversed) {
         long tomtomId = feature.getLong("ID");
         if (maneuvers.getRestrictionRoadIds().contains(tomtomId)) {
             if (!PARKING_GARAGE_BUILDING.is(feature.getInteger("FOW"))) {
-                boolean reversed = isReversed(feature);
+                boolean reversed = isReversed;
                 Long from = feature.getLong("F_JNCTID");
                 Long to = feature.getLong("T_JNCTID");
 

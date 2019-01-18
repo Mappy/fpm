@@ -4,12 +4,12 @@ import com.mappy.fpm.utils.MemoryFeature;
 
 import com.mappy.fpm.batches.tomtom.dbf.speedtimedomains.StDbf;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
+import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
 import org.junit.Test;
 
 import static com.google.common.collect.ImmutableMap.*;
 import static com.google.common.collect.Lists.*;
 import static com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.Validity.*;
-import static com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.VehicleType;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -22,7 +22,7 @@ public class SpeedRestrictionTaggerTest {
     public void should_tag_maxspeed() {
         when(srDbf.getSpeedRestrictions(123)).thenReturn(newArrayList(new SpeedRestriction(123, 1, 50, both, VehicleType.all)));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false))
                 .containsEntry("maxspeed", "50");
     }
 
@@ -30,7 +30,7 @@ public class SpeedRestrictionTaggerTest {
     public void should_not_add_maxspeed_if_not_present_in_dbf() {
         when(srDbf.getSpeedRestrictions(123)).thenReturn(newArrayList());
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")))).isEmpty();
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false)).isEmpty();
     }
 
     @Test
@@ -39,7 +39,7 @@ public class SpeedRestrictionTaggerTest {
                 new SpeedRestriction(123, 1, 30, positive, VehicleType.all),
                 new SpeedRestriction(123, 2, 60, negative, VehicleType.all)));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false))
                 .containsEntry("maxspeed:forward", "30")
                 .containsEntry("maxspeed:backward", "60");
     }
@@ -50,7 +50,7 @@ public class SpeedRestrictionTaggerTest {
                 new SpeedRestriction(123, 1, 30, positive, VehicleType.all),
                 new SpeedRestriction(123, 2, 60, negative, VehicleType.all)));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123", "ONEWAY", "TF"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123", "ONEWAY", "TF")), true))
                 .containsEntry("maxspeed:forward", "60")
                 .containsEntry("maxspeed:backward", "30");
     }
@@ -60,7 +60,7 @@ public class SpeedRestrictionTaggerTest {
         when(srDbf.getSpeedRestrictions(123)).thenReturn(newArrayList(
                 new SpeedRestriction(123, 1, 80, both, VehicleType.all)));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false))
                 .containsEntry("maxspeed", "80");
     }
 
@@ -70,7 +70,7 @@ public class SpeedRestrictionTaggerTest {
                 new SpeedRestriction(123, 1, 80, both, VehicleType.all),
                 new SpeedRestriction(123, 2, 90, both, VehicleType.all)));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false))
                 .containsEntry("maxspeed", "90");
     }
 
@@ -82,7 +82,7 @@ public class SpeedRestrictionTaggerTest {
                 new SpeedRestriction(123, 3, 70, both, VehicleType.residentialVehicles),
                 new SpeedRestriction(123, 4, 60, both, VehicleType.passengerCars)));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false))
                 .containsEntry("maxspeed", "60");
     }
 
@@ -92,7 +92,7 @@ public class SpeedRestrictionTaggerTest {
                 new SpeedRestriction(123, 1, 90, both, VehicleType.all),
                 new SpeedRestriction(123, 2, 80, both, VehicleType.passengerCars)));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false))
                 .containsEntry("maxspeed", "80");
     }
 
@@ -102,7 +102,7 @@ public class SpeedRestrictionTaggerTest {
                 new SpeedRestriction(123, 1, 80, both, VehicleType.passengerCars),
                 new SpeedRestriction(123, 2, 90, both, VehicleType.all)));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false))
                 .containsEntry("maxspeed", "80");
     }
 
@@ -115,7 +115,7 @@ public class SpeedRestrictionTaggerTest {
         when(stDbf.getSpeedTimeDomain(123L, 2)).thenReturn(
                 new TimeDomains(123, 2, "[(M3){M5}]"));
 
-        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123"))))
+        assertThat(tagger.tag(MemoryFeature.onlyTags(of("ID", "123")), false))
                 .containsEntry("maxspeed", "90");
     }
 }
