@@ -1,7 +1,7 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 public enum VehicleType {
-    notApplicable, all, passengerCars, residentialVehicles, taxi, publicBus;
+    notApplicable, all, passengerCars, residentialVehicles, taxi, publicBus, bicycle;
 
     public static VehicleType fromId(int id) {
         switch(id) {
@@ -17,6 +17,8 @@ public enum VehicleType {
                 return taxi;
             case 17:
                 return publicBus;
+            case 24:
+                return bicycle;
             default:
                 throw new RuntimeException("Unknown vehicle type: " + id);
         }
