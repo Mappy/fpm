@@ -127,7 +127,7 @@ public class SignPosts extends TomtomDbfReader {
         }
         //exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", "5"));
         //exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", exitRef));
-        //return tags;
+        return tags;
     }
 
     private String getSignOnIntermediateJunction(Long fromJunctionId, Long toJunctionId, Long signId, Long junctionId) {
