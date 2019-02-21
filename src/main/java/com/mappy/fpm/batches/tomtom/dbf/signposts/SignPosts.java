@@ -41,7 +41,7 @@ public class SignPosts extends TomtomDbfReader {
     private static final Predicate<SignPost> onlyColours = signPost -> Route_Number_Type.equals(signPost.getInfotyp());
     private static final Predicate<SignPost> onlySymbol = signPost -> Pictogram.equals(signPost.getInfotyp());
     private static final Predicate<SignPost> onlyExit = signPost -> Exit.equals(signPost.getContyp()) && Exit_Number.equals(signPost.getInfotyp());
-    private static final Pattern EXIT_NUMBER_PATTERN = compile("((\\d|\\.)+\\w{0,1})(.*)");
+    private static final Pattern EXIT_NUMBER_PATTERN = compile("([^ 1-9-]*[0-9]+[^ ]*)");
     private static final Pattern EXIT_LABEL_PATTERN = compile("(\\d|\\.)+\\w{0,1} (.*)");
 
     private final ListMultimap<Long, SignPost> si = ArrayListMultimap.create();
@@ -126,7 +126,7 @@ public class SignPosts extends TomtomDbfReader {
             tags.put(destinationTag + ":colour", on(";").join(signPostColourFor));
         }
         //exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", "5"));
-        //exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", exitRef));
+        exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", exitRef));
         return tags;
     }
 
