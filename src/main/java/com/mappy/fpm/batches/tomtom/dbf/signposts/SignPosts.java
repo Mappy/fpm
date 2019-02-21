@@ -125,8 +125,8 @@ public class SignPosts extends TomtomDbfReader {
         if (isNotEmpty(signPostColourFor)) {
             tags.put(destinationTag + ":colour", on(";").join(signPostColourFor));
         }
-
-        exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", "5"));
+        //exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", "5"));
+        //exitRefFor(tomtomId).ifPresent(exitRef -> tags.put("junction:ref", exitRef));
         return tags;
     }
 

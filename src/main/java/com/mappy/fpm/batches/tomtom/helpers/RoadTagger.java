@@ -148,8 +148,8 @@ public class RoadTagger {
         addTagIf("mappy_length", () -> valueOf(feature.getDouble("METERS")), ofNullable(feature.getDouble("METERS")).isPresent(), tags);
 
         if (SLIP_ROAD.is(feature.getInteger("FOW")) && intersectionProvider.getIntersectionById().containsKey(id)) {
-            //tags.put("junction:ref", intersectionProvider.getIntersectionById().get(id));
-            tags.put("junction:ref", "3");
+            tags.put("junction:ref", intersectionProvider.getIntersectionById().get(id));
+            //tags.put("junction:ref", "3");
         }
 
         tags.putAll(signPosts.getTags(id, isOneway, feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
