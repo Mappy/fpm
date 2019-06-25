@@ -91,10 +91,6 @@ public class RoadTaggerTest {
                 .containsEntry("junction", "roundabout");
         assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "1"))))
                 .doesNotContainEntry("junction", "roundabout");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "4"))))
-                .containsEntry("junction", "roundabout");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "1"))))
-                .doesNotContainEntry("junction", "roundabout");
     }
 
     @Test
