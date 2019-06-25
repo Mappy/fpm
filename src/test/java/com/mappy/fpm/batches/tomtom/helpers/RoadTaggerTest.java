@@ -77,6 +77,7 @@ public class RoadTaggerTest {
 	defaultTags.put("ID", "123");
 	defaultTags.put("F_ELEV", "0");
 	defaultTags.put("T_ELEV", "0");
+	defaultTags.put("RDCOND", "1");
     }
 
 
@@ -516,5 +517,16 @@ public class RoadTaggerTest {
                 .containsEntry("name:right:fr", "name_right_fr")
                 .containsEntry("alt_name:left:fr", "alt_name_left_fr");
 
+    }
+
+    @Test
+    public void should_have_paved_info() {
+        assertThat(tagger.tag(onlyTags(defaultTags)))
+                .containsEntry("surface", "paved");
+
+	for(String value: new String[]{"0", "2", "3"}) {
+	    defaultTags.put("RDCOND", value);
+	    assertThat(tagger.tag(onlyTags(defaultTags))) .containsEntry("surface", "unpaved");
+	}
     }
 }

@@ -95,6 +95,7 @@ public class RoadTagger {
 
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
+	tags.put("surface", feature.getInteger("RDCOND").equals(1) ? "paved" : "unpaved");
 
         tags.putAll(geocodeProvider.getNamesAndAlternateNamesWithSide(id));
 
