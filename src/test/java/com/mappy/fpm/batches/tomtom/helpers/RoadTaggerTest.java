@@ -19,6 +19,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
@@ -47,6 +49,7 @@ public class RoadTaggerTest {
     private final RouteIntersectionProvider intersectionProvider = mock(RouteIntersectionProvider.class);
     private final PoiProvider poiProvider = mock(PoiProvider.class);
     private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, intersectionProvider, poiProvider);
+    private final Map<String, String> defaultTags = new HashMap<String, String>();
 
     @Before
     public void setup() {
@@ -65,58 +68,93 @@ public class RoadTaggerTest {
         when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(of("N5"));
         when(routeNumbersProvider.getRouteTypeOrderByPriority(any(Long.class))).thenReturn(of("5"));
         when(poiProvider.getPoiNameByType(any(Long.class), eq(FeatureType.MOUNTAIN_PASS.getValue()))).thenReturn(empty());
+	setDefaultTags();
     }
+
+    private void setDefaultTags() {
+	defaultTags.clear();
+	defaultTags.put("FT", "0");
+	defaultTags.put("ID", "123");
+	defaultTags.put("F_ELEV", "0");
+	defaultTags.put("T_ELEV", "0");
+	defaultTags.put("RDCOND", "1");
+    }
+
 
     @Test
     public void should_add_intersection_exit() {
         when(intersectionProvider.getIntersectionById())
                 .thenReturn(ImmutableMap.of(123L, "exit 13"));
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10"))))
+	defaultTags.put("FOW", "10");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("junction:ref", "exit 13");
     }
 
     @Test
     public void should_add_level_tag() {
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0"))))
+	defaultTags.put("F_ELEV",  "0");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("layer", "0");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "1", "T_ELEV", "1"))))
+
+	defaultTags.put("F_ELEV",  "1");
+	defaultTags.put("T_ELEV",  "1");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("layer", "1");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "1"))))
+
+	defaultTags.put("F_ELEV",  "0");
+	defaultTags.put("T_ELEV",  "1");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("layer:from", "0").containsEntry("layer:to", "1");
     }
 
     @Test
     public void should_tag_roundabout() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "4"))))
+	defaultTags.put("FOW",  "4");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("junction", "roundabout");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "1"))))
-                .doesNotContainEntry("junction", "roundabout");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "4"))))
-                .containsEntry("junction", "roundabout");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "1"))))
+
+	defaultTags.put("FOW",  "1");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .doesNotContainEntry("junction", "roundabout");
     }
 
     @Test
     public void should_tag_ferries() {
-        assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "NAME", "Calais - Douvres", "MINUTES", "10.902"))))
+	defaultTags.put("FT", "1");
+	defaultTags.put("NAME", "Calais - Douvres");
+	defaultTags.put("MINUTES", "10.902");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("route", "ferry")
                 .containsEntry("name", "Calais - Douvres")
                 .containsEntry("duration", "00:10:54")
                 .containsEntry("name:left:fr", "name_left_fr");
-        assertThat(tagger.tag(onlyTags(map("ID", "123", "FT", "1", "F_ELEV", "0", "T_ELEV", "0", "MINUTES", "10", "", ""))))
+
+	defaultTags.put("FT", "1");
+	defaultTags.put("MINUTES", "10");
+	defaultTags.remove("NAME");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("route", "ferry").doesNotContainKey("name");
     }
 
     @Test
     public void should_tag_ferries_without_cars() {
-        assertThat(tagger.tag(onlyTags(map("FT", "1", "FEATTYP", "4110", "ID", "123", "MINUTES", "10.902", "F_ELEV", "0", "T_ELEV", "0", "FOW", "14", "NAME", "Calais - Douvres", "ONEWAY", "N"))))
+	defaultTags.put("FT", "1");
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("MINUTES", "10.902");
+	defaultTags.put("FOW", "14");
+	defaultTags.put("ONEWAY", "N");
+	defaultTags.put("NAME", "Calais - Douvres");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54").containsEntry("motor_vehicle", "no");
     }
 
     @Test
     public void should_tag_motor_vehicle_no() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))) //
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("MINUTES", "10");
+	defaultTags.put("FOW", "3");
+	defaultTags.put("ONEWAY", "N");
+        assertThat(tagger.tag(onlyTags(defaultTags))) //
                 .containsEntry("motor_vehicle", "no");
     }
 
@@ -125,95 +163,185 @@ public class RoadTaggerTest {
         List<TimeDomains> timeDomainList = newArrayList(new TimeDomains(1L, null));
         when(timeDomainsData.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
 
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "ONEWAY", "N")))) //
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("MINUTES", "10");
+	defaultTags.put("FOW", "3");
+	defaultTags.put("ONEWAY", "N");
+        assertThat(tagger.tag(onlyTags(defaultTags))) //
                 .doesNotContainEntry("motor_vehicle", "no");
     }
 
     @Test
     public void should_tag_pedestrian_roads() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "14"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("MINUTES", "10");
+
+	defaultTags.put("FOW", "14");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "pedestrian");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "15"))))
+
+	defaultTags.put("FOW", "15");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "footway");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "19"))))
+
+	defaultTags.put("FOW", "19");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "steps");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3"))))
+
+	defaultTags.put("FOW", "3");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .doesNotContainEntry("highway", "steps");
     }
 
     @Test
     public void should_tag_privateRoads() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "PRIVATERD", "1"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("MINUTES", "10");
+	defaultTags.put("FOW", "3");
+
+	defaultTags.put("PRIVATERD", "1");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("access", "private");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "PRIVATERD", "2"))))
+
+	defaultTags.put("PRIVATERD", "2");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("access", "private");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "PRIVATERD", "0")))).doesNotContainKey("access");
+
+	defaultTags.put("PRIVATERD", "0");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
+	    .doesNotContainKey("access");
     }
 
     @Test
     public void should_tag_foot_and_bicycle_no() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "0", "FREEWAY", "0", "RAMP", "1"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("MINUTES", "10");
+
+	defaultTags.put("RAMP", "1");
+
+	defaultTags.put("FOW", "3");
+	defaultTags.put("FRC", "0");
+	defaultTags.put("FREEWAY", "0");
+
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("foot", "no").containsEntry("bicycle", "no");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW", "1", "FRC", "1", "FREEWAY", "0", "RAMP", "1"))))
+
+	defaultTags.put("FOW", "1");
+	defaultTags.put("FRC", "1");
+	defaultTags.put("FREEWAY", "0");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("foot", "no").containsEntry("bicycle", "no");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "0", "FREEWAY", "1", "RAMP", "1"))))
+
+	defaultTags.put("FOW", "3");
+	defaultTags.put("FRC", "0");
+	defaultTags.put("FREEWAY", "1");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("foot", "no").containsEntry("bicycle", "no");
     }
 
     @Test
     public void should_tag_road_type() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "0", "RAMP", "0"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("MINUTES", "10");
+	defaultTags.put("FOW", "3");
+	defaultTags.put("RAMP", "0");
+
+
+	defaultTags.put("FRC", "0");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "motorway");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "1", "RAMP", "0"))))
+
+	defaultTags.put("FRC", "1");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "trunk");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "2", "RAMP", "0"))))
+
+	defaultTags.put("FRC", "2");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "primary");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "4", "RAMP", "0"))))
+
+	defaultTags.put("FRC", "3");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "secondary");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "5", "RAMP", "0"))))
+
+	defaultTags.put("FRC", "5");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "tertiary");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "3", "FRC", "7", "RAMP", "0"))))
+
+	defaultTags.put("FRC", "7");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "residential");
     }
 
     @Test
     public void should_add_mappy_length_tag() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "feattyp", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "fow", "14", "METERS", "150.25"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "14");
+	defaultTags.put("METERS", "150.25");
+
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("mappy_length", "150.25");
     }
 
     @Test
     public void should_add_bridge_and_tunnel() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "PARTSTRUC", "0"))))
+	defaultTags.put("PARTSTRUC", "0");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .doesNotContainKey("tunnel").doesNotContainKey("bridge");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "PARTSTRUC", "1"))))
+
+	defaultTags.put("PARTSTRUC", "1");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("tunnel", "yes");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "PARTSTRUC", "2"))))
+
+	defaultTags.put("PARTSTRUC", "2");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("bridge", "yes");
     }
 
     @Test
     public void should_tag_motorway_link() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10", "FRC", "0"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("MINUTES", "10");
+	defaultTags.put("FOW", "10");
+
+	defaultTags.put("FRC", "0");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "motorway_link");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10", "FRC", "1"))))
+
+	defaultTags.put("FRC", "1");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "trunk_link");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10", "FRC", "2"))))
+
+
+	defaultTags.put("FRC", "2");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "primary_link");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10", "FRC", "3"))))
+
+	defaultTags.put("FRC", "3");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "secondary_link");
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "10", "FRC", "7"))))
+
+	defaultTags.put("FRC", "7");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "tertiary_link");
 
     }
 
     @Test
     public void should_tag_oneway() {
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("ID", "123", "ONEWAY", "FT", "F_ELEV", "0", "T_ELEV", "0", "FT", "0")))).containsEntry("oneway", "yes");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("ID", "123", "ONEWAY", "TF", "F_ELEV", "0", "T_ELEV", "0", "FT", "0")))).containsEntry("oneway", "yes");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("ID", "123", "ONEWAY", "N", "F_ELEV", "0", "T_ELEV", "0", "FT", "0")))).doesNotContainKey("oneway");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("ID", "123", "ONEWAY", "", "F_ELEV", "0", "T_ELEV", "0", "FT", "0")))).doesNotContainKey("oneway");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0")))).doesNotContainKey("oneway");
+	defaultTags.put("ONEWAY", "FT");
+        assertThat(tagger.tag(onlyTags(defaultTags))).containsEntry("oneway", "yes");
+
+	defaultTags.put("ONEWAY", "TF");
+        assertThat(tagger.tag(onlyTags(defaultTags))).containsEntry("oneway", "yes");
+
+	defaultTags.put("ONEWAY", "N");
+        assertThat(tagger.tag(onlyTags(defaultTags))).doesNotContainKey("oneway");
+
+	defaultTags.put("ONEWAY", "");
+        assertThat(tagger.tag(onlyTags(defaultTags))).doesNotContainKey("oneway");
+
+	defaultTags.remove("ONEWAY");
+        assertThat(tagger.tag(onlyTags(defaultTags))).doesNotContainKey("oneway");
     }
 
     @Test
@@ -221,9 +349,13 @@ public class RoadTaggerTest {
         when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(empty());
         when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(empty());
 
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "SHIELDNUM", "A13"))))
+	defaultTags.put("FT", "0");
+	defaultTags.put("SHIELDNUM", "A13");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("int_ref", "A13");
-        assertThat(tagger.tag(onlyTags(ImmutableMap.of("FT", "0", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0"))))
+
+	defaultTags.remove("SHIELDNUM");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .doesNotContainKey("ref");
     }
 
@@ -234,7 +366,7 @@ public class RoadTaggerTest {
         List<TimeDomains> timeDomains = newArrayList(domainTomtom, domainTomtom2);
         when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenReturn("10:00-14:00 off, 22:00-06:00 off");
-        MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
+        MemoryFeature feature = onlyTags(defaultTags);
 
         assertThat(tagger.tag(feature)).containsEntry("opening_hours", "10:00-14:00 off, 22:00-06:00 off");
     }
@@ -245,7 +377,7 @@ public class RoadTaggerTest {
         List<TimeDomains> timeDomains = newArrayList(domainTomtom);
         when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenReturn("");
-        MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
+        MemoryFeature feature = onlyTags(defaultTags);
 
         assertThat(tagger.tag(feature)).doesNotContainKeys("opening_hours");
     }
@@ -256,27 +388,36 @@ public class RoadTaggerTest {
         List<TimeDomains> timeDomains = newArrayList(domainTomtom);
         when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
         when(timeDomainsParser.parse(timeDomains)).thenThrow(new IllegalArgumentException("Test exception"));
-        MemoryFeature feature = onlyTags(ImmutableMap.of("ID", "123", "F_ELEV", "0", "T_ELEV", "0", "FT", "0"));
+        MemoryFeature feature = onlyTags(defaultTags);
 
         assertThat(tagger.tag(feature)).doesNotContainKeys("opening_hours");
     }
 
     @Test
     public void should_tag_a_highway_service() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("FRC", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "service");
     }
 
     @Test
     public void should_tag_is_in() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("FRC", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("is_in:left", "9120")
                 .containsEntry("is_in:right", "9130");
     }
 
     @Test
     public void should_tag_interpolation() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("FRC", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("addr:interpolation:left", "even")
                 .containsEntry("addr:interpolation:right", "odd");
     }
@@ -284,34 +425,51 @@ public class RoadTaggerTest {
     @Test
     public void should_tag_left_and_interpolation_address() {
         when(geocoding.getInterpolations(any(Long.class))).thenReturn(ImmutableMap.of("interpolation:left", "1;10", "interpolation:right", "11;20"));
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
+
+
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("FRC", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("interpolation:left", "1;10")
                 .containsEntry("interpolation:right", "11;20");
     }
 
     @Test
     public void should_have_a_global_importance() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("NET2CLASS", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("global_importance:tomtom", "6");
     }
 
     @Test
     public void should_have_built_up_ids() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("NET2CLASS", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("bua:tomtom:left", "123")
                 .containsEntry("bua:tomtom:right", "456");
     }
 
     @Test
     public void should_have_areas_ids() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("NET2CLASS", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("admin:tomtom:left", "789")
                 .containsEntry("admin:tomtom:right", "112");
     }
 
     @Test
     public void should_have_route_numbers_and_type() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "NET2CLASS", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("NET2CLASS", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("int_ref", "E41")
                 .containsEntry("ref", "N5")
                 .containsEntry("route_type:tomtom", "5");
@@ -319,13 +477,19 @@ public class RoadTaggerTest {
 
     @Test
     public void should_have_steps() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "19", "NET2CLASS", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "19");
+	defaultTags.put("NET2CLASS", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "steps");
     }
 
     @Test
     public void should_have_road_authorities() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "20", "NET2CLASS", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "20");
+	defaultTags.put("NET2CLASS", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("highway", "service")
                 .containsEntry("service", "emergency_access");
     }
@@ -333,16 +497,36 @@ public class RoadTaggerTest {
     @Test
     public void should_have_mountain_pass() {
         when(poiProvider.getPoiNameByType(any(Long.class), eq(FeatureType.MOUNTAIN_PASS.getValue()))).thenReturn(of("everest"));
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "NAME", "not everest", "F_ELEV", "0", "T_ELEV", "0", "FOW", "20", "NET2CLASS", "6"))))
+
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("NAME", "not everest");
+	defaultTags.put("FOW", "20");
+	defaultTags.put("NET2CLASS", "6");
+
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("mountain_pass", "everest");
     }
 
     @Test
     public void should_add_Alternate_RoadNames_With_Side() {
-        assertThat(tagger.tag(onlyTags(map("FT", "0", "FEATTYP", "4110", "ID", "123", "MINUTES", "10", "F_ELEV", "0", "T_ELEV", "0", "FOW", "11", "FRC", "6"))))
+	defaultTags.put("FEATTYP", "4110");
+	defaultTags.put("FOW", "11");
+	defaultTags.put("FRC", "6");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("name:left:fr", "name_left_fr")
                 .containsEntry("name:right:fr", "name_right_fr")
                 .containsEntry("alt_name:left:fr", "alt_name_left_fr");
 
+    }
+
+    @Test
+    public void should_have_paved_info() {
+        assertThat(tagger.tag(onlyTags(defaultTags)))
+                .containsEntry("surface", "paved");
+
+	for(String value: new String[]{"0", "2", "3"}) {
+	    defaultTags.put("RDCOND", value);
+	    assertThat(tagger.tag(onlyTags(defaultTags))) .containsEntry("surface", "unpaved");
+	}
     }
 }
