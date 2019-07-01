@@ -51,6 +51,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
         this.nameProvider = nameProvider;
         if (new File(filename).exists()) {
             this.nameProvider.loadAlternateNames(getPrefixFileName(fileNameSplited) + "an.dbf");
+            this.nameProvider.loadAlternateCityNames();
         }
     }
 
@@ -124,6 +125,7 @@ public abstract class BoundariesShapefile extends TomtomShapefile {
             adminTags.put("place", cityCenter.getPlace());
             String capitalValue = osmLevelGenerator.getOsmLevel(zone, cityCenter.getAdminclass());
             adminTags.put("capital", "2".equals(capitalValue) ? "yes" : capitalValue);
+            adminTags.putAll(nameProvider.getAlternateCityNames(cityCenter.getId()));
             Optional<Node> node = serializer.writePoint(cityCenter.getPoint(), adminTags);
             return node.map(adminCenter -> new RelationMember(adminCenter.getId(), EntityType.Node, "admin_centre"));
         }

@@ -5,6 +5,7 @@ import com.google.inject.Singleton;
 import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.GeometrySerializer;
 import it.unimi.dsi.fastutil.longs.Long2LongAVLTreeMap;
+import it.unimi.dsi.fastutil.longs.LongArraySet;
 import lombok.extern.slf4j.Slf4j;
 import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
@@ -12,12 +13,14 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Collections;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.mappy.fpm.batches.tomtom.helpers.RoadTagger.isReversed;
+import static com.mappy.fpm.batches.tomtom.helpers.FormOfWay.PARKING_GARAGE_BUILDING;
 import static java.util.stream.Collectors.joining;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Node;
 import static org.openstreetmap.osmosis.core.domain.v0_6.EntityType.Way;
@@ -29,6 +32,7 @@ public class RestrictionsAccumulator {
     private final Maneuvers maneuvers;
     private final Map<Long, Long> wayByTomtomId = new Long2LongAVLTreeMap();
     private final Map<Long, Long> nodeByJunctionId = new Long2LongAVLTreeMap();
+    private Set<Long> ignoredTomtomIds = new LongArraySet();
     private int viaCounter = 0;
 
     @Inject
@@ -36,17 +40,23 @@ public class RestrictionsAccumulator {
         this.maneuvers = maneuvers;
     }
 
-    public void register(Feature feature, Way way) {
+    public void register(Feature feature, Way way, Boolean isReversed) {
         long tomtomId = feature.getLong("ID");
         if (maneuvers.getRestrictionRoadIds().contains(tomtomId)) {
-            boolean reversed = isReversed(feature);
-            Long from = feature.getLong("F_JNCTID");
-            Long to = feature.getLong("T_JNCTID");
-            wayByTomtomId.put(tomtomId, way.getId());
-            long firstNode = way.getWayNodes().get(0).getNodeId();
-            long lastNode = way.getWayNodes().get(way.getWayNodes().size() - 1).getNodeId();
-            add(reversed ? to : from, firstNode);
-            add(reversed ? from : to, lastNode);
+            if (!PARKING_GARAGE_BUILDING.is(feature.getInteger("FOW"))) {
+                boolean reversed = isReversed;
+                Long from = feature.getLong("F_JNCTID");
+                Long to = feature.getLong("T_JNCTID");
+
+                wayByTomtomId.put(tomtomId, way.getId());
+                long firstNode = way.getWayNodes().get(0).getNodeId();
+                long lastNode = way.getWayNodes().get(way.getWayNodes().size() - 1).getNodeId();
+                add(reversed ? to : from, firstNode);
+                add(reversed ? from : to, lastNode);
+            } else {
+                ignoredTomtomIds.add(tomtomId);
+                log.info("Feature {} is a PARKING_GARAGE_BUILDING, adding to ignore list", tomtomId);
+            }
         }
     }
 
@@ -54,12 +64,18 @@ public class RestrictionsAccumulator {
         int count = 0;
         int ignored = 0;
         for (Restriction restriction : maneuvers.getRestrictions()) {
+            if (!Collections.disjoint(restriction.getSegments(), ignoredTomtomIds)) {
+                log.info("Restriction {} contains PARKING_GARAGE_BUILDING, skipping serialization", restriction);
+                ignored++;
+                count++;
+                continue;
+            }
+
             try {
                 serializer.write(members(restriction), tomtomMembers(restriction));
             }
             catch (IllegalArgumentException e) {
-                log.error(e.getMessage());
-                log.error("Ignoring restriction {}", restriction);
+                log.error("Ignoring {}: {}", restriction, e);
                 ignored++;
             }
             count++;

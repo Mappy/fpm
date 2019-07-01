@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
+import com.mappy.fpm.batches.utils.Feature;
 import com.mappy.fpm.batches.utils.ShapefileIterator;
 
 import javax.inject.Inject;
@@ -22,9 +23,11 @@ public class CapitalProvider {
             File file = new File(filePath);
             try (ShapefileIterator iterator = new ShapefileIterator(file, true)) {
                 while (iterator.hasNext()) {
-                    Centroid centroid = Centroid.from(iterator.next());
+                    Feature feature = iterator.next();
+                    Centroid centroid = Centroid.from(feature);
+                    Long id = feature.getLong("ID");
                     if (centroid.getAdminclass() <= 7) {
-                        allCapitals.add(centroid);
+                        allCapitals.add(centroid.withId(id));
                     }
                 }
             }

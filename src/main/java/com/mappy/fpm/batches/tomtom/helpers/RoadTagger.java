@@ -5,6 +5,7 @@ import com.mappy.fpm.batches.tomtom.dbf.intersection.RouteIntersectionProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
 import com.mappy.fpm.batches.tomtom.dbf.poi.FeatureType;
 import com.mappy.fpm.batches.tomtom.dbf.poi.PoiProvider;
+import com.mappy.fpm.batches.tomtom.dbf.restrictions.RestrictionTagger;
 import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
@@ -42,9 +43,8 @@ public class RoadTagger {
     private final SignPosts signPosts;
     private final LaneTagger lanes;
     private final SpeedRestrictionTagger speedRestriction;
+    private final RestrictionTagger restrictionTagger;
     private final TollTagger tolls;
-    private final TimeDomainsProvider timeDomainsProvider;
-    private final TimeDomainsParser timeDomainsParser;
     private final TransportationAreaProvider transportationAreaProvider;
     private final RouteNumbersProvider routeNumbersProvider;
     private final RouteIntersectionProvider intersectionProvider;
@@ -52,16 +52,15 @@ public class RoadTagger {
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction, TollTagger tolls, TimeDomainsProvider timeDomainsProvider, TimeDomainsParser timeDomainsParser,
+                      SpeedRestrictionTagger speedRestriction, RestrictionTagger restrictionTagger, TollTagger tolls, TimeDomainsProvider timeDomainsProvider, TimeDomainsParser timeDomainsParser,
                       TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider, RouteIntersectionProvider intersectionProvider, PoiProvider poiProvider) {
         this.speedProfiles = speedProfiles;
         this.geocodeProvider = geocodeProvider;
         this.signPosts = signPosts;
         this.lanes = lanes;
         this.speedRestriction = speedRestriction;
+        this.restrictionTagger = restrictionTagger;
         this.tolls = tolls;
-        this.timeDomainsProvider = timeDomainsProvider;
-        this.timeDomainsParser = timeDomainsParser;
         this.transportationAreaProvider = transportationAreaProvider;
         this.routeNumbersProvider = routeNumbersProvider;
         this.intersectionProvider = intersectionProvider;
@@ -74,24 +73,20 @@ public class RoadTagger {
 
         Long id = feature.getLong("ID");
 
+        Map<String, String> directionTags = restrictionTagger.tag(feature);
+        Boolean isOneway = directionTags.containsKey("oneway");
+        Boolean isReversed = directionTags.containsKey("reversed:tomtom");
+        tags.putAll(directionTags);
         tagTomtomSpecial(feature, tags, id);
 
-        tags.putAll(level(feature));
+        tags.putAll(level(feature, isReversed));
 
         addTagIf("name", feature.getString("NAME"), ofNullable(feature.getString("NAME")).isPresent(), tags);
         addTagIf("int_ref", feature.getString("SHIELDNUM"), ofNullable(feature.getString("SHIELDNUM")).isPresent(), tags);
         routeNumbersProvider.getInternationalRouteNumbers(id).ifPresent(s -> tags.put("int_ref", s));
         routeNumbersProvider.getNationalRouteNumbers(id).ifPresent(s -> tags.put("ref", s));
-        addTagIf("oneway", "yes", isOneway(feature), tags);
 
         tags.putAll(tolls.tag(id));
-
-        Collection<TimeDomains> timeDomains = timeDomainsProvider.getTimeDomains(id);
-        addTagIf("motor_vehicle", "no", "N".equals(feature.getString("ONEWAY")) && timeDomains.isEmpty(), tags);
-
-        if (timeDomains != null && !timeDomains.isEmpty()) {
-            tagsTimeDomains(tags, timeDomains);
-        }
 
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
@@ -102,7 +97,7 @@ public class RoadTagger {
             return tags;
         }
 
-        tagRoute(feature, tags, id);
+        tagRoute(feature, tags, id, isOneway, isReversed);
 
         tags.putAll(geocodeProvider.getInterpolations(id));
 
@@ -114,7 +109,7 @@ public class RoadTagger {
         return tags;
     }
 
-    public static Map<String, String> level(Feature feature) {
+    public static Map<String, String> level(Feature feature, Boolean isReversed) {
         Map<String, String> tags = newHashMap();
         Integer fElev = feature.getInteger("F_ELEV");
         Integer tElev = feature.getInteger("T_ELEV");
@@ -122,7 +117,7 @@ public class RoadTagger {
         if (fElev.equals(tElev)) {
             tags.put("layer", valueOf(fElev));
         } else {
-            if (isReversed(feature)) {
+            if (isReversed) {
                 tags.put("layer:from", valueOf(tElev));
                 tags.put("layer:to", valueOf(fElev));
             } else {
@@ -133,21 +128,17 @@ public class RoadTagger {
         return tags;
     }
 
-    public static boolean isReversed(Feature feature) {
-        return "TF".equals(feature.getString("ONEWAY"));
-    }
-
     public static void addTagIf(String key, String value, boolean condition, Map<String, String> tags) {
         if (condition) {
             tags.put(key, value);
         }
     }
 
-    private void tagRoute(Feature feature, Map<String, String> tags, Long id) {
+    private void tagRoute(Feature feature, Map<String, String> tags, Long id, Boolean isOneway, Boolean isReversed) {
         tags.putAll(speedProfiles.getTags(feature));
-        tags.putAll(speedRestriction.tag(feature));
+        tags.putAll(speedRestriction.tag(feature, isReversed));
         tags.putAll(highwayType(feature));
-        tags.putAll(lanes.lanesFor(feature));
+        tags.putAll(lanes.lanesFor(feature, isReversed));
 
         addTagIf("tunnel", "yes", TUNNEL.equals(feature.getInteger("PARTSTRUC")), tags);
         addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);
@@ -160,7 +151,7 @@ public class RoadTagger {
             tags.put("junction:ref", intersectionProvider.getIntersectionById().get(id));
         }
 
-        tags.putAll(signPosts.getTags(id, isOneway(feature), feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
+        tags.putAll(signPosts.getTags(id, isOneway, feature.getLong("F_JNCTID"), feature.getLong("T_JNCTID")));
 
         poiProvider.getPoiNameByType(id, FeatureType.MOUNTAIN_PASS.getValue()).ifPresent(value -> {
             tags.put("mountain_pass", value);
@@ -171,26 +162,14 @@ public class RoadTagger {
         tags.put("ref:tomtom", valueOf(id));
         tags.put("from:tomtom", valueOf(feature.getLong("F_JNCTID")));
         tags.put("to:tomtom", valueOf(feature.getLong("T_JNCTID")));
-        addTagIf("reversed:tomtom", "yes", isReversed(feature), tags);
         addTagIf("global_importance:tomtom", valueOf(feature.getInteger("NET2CLASS")), ofNullable(feature.getInteger("NET2CLASS")).isPresent(), tags);
+        addTagIf("fow:tomtom", valueOf(feature.getInteger("FOW")), ofNullable(feature.getInteger("FOW")).isPresent(), tags);
+        addTagIf("frc:tomtom", valueOf(feature.getInteger("FRC")), ofNullable(feature.getInteger("FRC")).isPresent(), tags);
         transportationAreaProvider.getSmallestAreasLeft(id).ifPresent(ids -> tags.put("admin:tomtom:left", ids));
         transportationAreaProvider.geSmallestAreasRight(id).ifPresent(ids -> tags.put("admin:tomtom:right", ids));
         transportationAreaProvider.getBuiltUpLeft(id).ifPresent(ids -> tags.put("bua:tomtom:left", ids));
         transportationAreaProvider.getBuiltUpRight(id).ifPresent(ids -> tags.put("bua:tomtom:right", ids));
         routeNumbersProvider.getRouteTypeOrderByPriority(id).ifPresent(type -> tags.put("route_type:tomtom", type));
-    }
-
-    private void tagsTimeDomains(Map<String, String> tags, Collection<TimeDomains> timeDomains) {
-        try {
-            String openingHours = timeDomainsParser.parse(timeDomains);
-            addTagIf("opening_hours", openingHours, !"".equals(openingHours), tags);
-        } catch (IllegalArgumentException iae) {
-            log.warn("Unable to parse opening hours from " + timeDomains);
-        }
-    }
-
-    private boolean isOneway(Feature feature) {
-        return "TF".equals(feature.getString("ONEWAY")) || "FT".equals(feature.getString("ONEWAY"));
     }
 
     private static void addTagIf(String key, Supplier<String> toExecute, boolean condition, Map<String, String> tags) {
