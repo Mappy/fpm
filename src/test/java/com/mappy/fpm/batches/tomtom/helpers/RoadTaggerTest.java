@@ -10,6 +10,7 @@ import com.mappy.fpm.batches.tomtom.dbf.routenumbers.RouteNumbersProvider;
 import com.mappy.fpm.batches.tomtom.dbf.signposts.SignPosts;
 import com.mappy.fpm.batches.tomtom.dbf.speedprofiles.SpeedProfiles;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestrictionTagger;
+import com.mappy.fpm.batches.tomtom.dbf.restrictions.RestrictionTagger;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsParser;
 import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomainsProvider;
@@ -38,6 +39,7 @@ public class RoadTaggerTest {
 
     private final SpeedProfiles speedProfiles = mock(SpeedProfiles.class);
     private final SpeedRestrictionTagger speedRestrictionTagger = mock(SpeedRestrictionTagger.class);
+    private final RestrictionTagger restrictionTagger = mock(RestrictionTagger.class);
     private final GeocodeProvider geocoding = mock(GeocodeProvider.class);
     private final TransportationAreaProvider transportationAreaProvider = mock(TransportationAreaProvider.class);
     private final SignPosts signPosts = mock(SignPosts.class);
@@ -48,8 +50,8 @@ public class RoadTaggerTest {
     private final RouteNumbersProvider routeNumbersProvider = mock(RouteNumbersProvider.class);
     private final RouteIntersectionProvider intersectionProvider = mock(RouteIntersectionProvider.class);
     private final PoiProvider poiProvider = mock(PoiProvider.class);
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, intersectionProvider, poiProvider);
     private final Map<String, String> defaultTags = new HashMap<String, String>();
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, restrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, intersectionProvider, poiProvider);
 
     @Before
     public void setup() {
@@ -145,30 +147,7 @@ public class RoadTaggerTest {
 	defaultTags.put("ONEWAY", "N");
 	defaultTags.put("NAME", "Calais - Douvres");
         assertThat(tagger.tag(onlyTags(defaultTags)))
-                .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54").containsEntry("motor_vehicle", "no");
-    }
-
-    @Test
-    public void should_tag_motor_vehicle_no() {
-	defaultTags.put("FEATTYP", "4110");
-	defaultTags.put("MINUTES", "10");
-	defaultTags.put("FOW", "3");
-	defaultTags.put("ONEWAY", "N");
-        assertThat(tagger.tag(onlyTags(defaultTags))) //
-                .containsEntry("motor_vehicle", "no");
-    }
-
-    @Test
-    public void should_not_tag_motor_vehicle_no_when_restriction_speed() {
-        List<TimeDomains> timeDomainList = newArrayList(new TimeDomains(1L, null));
-        when(timeDomainsData.getTimeDomains(any(Long.class))).thenReturn(timeDomainList);
-
-	defaultTags.put("FEATTYP", "4110");
-	defaultTags.put("MINUTES", "10");
-	defaultTags.put("FOW", "3");
-	defaultTags.put("ONEWAY", "N");
-        assertThat(tagger.tag(onlyTags(defaultTags))) //
-                .doesNotContainEntry("motor_vehicle", "no");
+                .containsEntry("route", "ferry").containsEntry("name", "Calais - Douvres").containsEntry("duration", "00:10:54");
     }
 
     @Test
@@ -327,24 +306,6 @@ public class RoadTaggerTest {
     }
 
     @Test
-    public void should_tag_oneway() {
-	defaultTags.put("ONEWAY", "FT");
-        assertThat(tagger.tag(onlyTags(defaultTags))).containsEntry("oneway", "yes");
-
-	defaultTags.put("ONEWAY", "TF");
-        assertThat(tagger.tag(onlyTags(defaultTags))).containsEntry("oneway", "yes");
-
-	defaultTags.put("ONEWAY", "N");
-        assertThat(tagger.tag(onlyTags(defaultTags))).doesNotContainKey("oneway");
-
-	defaultTags.put("ONEWAY", "");
-        assertThat(tagger.tag(onlyTags(defaultTags))).doesNotContainKey("oneway");
-
-	defaultTags.remove("ONEWAY");
-        assertThat(tagger.tag(onlyTags(defaultTags))).doesNotContainKey("oneway");
-    }
-
-    @Test
     public void should_add_ref_tag() {
         when(routeNumbersProvider.getInternationalRouteNumbers(any(Long.class))).thenReturn(empty());
         when(routeNumbersProvider.getNationalRouteNumbers(any(Long.class))).thenReturn(empty());
@@ -357,40 +318,6 @@ public class RoadTaggerTest {
 	defaultTags.remove("SHIELDNUM");
         assertThat(tagger.tag(onlyTags(defaultTags)))
                 .doesNotContainKey("ref");
-    }
-
-    @Test
-    public void should_add_opening_hours_tag() {
-        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
-        TimeDomains domainTomtom2 = new TimeDomains(789, "domainetomtom2");
-        List<TimeDomains> timeDomains = newArrayList(domainTomtom, domainTomtom2);
-        when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
-        when(timeDomainsParser.parse(timeDomains)).thenReturn("10:00-14:00 off, 22:00-06:00 off");
-        MemoryFeature feature = onlyTags(defaultTags);
-
-        assertThat(tagger.tag(feature)).containsEntry("opening_hours", "10:00-14:00 off, 22:00-06:00 off");
-    }
-
-    @Test
-    public void should_ignore_non_meaning_time_domain() {
-        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
-        List<TimeDomains> timeDomains = newArrayList(domainTomtom);
-        when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
-        when(timeDomainsParser.parse(timeDomains)).thenReturn("");
-        MemoryFeature feature = onlyTags(defaultTags);
-
-        assertThat(tagger.tag(feature)).doesNotContainKeys("opening_hours");
-    }
-
-    @Test
-    public void should_ignore_non_parsable_time_domain() {
-        TimeDomains domainTomtom = new TimeDomains(456, "domainetomtom");
-        List<TimeDomains> timeDomains = newArrayList(domainTomtom);
-        when(timeDomainsData.getTimeDomains(123)).thenReturn(timeDomains);
-        when(timeDomainsParser.parse(timeDomains)).thenThrow(new IllegalArgumentException("Test exception"));
-        MemoryFeature feature = onlyTags(defaultTags);
-
-        assertThat(tagger.tag(feature)).doesNotContainKeys("opening_hours");
     }
 
     @Test
@@ -505,6 +432,20 @@ public class RoadTaggerTest {
 
         assertThat(tagger.tag(onlyTags(defaultTags)))
                 .containsEntry("mountain_pass", "everest");
+    }
+
+    @Test
+    public void should_have_a_functional_road_class() {
+	defaultTags.put("FRC", "7");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
+                .containsEntry("frc:tomtom", "7");
+    }
+
+    @Test
+    public void should_have_a_form_of_way() {
+	defaultTags.put("FOW", "11");
+        assertThat(tagger.tag(onlyTags(defaultTags)))
+                .containsEntry("fow:tomtom", "11");
     }
 
     @Test

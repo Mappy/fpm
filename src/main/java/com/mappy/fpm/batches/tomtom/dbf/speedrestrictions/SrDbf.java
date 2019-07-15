@@ -3,6 +3,7 @@ package com.mappy.fpm.batches.tomtom.dbf.speedrestrictions;
 import com.google.common.collect.ArrayListMultimap;
 import com.mappy.fpm.batches.tomtom.TomtomFolder;
 import com.mappy.fpm.batches.tomtom.dbf.speedrestrictions.SpeedRestriction.Validity;
+import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
 import lombok.extern.slf4j.Slf4j;
 import org.jamel.dbf.DbfReader;
 import org.jamel.dbf.structure.DbfRow;
@@ -32,7 +33,7 @@ public class SrDbf {
         try (DbfReader reader = new DbfReader(file)) {
             DbfRow row;
             while ((row = reader.nextRow()) != null) {
-                SpeedRestriction restriction = new SpeedRestriction(row.getLong("ID"), row.getInt("SPEED"), Validity.values()[row.getInt("VALDIR") - 1]);
+                SpeedRestriction restriction = new SpeedRestriction(row.getLong("ID"), row.getInt("SEQNR"), row.getInt("SPEED"), Validity.values()[row.getInt("VALDIR") - 1], VehicleType.fromId(row.getInt("VT")));
                 restrictions.put(restriction.getId(), restriction);
             }
         }

@@ -20,9 +20,6 @@ public class BoundariesA8Shapefile extends BoundariesShapefile {
     @Inject
     public BoundariesA8Shapefile(TomtomFolder folder, TownTagger townTagger, NameProvider nameProvider, OsmLevelGenerator osmLevelGenerator) {
         super(folder.getFile("a8.shp"), 8, null, townTagger, nameProvider, osmLevelGenerator);
-        if(new File(folder.getFile("a8.shp")).exists()) {
-            this.nameProvider.loadAlternateCityNames();
-        }
     }
 
     @Override

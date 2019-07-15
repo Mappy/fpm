@@ -11,6 +11,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class TimeDomains implements Comparable<TimeDomains>{
 
     private final long id;
+    private final int sequenceNumber;
     private final String domain;
 
     @Override
@@ -21,6 +22,7 @@ public class TimeDomains implements Comparable<TimeDomains>{
     public static TimeDomains fromDbf(DbfRow entry) {
         return new TimeDomains(
                 entry.getLong("ID"),
+                entry.getInt("SEQNR"),
                 entry.getString("TIMEDOM", UTF_8).trim()
         );
     }
