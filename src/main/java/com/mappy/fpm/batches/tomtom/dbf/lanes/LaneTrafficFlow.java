@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -21,12 +22,28 @@ public class LaneTrafficFlow {
     private final VehicleType vehicleType;
     private final List<Integer> laneValidity;
 
+    public enum Direction {
+        forward("forward"),
+        backward("backward");
+
+        public final String osmLabel;
+
+        private Direction(String label) {
+            osmLabel = label;
+        }
+    }
+
     public enum DirectionOfTrafficFlow {
-        notApplicable,
-        openInBothDirections,
-        closedInPositiveDirection,
-        closedInNegativeDirection,
-        closedInBothDirections;
+        openInBothDirections(EnumSet.noneOf(Direction.class)),
+        closedInPositiveDirection(EnumSet.of(Direction.forward)),
+        closedInNegativeDirection(EnumSet.of(Direction.backward)),
+        closedInBothDirections(EnumSet.allOf(Direction.class));
+
+        public final EnumSet<Direction> directions;
+
+        private DirectionOfTrafficFlow(EnumSet<Direction> directions) {
+            this.directions = directions;
+        }
     }
 
     public static List<Integer> parseLaneValidity(String input) {
@@ -45,7 +62,7 @@ public class LaneTrafficFlow {
         return new LaneTrafficFlow(
             row.getLong("ID"),
             row.getInt("SEQNR"),
-            DirectionOfTrafficFlow.values()[row.getInt("DFLANE")],
+            DirectionOfTrafficFlow.values()[row.getInt("DFLANE") - 1],
             VehicleType.fromId(row.getInt("VT")),
             parseLaneValidity(row.getString("VALIDITY"))
         );
