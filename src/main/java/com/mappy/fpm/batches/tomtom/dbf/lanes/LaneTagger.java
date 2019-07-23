@@ -13,10 +13,12 @@ import static com.google.common.collect.Maps.newHashMap;
 public class LaneTagger {
 
     private final LdDbf ldDbf;
+    private final LfDbf lfDbf;
 
     @Inject
-    public LaneTagger(LdDbf ldDbf) {
+    public LaneTagger(LdDbf ldDbf, LfDbf lfDbf) {
         this.ldDbf = ldDbf;
+        this.lfDbf = lfDbf;
     }
 
     public Map<String, String> lanesFor(Feature feature, Boolean isReversed) {
