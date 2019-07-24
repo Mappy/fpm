@@ -28,6 +28,7 @@ public enum TomtomFile {
     SIGNPOST("mn", "_sg."),
     LANE_DIRECTIONS("mn", "_ld."),
     LANE_TRAFFIC_FLOW("mn", "_lf."),
+    LANE_TIME_DOMAIN("mn", "_lt."),
     BOUNDARIES_LEVEL0_COUNTRY("mn", "_a0."),
     BOUNDARIES_LEVEL1("mn", "_a1."),
     BOUNDARIES_LEVEL2("mn", "_a2."),

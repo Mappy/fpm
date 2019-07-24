@@ -16,7 +16,8 @@ import static org.mockito.Mockito.when;
 public class LaneTaggerTest {
     private final LdDbf directions = mock(LdDbf.class);
     private final LfDbf trafficFlow = mock(LfDbf.class);
-    private final LaneTagger tagger = new LaneTagger(directions, trafficFlow);
+    private final LtDbf timeDomains = mock(LtDbf.class);
+    private final LaneTagger tagger = new LaneTagger(directions, trafficFlow, timeDomains);
 
     @Test
     public void should_parse_ld_file() {

@@ -14,16 +14,17 @@ import static com.google.common.collect.Lists.reverse;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Lists.newArrayList;
 
-
 public class LaneTagger {
 
     private final LdDbf ldDbf;
     private final LfDbf lfDbf;
+    private final LtDbf ltDbf;
 
     @Inject
-    public LaneTagger(LdDbf ldDbf, LfDbf lfDbf) {
+    public LaneTagger(LdDbf ldDbf, LfDbf lfDbf, LtDbf ltDbf) {
         this.ldDbf = ldDbf;
         this.lfDbf = lfDbf;
+        this.ltDbf = ltDbf;
     }
 
     public Map<String, String> lanesFor(Feature feature, Boolean isReversed) {
