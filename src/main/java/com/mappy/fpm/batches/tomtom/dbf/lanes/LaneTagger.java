@@ -2,6 +2,7 @@ package com.mappy.fpm.batches.tomtom.dbf.lanes;
 
 import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
 import com.mappy.fpm.batches.utils.Feature;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -65,6 +66,16 @@ public class LaneTagger {
             restrictions.add(laneRestrictions);
         }
         for (LaneTrafficFlow laneRestriction: trafficFlow) {
+            TimeDomains timeDomains = ltDbf.getTimeDomains(
+                LtDbf.RestrictionType.directionOfTrafficFlow,
+                laneRestriction.getId(),
+                laneRestriction.getSequenceNumber()
+            );
+            if (timeDomains != null) {
+                // The restriction does only apply sometimes
+                // we consider it to not apply in general
+                continue;
+            }
             for (int lane: laneRestriction.getLaneValidity()) {
                 for (LaneTrafficFlow.Direction direction: LaneTrafficFlow.Direction.values()) {
                     if (laneRestriction.getDirection().directions.contains(direction)) {

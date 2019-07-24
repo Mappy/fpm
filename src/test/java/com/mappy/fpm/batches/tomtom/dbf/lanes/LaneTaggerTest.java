@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches.tomtom.dbf.lanes;
 
 import com.mappy.fpm.batches.tomtom.helpers.VehicleType;
+import com.mappy.fpm.batches.tomtom.dbf.timedomains.TimeDomains;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
@@ -173,5 +174,28 @@ public class LaneTaggerTest {
         assertThat(tags).containsEntry("lanes", "1");
         assertThat(tags).containsEntry("motor_vehicle:lanes:forward", "private");
         assertThat(tags).containsEntry("motor_vehicle:lanes:backward", "private");
+    }
+
+    @Test
+    public void should_consider_restriction_time_domains() {
+        when(trafficFlow.get(123)).thenReturn(newArrayList(
+            new LaneTrafficFlow(
+                123,
+                1,
+                LaneTrafficFlow.DirectionOfTrafficFlow.closedInBothDirections,
+                VehicleType.passengerCars,
+                newArrayList(0)
+            )
+        ));
+        when(timeDomains.getTimeDomains(
+            LtDbf.RestrictionType.directionOfTrafficFlow,
+            123,
+            1
+        )).thenReturn(new TimeDomains(123, 1, ""));
+        Map<String, String> tags = tagger.lanesFor(onlyTags(ImmutableMap.of("ID", "123", "ONEWAY", "", "LANES", "1")), false);
+
+        assertThat(tags).containsEntry("lanes", "1");
+        assertThat(tags).containsEntry("motor_vehicle:lanes:forward", "yes");
+        assertThat(tags).containsEntry("motor_vehicle:lanes:backward", "yes");
     }
 }
