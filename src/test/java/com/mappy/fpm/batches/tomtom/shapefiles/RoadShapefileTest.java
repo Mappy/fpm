@@ -12,8 +12,9 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.Map;
 
-import static com.google.common.collect.ImmutableMap.of;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -29,8 +30,12 @@ public class RoadShapefileTest {
 
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("nw.shp")).thenReturn("src/test/resources/tomtom/road/nw.shp");
+        when(tomtomFolder.getZone()).thenReturn("mockzone");
+        when(tomtomFolder.getInputFolder()).thenReturn("/this/is/a/path/mockinputfolder");
 
-        when(roadTagger.tag(any(Feature.class))).thenReturn(of("ref:tomtom", "12500001097987"));
+        Map<String, String> mockedMap = newHashMap();
+        mockedMap.put("ref:tomtom", "12500001097987");
+        when(roadTagger.tag(any(Feature.class))).thenReturn(mockedMap);
 
         RestrictionsAccumulator restrictionsAccumulator = new RestrictionsAccumulator(mock(Maneuvers.class));
 

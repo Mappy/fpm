@@ -20,6 +20,14 @@ public class TomtomFolder {
         this.zone = zone;
     }
 
+    public String getInputFolder() {
+        return inputFolder;
+    }
+
+    public String getZone() {
+        return zone;
+    }
+
     public String getFile(String name) {
         if (name.startsWith("2d")) {
             return inputFolder + zone + "_" + name;

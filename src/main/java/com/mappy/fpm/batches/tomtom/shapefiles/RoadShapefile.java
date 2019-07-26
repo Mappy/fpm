@@ -12,19 +12,26 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.io.File;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.mappy.fpm.batches.tomtom.helpers.FormOfWay.PARKING_GARAGE_BUILDING;
 import static com.mappy.fpm.batches.tomtom.helpers.RoadTagger.isReversed;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
 
 public class RoadShapefile extends TomtomShapefile {
 
     private final RoadTagger roadTagger;
     private final RestrictionsAccumulator restrictions;
+    private final String sourcePbfCountry;
+    private final String sourcePbfZone;
 
     @Inject
     public RoadShapefile(TomtomFolder folder, RoadTagger roadTagger, RestrictionsAccumulator restrictions) {
         super(folder.getFile("nw.shp"));
+        File inputFolder = new File(folder.getInputFolder());
+        this.sourcePbfCountry = getBaseName(inputFolder.getAbsolutePath());
+        this.sourcePbfZone = folder.getZone();
         this.roadTagger = roadTagger;
         this.restrictions = restrictions;
     }
@@ -41,11 +48,13 @@ public class RoadShapefile extends TomtomShapefile {
             LineString raw = geom(feature);
             LineString geom = isReversed(feature) ? (LineString) raw.reverse() : raw;
             Map<String, String> tags = roadTagger.tag(feature);
+            tags.put("source_pbf:country:tomtom", sourcePbfCountry);
+            tags.put("source_pbf:zone:tomtom", sourcePbfZone);
             Way way = serializer.write(geom, tags);
             restrictions.register(feature, way);
         }
     }
-
+;
     private static LineString geom(Feature feature) {
         MultiLineString multiLine = feature.getMultiLineString();
         checkArgument(multiLine.getNumGeometries() == 1, "Tomtom road multiline should contain only line");
