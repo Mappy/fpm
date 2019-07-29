@@ -54,7 +54,7 @@ public class RoadShapefile extends TomtomShapefile {
             restrictions.register(feature, way);
         }
     }
-;
+
     private static LineString geom(Feature feature) {
         MultiLineString multiLine = feature.getMultiLineString();
         checkArgument(multiLine.getNumGeometries() == 1, "Tomtom road multiline should contain only line");
