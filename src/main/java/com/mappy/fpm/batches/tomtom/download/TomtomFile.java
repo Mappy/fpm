@@ -30,6 +30,7 @@ public enum TomtomFile {
     LANE_TRAFFIC_FLOW("mn", "_lf."),
     LANE_TIME_DOMAIN("mn", "_lt."),
     LANE_CONNECTIVITY_INFORMATION("mn", "_ln."),
+    LANE_CONNECTIVITY_PATH("mn", "_lp."),
     BOUNDARIES_LEVEL0_COUNTRY("mn", "_a0."),
     BOUNDARIES_LEVEL1("mn", "_a1."),
     BOUNDARIES_LEVEL2("mn", "_a2."),
