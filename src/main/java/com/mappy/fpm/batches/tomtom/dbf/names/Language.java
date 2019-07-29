@@ -7,6 +7,9 @@ import java.util.stream.Stream;
 public enum Language {
     ALB("sq"),
     ARA("ar"),
+    ARM("hy"),
+    ARR("hy-Latn"),
+    AZE("az"),
     BAQ("eu"),
     BEL("be"),
     BET("be-Latn"),
@@ -19,9 +22,12 @@ public enum Language {
     DUT("nl"),
     ENG("en"),
     EST("et"),
+    FAO("fo"),
     FIN("fi"),
     FRE("fr"),
     FRY("fy"),
+    GEL("ka-Latn"),
+    GEO("ka"),
     GER("de"),
     GLE("ga"),
     GLG("gl"),
@@ -40,8 +46,8 @@ public enum Language {
     POL("pl"),
     POR("pt"),
     ROH("rm"),
-    RUM("ro"),
     RUL("ru-Latn"),
+    RUM("ro"),
     RUS("ru"),
     SCC("sr-Latn"),
     SCR("hr"),
@@ -55,6 +61,7 @@ public enum Language {
     TUR("tr"),
     UKL("uk-Latn"),
     UKR("uk"),
+    VAL("ca"),  // unknown language code, interpreted as valencian
     WEL("cy"),
     UND(null);
 

@@ -22,6 +22,7 @@ public enum TomtomFile {
     RAILROADS("mn", "_rr."),
     GEOCODE_INFORMATION("mn", "_gc."),
     SPEEDS_RESTRICTIONS("mn", "_sr."),
+    SPEEDS_TIMEDOMAINS("mn", "_st."),
     SIGNPOST_INFORMATION("mn", "_si."),
     SIGNPOST_PATHS("mn", "_sp."),
     SIGNPOST("mn", "_sg."),

@@ -30,13 +30,9 @@ public class TownTagger {
             try (ShapefileIterator iterator = new ShapefileIterator(file, true)) {
                 while (iterator.hasNext()) {
                     Feature feature = iterator.next();
-
                     Centroid centroid = from(feature);
-
                     Long id = feature.getLong("ID");
-
                     centroidsCity.put(id, centroid.withId(id));
-
                     putBuiltUpCentroid(feature, centroid);
                 }
             }

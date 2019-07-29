@@ -15,7 +15,7 @@ public enum FormOfWay {
     PART_OF_SINGLE_CARRIAGEWAY(3, of()),
     ROUNDABOUT(4, of("junction", "roundabout")),
     PARKING_PLACE(6, of("highway", "service", "service", "parking_aisle")),
-    PARKING_GARAGE_BUILDING(7, of()),
+    PARKING_GARAGE_BUILDING(7, of("highway", "service", "service", "parking_aisle")),
     UNSTRUCTURED_TRAFFIC_SQUARE(8, of()),
     SLIP_ROAD(10, of()),
     SERVICE_ROAD(11, of("highway", "service")),
