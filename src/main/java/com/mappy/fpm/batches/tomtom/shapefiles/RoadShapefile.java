@@ -48,8 +48,8 @@ public class RoadShapefile extends TomtomShapefile {
             LineString raw = geom(feature);
             LineString geom = isReversed(feature) ? (LineString) raw.reverse() : raw;
             Map<String, String> tags = roadTagger.tag(feature);
-            tags.put("source_pbf:country:tomtom", sourcePbfCountry);
-            tags.put("source_pbf:zone:tomtom", sourcePbfZone);
+            tags.put("source:country:download_job", sourcePbfCountry);
+            tags.put("source:zone:tomtom", sourcePbfZone);
             Way way = serializer.write(geom, tags);
             restrictions.register(feature, way);
         }
