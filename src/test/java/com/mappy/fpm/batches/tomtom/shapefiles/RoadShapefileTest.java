@@ -30,9 +30,9 @@ public class RoadShapefileTest {
         TomtomFolder tomtomFolder = mock(TomtomFolder.class);
         when(tomtomFolder.getFile("nw.shp")).thenReturn("src/test/resources/tomtom/road/nw.shp");
         when(tomtomFolder.getZone()).thenReturn("mockzone");
-        when(tomtomFolder.getInputFolder()).thenReturn("/this/is/a/path/mockinputfolder");
+        when(tomtomFolder.getInputFolder()).thenReturn("/this/is/a/path");
 
-        when(roadTagger.tag(any(Feature.class))).thenReturn(of("ref:tomtom", "12500001097987"));
+        when(roadTagger.tag(any(Feature.class), any(String.class), any(String.class))).thenReturn(of("ref:tomtom", "12500001097987"));
 
         RestrictionsAccumulator restrictionsAccumulator = new RestrictionsAccumulator(mock(Maneuvers.class));
 
@@ -48,6 +48,6 @@ public class RoadShapefileTest {
         Optional<Way> optWay = pbfContent.getWays().stream().filter(way -> way.getTags().hasKeyValue("ref:tomtom", "12500001097987")).findFirst();
         assertThat(optWay.isPresent()).isTrue();
 
-        verify(roadTagger, times(6)).tag(any(Feature.class));
+        verify(roadTagger, times(6)).tag(any(Feature.class), any(String.class), any(String.class));
     }
 }

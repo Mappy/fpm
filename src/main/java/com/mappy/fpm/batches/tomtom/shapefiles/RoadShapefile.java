@@ -31,8 +31,6 @@ public class RoadShapefile extends TomtomShapefile {
         this.sourceCountry = getBaseName(inputFolder.getAbsolutePath());
         this.sourceZone = folder.getZone();
         this.roadTagger = roadTagger;
-        roadTagger.addMetadataTag("source:country:download_job", sourceCountry);
-        roadTagger.addMetadataTag("source:zone:tomtom", sourceZone);
         this.restrictions = restrictions;
     }
 
@@ -44,7 +42,7 @@ public class RoadShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
         LineString raw = geom(feature);
-        Map<String, String> tags = roadTagger.tag(feature);
+        Map<String, String> tags = roadTagger.tag(feature, sourceCountry, sourceZone);
         Boolean isReversed = tags.containsKey("reversed:tomtom");
         LineString geom = isReversed ? (LineString) raw.reverse() : raw;
         Way way = serializer.write(geom, tags);

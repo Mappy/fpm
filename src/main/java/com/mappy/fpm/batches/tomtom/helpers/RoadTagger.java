@@ -49,7 +49,6 @@ public class RoadTagger {
     private final RouteNumbersProvider routeNumbersProvider;
     private final RouteIntersectionProvider intersectionProvider;
     private final PoiProvider poiProvider;
-    private final Map<String, String> metadataTags;
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
@@ -67,15 +66,26 @@ public class RoadTagger {
         this.intersectionProvider = intersectionProvider;
         this.poiProvider = poiProvider;
         this.intersectionProvider.loadIntersectionById();
-        this.metadataTags = newHashMap();
-    }
-
-    public void addMetadataTag(String key, String value) {
-        metadataTags.put(key, value);
     }
 
 
-    public Map<String, String> tag(Feature feature) {
+    public Map<String, String> tag(Feature feature, String sourceCountry, String sourceZone) {
+        Map<String, String> dataTags = tagData(feature);
+        Map<String, String> metadataTags = tagMetadata(sourceCountry, sourceZone);
+        dataTags.putAll(metadataTags);
+        return dataTags;
+    }
+
+
+    public Map<String, String> tagMetadata(String sourceCountry, String sourceZone) {
+        Map<String, String> tags = newHashMap();
+        tags.put("source:country:download_job", sourceCountry);
+        tags.put("source:zone:tomtom", sourceZone);
+        return tags;
+    }
+
+
+    public Map<String, String> tagData(Feature feature) {
         Map<String, String> tags = newHashMap();
 
         Long id = feature.getLong("ID");
@@ -113,8 +123,6 @@ public class RoadTagger {
         geocodeProvider.getRightPostalCode(id).ifPresent(postcodes -> tags.put("is_in:right", postcodes));
         geocodeProvider.getInterpolationsAddressLeft(id).ifPresent(interpolations -> tags.put("addr:interpolation:left", interpolations));
         geocodeProvider.getInterpolationsAddressRight(id).ifPresent(interpolations -> tags.put("addr:interpolation:right", interpolations));
-
-        tags.putAll(metadataTags);
 
         return tags;
     }
