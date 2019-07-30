@@ -12,17 +12,24 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.io.File;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.io.FilenameUtils.getBaseName;
 
 public class RoadShapefile extends TomtomShapefile {
 
     private final RoadTagger roadTagger;
     private final RestrictionsAccumulator restrictions;
+    private final String sourceCountry;
+    private final String sourceZone;
 
     @Inject
     public RoadShapefile(TomtomFolder folder, RoadTagger roadTagger, RestrictionsAccumulator restrictions) {
         super(folder.getFile("nw.shp"));
+        File inputFolder = new File(folder.getInputFolder());
+        this.sourceCountry = getBaseName(inputFolder.getAbsolutePath());
+        this.sourceZone = folder.getZone();
         this.roadTagger = roadTagger;
         this.restrictions = restrictions;
     }
@@ -35,7 +42,7 @@ public class RoadShapefile extends TomtomShapefile {
     @Override
     public void serialize(GeometrySerializer serializer, Feature feature) {
         LineString raw = geom(feature);
-        Map<String, String> tags = roadTagger.tag(feature);
+        Map<String, String> tags = roadTagger.tag(feature, sourceCountry, sourceZone);
         Boolean isReversed = tags.containsKey("reversed:tomtom");
         LineString geom = isReversed ? (LineString) raw.reverse() : raw;
         Way way = serializer.write(geom, tags);

@@ -68,7 +68,24 @@ public class RoadTagger {
         this.intersectionProvider.loadIntersectionById();
     }
 
-    public Map<String, String> tag(Feature feature) {
+
+    public Map<String, String> tag(Feature feature, String sourceCountry, String sourceZone) {
+        Map<String, String> dataTags = tagData(feature);
+        Map<String, String> metadataTags = tagMetadata(sourceCountry, sourceZone);
+        dataTags.putAll(metadataTags);
+        return dataTags;
+    }
+
+
+    public Map<String, String> tagMetadata(String sourceCountry, String sourceZone) {
+        Map<String, String> tags = newHashMap();
+        tags.put("source:country:download_job", sourceCountry);
+        tags.put("source:zone:tomtom", sourceZone);
+        return tags;
+    }
+
+
+    public Map<String, String> tagData(Feature feature) {
         Map<String, String> tags = newHashMap();
 
         Long id = feature.getLong("ID");
@@ -90,7 +107,7 @@ public class RoadTagger {
 
         addTagIf("route", "ferry", feature.getInteger("FT").equals(1), tags);
         addTagIf("duration", () -> duration(feature), tags.containsValue("ferry"), tags);
-	tags.put("surface", feature.getInteger("RDCOND").equals(1) ? "paved" : "unpaved");
+        tags.put("surface", feature.getInteger("RDCOND").equals(1) ? "paved" : "unpaved");
 
         tags.putAll(geocodeProvider.getNamesAndAlternateNamesWithSide(id));
 
