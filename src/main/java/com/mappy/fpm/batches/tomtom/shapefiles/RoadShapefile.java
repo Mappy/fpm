@@ -21,16 +21,18 @@ public class RoadShapefile extends TomtomShapefile {
 
     private final RoadTagger roadTagger;
     private final RestrictionsAccumulator restrictions;
-    private final String sourcePbfCountry;
-    private final String sourcePbfZone;
+    private final String sourceCountry;
+    private final String sourceZone;
 
     @Inject
     public RoadShapefile(TomtomFolder folder, RoadTagger roadTagger, RestrictionsAccumulator restrictions) {
         super(folder.getFile("nw.shp"));
         File inputFolder = new File(folder.getInputFolder());
-        this.sourcePbfCountry = getBaseName(inputFolder.getAbsolutePath());
-        this.sourcePbfZone = folder.getZone();
+        this.sourceCountry = getBaseName(inputFolder.getAbsolutePath());
+        this.sourceZone = folder.getZone();
         this.roadTagger = roadTagger;
+        roadTagger.addMetadataTag("source:country:download_job", sourceCountry);
+        roadTagger.addMetadataTag("source:zone:tomtom", sourceZone);
         this.restrictions = restrictions;
     }
 
@@ -43,8 +45,6 @@ public class RoadShapefile extends TomtomShapefile {
     public void serialize(GeometrySerializer serializer, Feature feature) {
         LineString raw = geom(feature);
         Map<String, String> tags = roadTagger.tag(feature);
-        tags.put("source:country:download_job", sourcePbfCountry);
-        tags.put("source:zone:tomtom", sourcePbfZone);
         Boolean isReversed = tags.containsKey("reversed:tomtom");
         LineString geom = isReversed ? (LineString) raw.reverse() : raw;
         Way way = serializer.write(geom, tags);

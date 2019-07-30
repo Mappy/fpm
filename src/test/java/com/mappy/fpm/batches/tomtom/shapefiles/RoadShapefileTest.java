@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.Optional;
 import java.util.Map;
 
-import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.ImmutableMap.of;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -33,9 +33,7 @@ public class RoadShapefileTest {
         when(tomtomFolder.getZone()).thenReturn("mockzone");
         when(tomtomFolder.getInputFolder()).thenReturn("/this/is/a/path/mockinputfolder");
 
-        Map<String, String> mockedMap = newHashMap();
-        mockedMap.put("ref:tomtom", "12500001097987");
-        when(roadTagger.tag(any(Feature.class))).thenReturn(mockedMap);
+        when(roadTagger.tag(any(Feature.class))).thenReturn(of("ref:tomtom", "12500001097987")); 
 
         RestrictionsAccumulator restrictionsAccumulator = new RestrictionsAccumulator(mock(Maneuvers.class));
 
