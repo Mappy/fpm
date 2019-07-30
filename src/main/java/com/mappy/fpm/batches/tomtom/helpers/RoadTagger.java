@@ -1,5 +1,6 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
+import com.mappy.fpm.batches.tomtom.dbf.connectivity.ConnectivityTagger;
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
 import com.mappy.fpm.batches.tomtom.dbf.intersection.RouteIntersectionProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
@@ -45,6 +46,7 @@ public class RoadTagger {
     private final SpeedRestrictionTagger speedRestriction;
     private final RestrictionTagger restrictionTagger;
     private final TollTagger tolls;
+    private final ConnectivityTagger connectivityTagger;
     private final TransportationAreaProvider transportationAreaProvider;
     private final RouteNumbersProvider routeNumbersProvider;
     private final RouteIntersectionProvider intersectionProvider;
@@ -52,8 +54,10 @@ public class RoadTagger {
 
     @Inject
     public RoadTagger(SpeedProfiles speedProfiles, GeocodeProvider geocodeProvider, SignPosts signPosts, LaneTagger lanes,
-                      SpeedRestrictionTagger speedRestriction, RestrictionTagger restrictionTagger, TollTagger tolls, TimeDomainsProvider timeDomainsProvider, TimeDomainsParser timeDomainsParser,
-                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider, RouteIntersectionProvider intersectionProvider, PoiProvider poiProvider) {
+                      SpeedRestrictionTagger speedRestriction, RestrictionTagger restrictionTagger, TollTagger tolls,
+                      ConnectivityTagger connectivityTagger, TimeDomainsProvider timeDomainsProvider, TimeDomainsParser timeDomainsParser,
+                      TransportationAreaProvider transportationAreaProvider, RouteNumbersProvider routeNumbersProvider,
+                      RouteIntersectionProvider intersectionProvider, PoiProvider poiProvider) {
         this.speedProfiles = speedProfiles;
         this.geocodeProvider = geocodeProvider;
         this.signPosts = signPosts;
@@ -61,6 +65,7 @@ public class RoadTagger {
         this.speedRestriction = speedRestriction;
         this.restrictionTagger = restrictionTagger;
         this.tolls = tolls;
+        this.connectivityTagger = connectivityTagger;
         this.transportationAreaProvider = transportationAreaProvider;
         this.routeNumbersProvider = routeNumbersProvider;
         this.intersectionProvider = intersectionProvider;
@@ -157,6 +162,7 @@ public class RoadTagger {
         tags.putAll(speedRestriction.tag(feature, isReversed));
         tags.putAll(highwayType(feature));
         tags.putAll(lanes.lanesFor(feature, isReversed));
+        tags.putAll(connectivityTagger.tagConnectivities(feature));
 
         addTagIf("tunnel", "yes", TUNNEL.equals(feature.getInteger("PARTSTRUC")), tags);
         addTagIf("bridge", "yes", BRIDGE.equals(feature.getInteger("PARTSTRUC")), tags);

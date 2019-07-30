@@ -1,6 +1,7 @@
 package com.mappy.fpm.batches.tomtom.helpers;
 
 import com.google.common.collect.ImmutableMap;
+import com.mappy.fpm.batches.tomtom.dbf.connectivity.ConnectivityTagger;
 import com.mappy.fpm.batches.tomtom.dbf.geocodes.GeocodeProvider;
 import com.mappy.fpm.batches.tomtom.dbf.intersection.RouteIntersectionProvider;
 import com.mappy.fpm.batches.tomtom.dbf.lanes.LaneTagger;
@@ -47,11 +48,12 @@ public class RoadTaggerTest {
     private final TimeDomainsProvider timeDomainsData = mock(TimeDomainsProvider.class);
     private final TimeDomainsParser timeDomainsParser = mock(TimeDomainsParser.class);
     private final TollTagger tollTagger = mock(TollTagger.class);
+    private final ConnectivityTagger connectivityTagger = mock(ConnectivityTagger.class);
     private final RouteNumbersProvider routeNumbersProvider = mock(RouteNumbersProvider.class);
     private final RouteIntersectionProvider intersectionProvider = mock(RouteIntersectionProvider.class);
     private final PoiProvider poiProvider = mock(PoiProvider.class);
     private final Map<String, String> defaultTags = new HashMap<String, String>();
-    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, restrictionTagger, tollTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, intersectionProvider, poiProvider);
+    private final RoadTagger tagger = new RoadTagger(speedProfiles, geocoding, signPosts, lanes, speedRestrictionTagger, restrictionTagger, tollTagger, connectivityTagger, timeDomainsData, timeDomainsParser, transportationAreaProvider, routeNumbersProvider, intersectionProvider, poiProvider);
 
     @Before
     public void setup() {
