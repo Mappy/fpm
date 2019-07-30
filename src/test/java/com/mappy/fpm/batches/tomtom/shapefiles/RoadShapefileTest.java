@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.Map;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static com.mappy.fpm.batches.tomtom.Tomtom2OsmTestUtils.read;
