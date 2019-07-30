@@ -32,7 +32,7 @@ public class RoadShapefileTest {
         when(tomtomFolder.getZone()).thenReturn("mockzone");
         when(tomtomFolder.getInputFolder()).thenReturn("/this/is/a/path/mockinputfolder");
 
-        when(roadTagger.tag(any(Feature.class))).thenReturn(of("ref:tomtom", "12500001097987")); 
+        when(roadTagger.tag(any(Feature.class))).thenReturn(of("ref:tomtom", "12500001097987"));
 
         RestrictionsAccumulator restrictionsAccumulator = new RestrictionsAccumulator(mock(Maneuvers.class));
 
