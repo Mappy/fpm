@@ -479,4 +479,15 @@ public class RoadTaggerTest {
                 .containsEntry("source:country:download_job", "mockcountry")
                 .containsEntry("source:zone:tomtom", "mockzone");
     }
+
+    @Test
+    public void should_add_is_exit() {
+    	defaultTags.put("RAMP", "1");
+      assertThat(tagger.tagData(onlyTags(defaultTags)))
+              .containsEntry("ramp_type", "exit");
+
+    	defaultTags.put("RAMP", "2");
+            assertThat(tagger.tagData(onlyTags(defaultTags)))
+            .containsEntry("ramp_type", "entrance");
+    }
 }

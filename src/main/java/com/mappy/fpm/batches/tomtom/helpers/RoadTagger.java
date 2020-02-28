@@ -122,6 +122,10 @@ public class RoadTagger {
 
         tagRoute(feature, tags, id, isOneway, isReversed);
 
+        Integer ramp = feature.getInteger("RAMP");
+        addTagIf("ramp_type", () -> ramp.equals(1) ? "exit" : "entrance",
+            ofNullable(ramp).isPresent() && (ramp.equals(1) || ramp.equals(2)), tags);
+
         tags.putAll(geocodeProvider.getInterpolations(id));
 
         geocodeProvider.getLeftPostalCode(id).ifPresent(postcodes -> tags.put("is_in:left", postcodes));
