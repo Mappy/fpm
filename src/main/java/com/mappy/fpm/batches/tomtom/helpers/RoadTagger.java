@@ -122,8 +122,9 @@ public class RoadTagger {
 
         tagRoute(feature, tags, id, isOneway, isReversed);
 
-        addTagIf("ramp_type", () -> feature.getInteger("RAMP").equals(1) ? "exit" : "entrance", 
-            ofNullable(feature.getInteger("RAMP")).isPresent() && (feature.getInteger("RAMP").equals(1) || feature.getInteger("RAMP").equals(2)), tags);
+        Integer ramp = feature.getInteger("RAMP");
+        addTagIf("ramp_type", () -> ramp.equals(1) ? "exit" : "entrance",
+            ofNullable(ramp).isPresent() && (ramp.equals(1) || ramp.equals(2)), tags);
 
         tags.putAll(geocodeProvider.getInterpolations(id));
 
