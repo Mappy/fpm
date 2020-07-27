@@ -72,6 +72,15 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("GLP", "French-West-Indies"));
         countries.add(new TomtomCountry("GUF", "French-Guiana"));
         countries.add(new TomtomCountry("REU", "Reunion-and-Mayotte"));
+        countries.add(new TomtomCountry("XKS", "Kosovo"));
+        countries.add(new TomtomCountry("LIE", "Liechtenstein"));
+        countries.add(new TomtomCountry("VAT", "Vatican"));
+        countries.add(new TomtomCountry("SPM", "Saint-Pierre-et-Miquelon"));
+        countries.add(new TomtomCountry("PYF", "French-Polynesia"));
+        countries.add(new TomtomCountry("GRL", "Greenland"));
+        countries.add(new TomtomCountry("GIB", "Gibraltar"));
+        countries.add(new TomtomCountry("ATF", "French-Southern-Territories"));
+        countries.add(new TomtomCountry("MCO", "Monaco"));
         return countries;
     }
 

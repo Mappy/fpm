@@ -84,5 +84,14 @@ class CountryWrapper {
             .add("Outerworld-UK") //
             .add("Outerworld-USA-Atlantic-Ocean") //
             .add("Outerworld-USA-Pacific-Ocean") //
+            .add("Kosovo") //
+            .add("Liechtenstein") //
+            .add("Vatican") //
+            .add("Saint-Pierre-et-Miquelon") //
+            .add("French-Polynesia") //
+            .add("Greenland") //
+            .add("Gibraltar") //
+            .add("French-Southern-Territories") //
+            .add("Monaco") //
             .build();
 }
