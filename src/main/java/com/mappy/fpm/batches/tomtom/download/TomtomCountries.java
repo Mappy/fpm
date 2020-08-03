@@ -25,6 +25,7 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("ALB", "Albania"));
         countries.add(new TomtomCountry("AND", "Andorra"));
         countries.add(new TomtomCountry("ARM", "Armenia"));
+        countries.add(new TomtomCountry("ATF", "French-Southern-Territories"));
         countries.add(new TomtomCountry("AUT", "Austria"));
         countries.add(new TomtomCountry("AZE", "Azerbaijan"));
         countries.add(new TomtomCountry("BEL", "Belgium"));
@@ -43,15 +44,21 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("FRO", "Faroe-Islands"));
         countries.add(new TomtomCountry("GBR", "UK"));
         countries.add(new TomtomCountry("GEO", "Georgia"));
+        countries.add(new TomtomCountry("GIB", "Gibraltar"));
+        countries.add(new TomtomCountry("GLP", "French-West-Indies"));
         countries.add(new TomtomCountry("GRC", "Greece"));
+        countries.add(new TomtomCountry("GRL", "Greenland"));        
+        countries.add(new TomtomCountry("GUF", "French-Guiana"));        
         countries.add(new TomtomCountry("HRV", "Croatia"));
         countries.add(new TomtomCountry("HUN", "Hungary"));
         countries.add(new TomtomCountry("IRL", "Ireland"));
         countries.add(new TomtomCountry("ISL", "Iceland"));
         countries.add(new TomtomCountry("ITA", "Italy"));
+        countries.add(new TomtomCountry("LIE", "Liechtenstein"));        
         countries.add(new TomtomCountry("LTU", "Lithuania"));
         countries.add(new TomtomCountry("LUX", "Luxembourg"));
         countries.add(new TomtomCountry("LVA", "Latvia"));
+        countries.add(new TomtomCountry("MCO", "Monaco"));
         countries.add(new TomtomCountry("MDA", "Moldova"));
         countries.add(new TomtomCountry("MKD", "Macedonia"));
         countries.add(new TomtomCountry("MLT", "Malta"));
@@ -60,6 +67,8 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("NOR", "Norway"));
         countries.add(new TomtomCountry("POL", "Poland"));
         countries.add(new TomtomCountry("PRT", "Portugal"));
+        countries.add(new TomtomCountry("PYF", "French-Polynesia"));
+        countries.add(new TomtomCountry("REU", "Reunion-and-Mayotte"));
         countries.add(new TomtomCountry("ROU", "Romania"));
         countries.add(new TomtomCountry("RUS", "Russia"));
         countries.add(new TomtomCountry("SMR", "San-Marino"));
@@ -67,20 +76,11 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("SVK", "Slovakia"));
         countries.add(new TomtomCountry("SVN", "Slovenia"));
         countries.add(new TomtomCountry("SWE", "Sweden"));
+        countries.add(new TomtomCountry("SPM", "Saint-Pierre-et-Miquelon"));
         countries.add(new TomtomCountry("TUR", "Turkey"));
         countries.add(new TomtomCountry("UKR", "Ukraine"));
-        countries.add(new TomtomCountry("GLP", "French-West-Indies"));
-        countries.add(new TomtomCountry("GUF", "French-Guiana"));
-        countries.add(new TomtomCountry("REU", "Reunion-and-Mayotte"));
-        countries.add(new TomtomCountry("XKS", "Kosovo"));
-        countries.add(new TomtomCountry("LIE", "Liechtenstein"));
         countries.add(new TomtomCountry("VAT", "Vatican"));
-        countries.add(new TomtomCountry("SPM", "Saint-Pierre-et-Miquelon"));
-        countries.add(new TomtomCountry("PYF", "French-Polynesia"));
-        countries.add(new TomtomCountry("GRL", "Greenland"));
-        countries.add(new TomtomCountry("GIB", "Gibraltar"));
-        countries.add(new TomtomCountry("ATF", "French-Southern-Territories"));
-        countries.add(new TomtomCountry("MCO", "Monaco"));
+        countries.add(new TomtomCountry("XKS", "Kosovo"));
         return countries;
     }
 
