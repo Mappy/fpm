@@ -59,7 +59,7 @@ class CountryWrapper {
             .add("Portugal") //
             .add("Romania") //
             .add("Russia") //
-            .add("Saint-Barthélemy") //
+            .add("Saint-Barthelemy") //
             .add("Saint-Martin") //
             .add("Saint-Pierre-et-Miquelon") //
             .add("San-Marino") //

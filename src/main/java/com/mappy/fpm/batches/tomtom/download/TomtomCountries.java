@@ -31,7 +31,7 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("BEL", "Belgium"));
         countries.add(new TomtomCountry("BGR", "Bulgaria"));
         countries.add(new TomtomCountry("BIH", "Bosnia-Herzegovina"));
-        countries.add(new TomtomCountry("BLM", "Saint-Barthélemy"));
+        countries.add(new TomtomCountry("BLM", "Saint-Barthelemy"));
         countries.add(new TomtomCountry("BLR", "Belarus"));
         countries.add(new TomtomCountry("CHE", "Switzerland"));
         countries.add(new TomtomCountry("CYP", "Cyprus"));
