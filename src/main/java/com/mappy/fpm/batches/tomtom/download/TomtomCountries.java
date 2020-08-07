@@ -102,8 +102,6 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("OFR", "Outerworld-France", true));
         countries.add(new TomtomCountry("OGB", "Outerworld-UK", true));
         countries.add(new TomtomCountry("OGR", "Outerworld-Greece", true));
-        countries.add(new TomtomCountry("OIA", "Indian Ocean MDV (Maldives)", true));
-        countries.add(new TomtomCountry("OIB", "Indian Ocean LKA (Sri Lanka)", true));
         countries.add(new TomtomCountry("OIE", "Outerworld-Ireland", true));
         countries.add(new TomtomCountry("OIT", "Outerworld-Italy", true));
         countries.add(new TomtomCountry("OIN", "Outerworld-Indian", true));
@@ -111,14 +109,11 @@ public class TomtomCountries {
         countries.add(new TomtomCountry("ONL", "Outerworld-Netherlands", true));
         countries.add(new TomtomCountry("ONO", "Outerworld-Norway", true));
         countries.add(new TomtomCountry("OPA", "Outerworld-Pacific-Ocean", true));
-        countries.add(new TomtomCountry("OPJ", "Pacific Ocean PYF (French Polynesia) 2", true));
-        countries.add(new TomtomCountry("OPH", "Pacific Ocean VUT (Vanuatu)", true));  
-        countries.add(new TomtomCountry("OPI", "Pacific Ocean PYF (French Polynesia)", true));
-        countries.add(new TomtomCountry("OPG", "Pacific Ocean NCL (New Caledonia)", true));
+        countries.add(new TomtomCountry("OPJ", "Pacific-Ocean-PYF-French-Polynesia-2", true));
+        countries.add(new TomtomCountry("OPI", "Pacific-Ocean-PYF-French-Polynesia", true));
+        countries.add(new TomtomCountry("OPG", "Pacific-Ocean-NCL-New-Caledonia", true));
         countries.add(new TomtomCountry("OPL", "Outerworld-Poland", true));
-        countries.add(new TomtomCountry("OPK", "Pacific Ocean PYF (French Polynesia) 3", true));
-        countries.add(new TomtomCountry("OPM", "Pacific Ocean WSM (Samoa)", true));
-        countries.add(new TomtomCountry("OPN", "Pacific Ocean TON (Tonga)", true));
+        countries.add(new TomtomCountry("OPK", "Pacific Ocean PYF-French-Polynesia-3", true));
         countries.add(new TomtomCountry("OPT", "Outerworld-Portugal", true));
         countries.add(new TomtomCountry("ORU", "Outerworld-Russia", true));
         countries.add(new TomtomCountry("OSE", "Outerworld-Sweden", true));

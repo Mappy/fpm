@@ -70,8 +70,6 @@ class CountryWrapper {
             .add("Turkey") //
             .add("Ukraine") //
             .add("Vatican") //
-            .add("Indian Ocean MDV (Maldives)") //
-            .add("Indian Ocean LKA (Sri Lanka)") //
             .add("Outerworld-Atlantic") //
             .add("Outerworld-Australia") //
             .add("Outerworld-Belgium") //
@@ -99,12 +97,9 @@ class CountryWrapper {
             .add("Outerworld-UK") //
             .add("Outerworld-USA-Atlantic-Ocean") //
             .add("Outerworld-USA-Pacific-Ocean") //
-            .add("Pacific Ocean NCL (New Caledonia)") //
-            .add("Pacific Ocean PYF (French Polynesia)") //
-            .add("Pacific Ocean PYF (French Polynesia) 2") //
-            .add("Pacific Ocean PYF (French Polynesia) 3") //
-            .add("Pacific Ocean TON (Tonga)") //
-            .add("Pacific Ocean VUT (Vanuatu)") //
-            .add("Pacific Ocean WSM (Samoa)") //
+            .add("Pacific-Ocean-NCL-New-Caledonia") //
+            .add("Pacific-Ocean-PYF-French-Polynesia") //
+            .add("Pacific-Ocean-PYF-French-Polynesia-2") //
+            .add("Pacific Ocean PYF-French-Polynesia-3") //
             .build();
 }
