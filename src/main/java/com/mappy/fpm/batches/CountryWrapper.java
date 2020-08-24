@@ -53,6 +53,7 @@ class CountryWrapper {
             .add("Monaco") //
             .add("Montenegro") //
             .add("Netherlands") //
+            .add("New-Caledonia") //
             .add("Norway") //
             .add("Reunion") //
             .add("Poland") //
@@ -64,12 +65,14 @@ class CountryWrapper {
             .add("Saint-Pierre-et-Miquelon") //
             .add("San-Marino") //
             .add("Serbia") //
+            .add("Sint-Maarten") //
             .add("Slovakia") //
             .add("Slovenia") //
             .add("Sweden") //
             .add("Turkey") //
             .add("Ukraine") //
             .add("Vatican") //
+            .add("Wallis-and-Futuna-Islands") //
             .add("Outerworld-Atlantic") //
             .add("Outerworld-Australia") //
             .add("Outerworld-Belgium") //
