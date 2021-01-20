@@ -61,6 +61,11 @@ public class RestrictionTagger {
         Boolean canBeCrossedBackward = true;
         HashSet<TimeDomains> forwardTimeDomains = Sets.newHashSet();;
         HashSet<TimeDomains> backwardTimeDomains = Sets.newHashSet();
+
+        Boolean inConstructionForward = false;
+        Boolean inConstructionBackward = false;
+        String constructionDateDomains = "";
+
         String oneway = feature.getString("ONEWAY");
         if (restrictions.isEmpty()) {
             // the "oneway" field considers the road to be crossable in a direction
@@ -79,48 +84,73 @@ public class RestrictionTagger {
             }
         }
         for (Restriction restriction: restrictions) {
-            if (restriction.getType() != Restriction.Type.directionOfTrafficFlow) {
-                continue;
+            if (restriction.getType() == Restriction.Type.directionOfTrafficFlow) {
+                if (restriction.getVehicleType() != VehicleType.passengerCars && restriction.getVehicleType() != VehicleType.all) {
+                    continue;
+                }
+                List<TimeDomains> restrictionTimeDomains;
+                Boolean noTimeDomains;
+                if (sectionTimeDomains == null) {
+                    restrictionTimeDomains = null;
+                    noTimeDomains = true;
+                } else {
+                    restrictionTimeDomains = sectionTimeDomains.get(restriction.getSequenceNumber());
+                    noTimeDomains = restrictionTimeDomains.isEmpty();
+                }
+                switch (restriction.getValidity()) {
+                case inBothLineDirections:
+                    if (noTimeDomains) {
+                        canBeCrossedForward = false;
+                        canBeCrossedBackward = false;
+                    } else {
+                        forwardTimeDomains.addAll(restrictionTimeDomains);
+                        backwardTimeDomains.addAll(restrictionTimeDomains);
+                    }
+                    break;
+                case inPositiveLineDirection:
+                    if (noTimeDomains) {
+                        canBeCrossedForward = false;
+                    } else {
+                        forwardTimeDomains.addAll(restrictionTimeDomains);
+                    }
+                    break;
+                case inNegativeLineDirection:
+                    if (noTimeDomains) {
+                        canBeCrossedBackward = false;
+                    } else {
+                        backwardTimeDomains.addAll(restrictionTimeDomains);
+                    }
+                    break;
+                default:
+                    throw new RuntimeException(
+                            "Cannot interpret restriction validity in given context: " + restriction.getValidity());
+                }
             }
-            if (restriction.getVehicleType() != VehicleType.passengerCars && restriction.getVehicleType() != VehicleType.all) {
-                continue;
-            }
-            List<TimeDomains> restrictionTimeDomains;
-            Boolean noTimeDomains;
-            if (sectionTimeDomains == null) {
-                restrictionTimeDomains = null;
-                noTimeDomains = true;
-            } else {
+            else if (restriction.getType() == Restriction.Type.constructionStatus) {
+                List<TimeDomains> restrictionTimeDomains;
                 restrictionTimeDomains = sectionTimeDomains.get(restriction.getSequenceNumber());
-                noTimeDomains = restrictionTimeDomains.isEmpty();
-            }
-            switch (restriction.getValidity()) {
-            case inBothLineDirections:
-                if (noTimeDomains) {
-                    canBeCrossedForward = false;
-                    canBeCrossedBackward = false;
-                } else {
-                    forwardTimeDomains.addAll(restrictionTimeDomains);
-                    backwardTimeDomains.addAll(restrictionTimeDomains);
+                switch (restriction.getValidity()) {
+                    case inBothLineDirections:
+                        tags.put("construction", "both");
+                        break;
+                    case inPositiveLineDirection:
+                        tags.put("construction", "forward");
+                        break;
+                    case inNegativeLineDirection:
+                        tags.put("construction", "backward");
+                        break;
+                    default:
+                        throw new RuntimeException(
+                                "Cannot interpret restriction validity in given context: " + restriction.getValidity());
                 }
-                break;
-            case inPositiveLineDirection:
-                if (noTimeDomains) {
-                    canBeCrossedForward = false;
-                } else {
-                    forwardTimeDomains.addAll(restrictionTimeDomains);
+                constructionDateDomains = restrictionTimeDomains.get(0).getDomain();
+                try {
+                    String[] dates = timeDomainsParser.parseDateInterval(constructionDateDomains);
+                    tags.put("construction_start_expected", dates[0]);
+                    tags.put("construction_end_expected", dates[1]);
+                } catch (IllegalArgumentException iae) {
+                    throw new RuntimeException("Could not parse construction date domain: " + iae.getMessage());
                 }
-                break;
-            case inNegativeLineDirection:
-                if (noTimeDomains) {
-                    canBeCrossedBackward = false;
-                } else {
-                    backwardTimeDomains.addAll(restrictionTimeDomains);
-                }
-                break;
-            default:
-                throw new RuntimeException(
-                        "Cannot interpret restriction validity in given context: " + restriction.getValidity());
             }
         }
         HashSet<TimeDomains> timeDomains;

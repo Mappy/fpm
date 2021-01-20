@@ -66,6 +66,26 @@ public class TimeDomainsParser {
         throw new IllegalArgumentException("Unable to parse '" + domain + "'");
     }
 
+    private String padLeftZeros(String inputString, int length) {
+        return String.format("%1$" + length + "s", inputString).replace(' ', '0');
+    }
+
+    public String[] parseDateInterval(String domain) {
+        String[] dates = new String[2];
+        String pattern = "\\[\\(y(\\d{4})M(\\d{1,2})d(\\d{1,2})\\)\\(y(\\d{4})M(\\d{1,2})d(\\d{1,2})\\)\\]";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(domain);
+
+        if (m.find( )) {
+            dates[0] = padLeftZeros(m.group(1), 4) + "-" + padLeftZeros(m.group(2), 2) + "-" + padLeftZeros(m.group(3), 2);
+            dates[1] = padLeftZeros(m.group(4), 4) + "-" + padLeftZeros(m.group(5), 2) + "-" + padLeftZeros(m.group(6), 2);
+        }
+        else {
+            throw new IllegalArgumentException("Unable to parse '" + domain + "'");
+        }
+        return dates;
+    }
+
     private String getOpeningHours(Matcher matcher, Boolean isDuration) {
         String firstMatch = matcher.group(1);
         String secondMatch = matcher.group(2);
