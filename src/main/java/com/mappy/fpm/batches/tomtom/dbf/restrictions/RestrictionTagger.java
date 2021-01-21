@@ -62,10 +62,6 @@ public class RestrictionTagger {
         HashSet<TimeDomains> forwardTimeDomains = Sets.newHashSet();;
         HashSet<TimeDomains> backwardTimeDomains = Sets.newHashSet();
 
-        Boolean inConstructionForward = false;
-        Boolean inConstructionBackward = false;
-        String constructionDateDomains = "";
-
         String oneway = feature.getString("ONEWAY");
         if (restrictions.isEmpty()) {
             // the "oneway" field considers the road to be crossable in a direction
@@ -143,9 +139,8 @@ public class RestrictionTagger {
                         throw new RuntimeException(
                                 "Cannot interpret restriction validity in given context: " + restriction.getValidity());
                 }
-                constructionDateDomains = restrictionTimeDomains.get(0).getDomain();
                 try {
-                    String[] dates = timeDomainsParser.parseDateInterval(constructionDateDomains);
+                    String[] dates = timeDomainsParser.parseDateInterval(restrictionTimeDomains.get(0));
                     tags.put("construction_start_expected", dates[0]);
                     tags.put("construction_end_expected", dates[1]);
                 } catch (IllegalArgumentException iae) {

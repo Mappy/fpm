@@ -49,6 +49,15 @@ public class TimeDomainsParserTest {
         assertThat(osmTimeDomain).isEqualTo("2017 Aug 31-2018 Sep 1 off");
     }
 
+    @Test
+    public void should_translate_interval_yyyy_mm_dd_format(){
+        TimeDomains tomtomTimesDomains = new TimeDomains(17240000000902L, 1, "[(y2020M5d5)(y2021M11d3)]");
+
+        String[] dates = parser.parseDateInterval(tomtomTimesDomains);
+        assertThat(dates[0]).isEqualTo("2020-05-05");
+        assertThat(dates[1]).isEqualTo("2021-11-03");
+    }
+
 
     // DURATION
 
