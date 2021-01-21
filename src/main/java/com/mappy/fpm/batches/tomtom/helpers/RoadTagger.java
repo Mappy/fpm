@@ -161,6 +161,38 @@ public class RoadTagger {
         }
     }
 
+    public void tagConstruction(Map<String, String> tags){
+        if (tags.containsKey("construction")) {
+
+            switch (tags.get("construction")) {
+                case "both":
+                    tags.put("construction", tags.get("highway"));
+                    break;
+                case "forward":
+                    if (tags.containsKey("oneway") && tags.get("oneway").equals("yes")){
+                        tags.put("construction", tags.get("highway"));
+                    }
+                    else{
+                        tags.put("construction:forward", tags.get("highway"));
+                        tags.remove("construction");
+                    }
+                    break;
+                case "backward":
+                    if (tags.containsKey("oneway") && tags.get("oneway").equals("yes")){
+                        tags.put("construction", tags.get("highway"));
+                    }
+                    else{
+                        tags.put("construction:backward", tags.get("highway"));
+                        tags.remove("construction");
+                    }
+                    break;
+                default:
+                    break;
+            }
+            tags.put("highway", "construction");
+        }
+    }
+
     private void tagRoute(Feature feature, Map<String, String> tags, Long id, Boolean isOneway, Boolean isReversed) {
         tags.putAll(speedProfiles.getTags(feature));
         tags.putAll(speedRestriction.tag(feature, isReversed));
@@ -184,33 +216,7 @@ public class RoadTagger {
         poiProvider.getPoiNameByType(id, FeatureType.MOUNTAIN_PASS.getValue()).ifPresent(value -> {
             tags.put("mountain_pass", value);
         });
-        if (tags.containsKey("construction")) {
-
-            switch (tags.get("construction")) {
-                case "both":
-                    tags.put("construction", tags.get("highway"));
-                    break;
-                case "forward":
-                    if (tags.get("oneway").equals("yes")){
-                        tags.put("construction", tags.get("highway"));
-                    }
-                    else{
-                        tags.put("construction:forward", tags.get("highway"));
-                    }
-                    break;
-                case "backward":
-                    if (tags.get("oneway").equals("yes")){
-                        tags.put("construction", tags.get("highway"));
-                    }
-                    else{
-                        tags.put("construction:backward", tags.get("highway"));
-                    }
-                    break;
-                default:
-                    break;
-            }
-            tags.put("highway", "construction");
-        }
+        tagConstruction(tags);
     }
 
     private void tagTomtomSpecial(Feature feature, Map<String, String> tags, Long id) {
