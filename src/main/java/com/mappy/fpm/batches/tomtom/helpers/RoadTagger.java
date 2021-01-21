@@ -191,10 +191,20 @@ public class RoadTagger {
                     tags.put("construction", tags.get("highway"));
                     break;
                 case "forward":
-                    tags.put("construction:forward", tags.get("highway"));
+                    if (tags.get("oneway").equals("yes")){
+                        tags.put("construction", tags.get("highway"));
+                    }
+                    else{
+                        tags.put("construction:forward", tags.get("highway"));
+                    }
                     break;
                 case "backward":
-                    tags.put("construction:backward", tags.get("highway"));
+                    if (tags.get("oneway").equals("yes")){
+                        tags.put("construction", tags.get("highway"));
+                    }
+                    else{
+                        tags.put("construction:backward", tags.get("highway"));
+                    }
                     break;
                 default:
                     break;
