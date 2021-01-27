@@ -26,5 +26,17 @@ public class RsDbfTest {
         assertThat(rsDbf.getRestrictions(17240000005566L)).containsExactly(
             new Restriction(17240000005566L, 1, Restriction.Validity.notApplicable, Restriction.Type.notApplicable, 0, VehicleType.all)
         );
+
+        assertThat(rsDbf.getRestrictions(17240000000902L)).containsExactly(
+            new Restriction(17240000000902L, 1, Restriction.Validity.inBothLineDirections, Restriction.Type.constructionStatus, 0, VehicleType.all)
+        );
+
+        assertThat(rsDbf.getRestrictions(17240000000903L)).containsExactly(
+            new Restriction(17240000000903L, 1, Restriction.Validity.inPositiveLineDirection, Restriction.Type.constructionStatus, 0, VehicleType.all)
+        );
+
+        assertThat(rsDbf.getRestrictions(17240000001376L)).containsExactly(
+            new Restriction(17240000001376L, 1, Restriction.Validity.inNegativeLineDirection, Restriction.Type.constructionStatus, 0, VehicleType.all)
+        );
     }
 }

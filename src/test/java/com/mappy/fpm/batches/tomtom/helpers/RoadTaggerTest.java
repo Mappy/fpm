@@ -490,4 +490,106 @@ public class RoadTaggerTest {
             assertThat(tagger.tagData(onlyTags(defaultTags)))
             .containsEntry("ramp_type", "entrance");
     }
+
+    @Test
+    public void should_tag_construction() {
+        Map<String, String> tags = new HashMap<String, String>();
+        tags.put("highway", "primary");
+        tags.put("construction", "both");
+        tags.put("construction_start_expected", "2020-02-02");
+        tags.put("construction_end_expected", "2021-02-02");
+
+        tagger.tagConstruction(tags);
+        assertThat(tags)
+                .containsEntry("construction", "primary")
+                .containsEntry("highway", "construction")
+                .containsEntry("construction_start_expected", "2020-02-02")
+                .containsEntry("construction_end_expected", "2021-02-02");
+    }
+
+    @Test
+    public void should_tag_construction_forward() {
+        Map<String, String> tags = new HashMap<String, String>();
+        tags.put("highway", "motorway");
+        tags.put("construction", "forward");
+        tags.put("construction_start_expected", "2020-02-02");
+        tags.put("construction_end_expected", "2021-02-02");
+
+        tagger.tagConstruction(tags);
+
+        assertThat(tags)
+                .containsEntry("construction:forward", "motorway")
+                .containsEntry("highway", "construction")
+                .containsEntry("construction_start_expected", "2020-02-02")
+                .containsEntry("construction_end_expected", "2021-02-02");
+    }
+
+    @Test
+    public void should_tag_construction_backward() {
+        Map<String, String> tags = new HashMap<String, String>();
+        tags.put("highway", "secondary");
+        tags.put("construction", "backward");
+        tags.put("construction_start_expected", "2020-02-02");
+        tags.put("construction_end_expected", "2021-02-02");
+
+        tagger.tagConstruction(tags);
+
+        assertThat(tags)
+                .containsEntry("construction:backward", "secondary")
+                .containsEntry("highway", "construction")
+                .containsEntry("construction_start_expected", "2020-02-02")
+                .containsEntry("construction_end_expected", "2021-02-02");
+    }
+
+    @Test
+    public void should_tag_construction_oneway() {
+        Map<String, String> tags = new HashMap<String, String>();
+        tags.put("oneway", "yes");
+        tags.put("highway", "primary");
+        tags.put("construction", "both");
+        tags.put("construction_start_expected", "2020-02-02");
+        tags.put("construction_end_expected", "2021-02-02");
+
+        tagger.tagConstruction(tags);
+        assertThat(tags)
+                .containsEntry("construction", "primary")
+                .containsEntry("highway", "construction")
+                .containsEntry("construction_start_expected", "2020-02-02")
+                .containsEntry("construction_end_expected", "2021-02-02");
+    }
+
+    @Test
+    public void should_tag_construction_oneway_forward() {
+        Map<String, String> tags = new HashMap<String, String>();
+        tags.put("oneway", "yes");
+        tags.put("highway", "primary");
+        tags.put("construction", "forward");
+        tags.put("construction_start_expected", "2020-02-02");
+        tags.put("construction_end_expected", "2021-02-02");
+
+        tagger.tagConstruction(tags);
+        assertThat(tags)
+                .containsEntry("construction", "primary")
+                .containsEntry("highway", "construction")
+                .containsEntry("construction_start_expected", "2020-02-02")
+                .containsEntry("construction_end_expected", "2021-02-02");
+    }
+
+    @Test
+    public void should_tag_construction_oneway_backward() {
+        Map<String, String> tags = new HashMap<String, String>();
+        tags.put("oneway", "yes");
+        tags.put("highway", "primary");
+        tags.put("construction", "backward");
+        tags.put("construction_start_expected", "2020-02-02");
+        tags.put("construction_end_expected", "2021-02-02");
+
+        tagger.tagConstruction(tags);
+        assertThat(tags)
+                .containsEntry("construction", "primary")
+                .containsEntry("highway", "construction")
+                .containsEntry("construction_start_expected", "2020-02-02")
+                .containsEntry("construction_end_expected", "2021-02-02");
+    }
+
 }

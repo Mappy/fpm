@@ -33,5 +33,10 @@ public class TimeDomainsProviderTest {
                 new TimeDomains(14420000000590L, 2, "[(h11){h7}]"));
         assertThat(sectionTimeDomains.get(3)).containsExactly(
                 new TimeDomains(14420000000590L, 3, "[(h22){h8}]"));
+
+        sectionTimeDomains = timeDomainsProvider.getSectionTimeDomains(17240000000902L);  // constructions status time domain
+        assertThat(sectionTimeDomains.get(1)).containsExactly(
+                new TimeDomains(17240000000902L, 1, "[(y2020M5d5)(y2021M11d3)]"));
+
     }
 }
