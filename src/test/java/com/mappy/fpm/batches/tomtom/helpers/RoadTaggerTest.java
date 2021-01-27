@@ -575,4 +575,21 @@ public class RoadTaggerTest {
                 .containsEntry("construction_end_expected", "2021-02-02");
     }
 
+    @Test
+    public void should_tag_construction_oneway_backward() {
+        Map<String, String> tags = new HashMap<String, String>();
+        tags.put("oneway", "yes");
+        tags.put("highway", "primary");
+        tags.put("construction", "backward");
+        tags.put("construction_start_expected", "2020-02-02");
+        tags.put("construction_end_expected", "2021-02-02");
+
+        tagger.tagConstruction(tags);
+        assertThat(tags)
+                .containsEntry("construction", "primary")
+                .containsEntry("highway", "construction")
+                .containsEntry("construction_start_expected", "2020-02-02")
+                .containsEntry("construction_end_expected", "2021-02-02");
+    }
+
 }

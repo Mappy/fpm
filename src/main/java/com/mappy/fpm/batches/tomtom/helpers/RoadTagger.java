@@ -161,34 +161,38 @@ public class RoadTagger {
         }
     }
 
-    public void tagConstruction(Map<String, String> tags){
-        if (tags.containsKey("construction")) {
+    public boolean is_oneway(Map<String, String> tags){
+        return tags.containsKey("oneway") && tags.get("oneway").equals("yes");
+    }
 
+    public void tagConstruction(Map<String, String> tags){
+        String construction_tag = "";
+        if (tags.containsKey("construction")) {
             switch (tags.get("construction")) {
                 case "both":
-                    tags.put("construction", tags.get("highway"));
+                    construction_tag = "construction";
                     break;
                 case "forward":
-                    if (tags.containsKey("oneway") && tags.get("oneway").equals("yes")){
-                        tags.put("construction", tags.get("highway"));
+                    if (is_oneway(tags)){
+                        construction_tag = "construction";
                     }
                     else{
-                        tags.put("construction:forward", tags.get("highway"));
-                        tags.remove("construction");
+                        construction_tag = "construction:forward";
                     }
                     break;
                 case "backward":
-                    if (tags.containsKey("oneway") && tags.get("oneway").equals("yes")){
-                        tags.put("construction", tags.get("highway"));
+                    if (is_oneway(tags)){
+                        construction_tag = "construction";
                     }
                     else{
-                        tags.put("construction:backward", tags.get("highway"));
-                        tags.remove("construction");
+                        construction_tag = "construction:backward";
                     }
                     break;
                 default:
                     break;
             }
+            tags.remove("construction");
+            tags.put(construction_tag, tags.get("highway"));
             tags.put("highway", "construction");
         }
     }

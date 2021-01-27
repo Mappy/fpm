@@ -71,6 +71,9 @@ public class TimeDomainsParser {
     }
 
     public String[] parseDateInterval(TimeDomains timeDomain) {
+        /*
+            sample timeDomain format [(y2020M1d1)(y2022M12d31)]
+        */
         String[] dates = new String[2];
         String pattern = "\\[\\(y(\\d{4})M(\\d{1,2})d(\\d{1,2})\\)\\(y(\\d{4})M(\\d{1,2})d(\\d{1,2})\\)\\]";
         Pattern r = Pattern.compile(pattern);
