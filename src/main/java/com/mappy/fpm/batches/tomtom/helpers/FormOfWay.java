@@ -19,7 +19,7 @@ public enum FormOfWay {
     UNSTRUCTURED_TRAFFIC_SQUARE(8, of()),
     SLIP_ROAD(10, of()),
     SERVICE_ROAD(11, of("highway", "service")),
-    ENTRANCE_EXIT_CAR_PARK(12, of("highway", "service", "service", "parking_aisle")),
+    ENTRANCE_EXIT_CAR_PARK(12, of("highway", "service", "service", "mappy_parking_entrance")),
     PEDESTRIAN(14, of("highway", "pedestrian")),
     WALKWAY(15, of("highway", "footway")),
     SPECIAL_TRAFFIC_FIGURE(17, of()),

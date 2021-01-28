@@ -43,10 +43,10 @@ public class TomtomWorldFactory {
                         Geometry highres = next.getGeometry().intersection(world());
                         for (Polygon polygon : polygons(highres)) {
                             if (cuttingPolygon.contains(polygon)) {
-                                log.debug("Polygon inside the cutting polygon. Inserting.");
+                                log.info("Polygon inside the cutting polygon. Inserting.");
                             }
                             else if (cuttingPolygon.intersects(polygon)) {
-                                log.debug("Polygon on the border of the cutting polygon. Inserting.");
+                                log.info("Polygon on the border of the cutting polygon. Inserting.");
                                 world.insertBorderPolygon(polygon);
                             }
                             else {
