@@ -141,4 +141,52 @@ public class RestrictionTaggerTest {
         assertThat(restrictionTagger.tag(MemoryFeature.onlyTags(ImmutableMap.of("ID", "123"))))
                 .containsOnly(entry("opening_hours", "22:00-06:00 off, 11:00-18:00 off"));
     }
+
+    @Test
+    public void should_tag_construction_status_properly() {
+        ArrayListMultimap<Integer, TimeDomains> timeDomains = ArrayListMultimap.create();
+        when(rsDbf.getRestrictions(123)).thenReturn(Lists.newArrayList(
+                new Restriction(123, 1, Restriction.Validity.inBothLineDirections, Restriction.Type.constructionStatus, 0, VehicleType.all)
+        ));
+        timeDomains.put(1, new TimeDomains(123, 1, "[(y2020M1d15)(y2022M12d5)]"));
+        when(timeDomainsProvider.getSectionTimeDomains(123)).thenReturn(timeDomains);
+        assertThat(restrictionTagger.tag(MemoryFeature.onlyTags(ImmutableMap.of("ID", "123"))))
+                .containsOnly(
+                        entry("construction", "both"),
+                        entry("construction_start_expected", "2020-01-15"),
+                        entry("construction_end_expected", "2022-12-05")
+                );
+    }
+
+    @Test
+    public void should_tag_construction_status_in_forward_properly() {
+        ArrayListMultimap<Integer, TimeDomains> timeDomains = ArrayListMultimap.create();
+        when(rsDbf.getRestrictions(123)).thenReturn(Lists.newArrayList(
+                new Restriction(123, 1, Restriction.Validity.inPositiveLineDirection, Restriction.Type.constructionStatus, 0, VehicleType.all)
+        ));
+        timeDomains.put(1, new TimeDomains(123, 1, "[(y2020M1d15)(y2022M12d5)]"));
+        when(timeDomainsProvider.getSectionTimeDomains(123)).thenReturn(timeDomains);
+        assertThat(restrictionTagger.tag(MemoryFeature.onlyTags(ImmutableMap.of("ID", "123"))))
+                .containsOnly(
+                        entry("construction", "forward"),
+                        entry("construction_start_expected", "2020-01-15"),
+                        entry("construction_end_expected", "2022-12-05")
+                );
+    }
+
+    @Test
+    public void should_tag_construction_status_in_backward_directions_properly() {
+        ArrayListMultimap<Integer, TimeDomains> timeDomains = ArrayListMultimap.create();
+        when(rsDbf.getRestrictions(123)).thenReturn(Lists.newArrayList(
+                new Restriction(123, 1, Restriction.Validity.inNegativeLineDirection, Restriction.Type.constructionStatus, 0, VehicleType.all)
+        ));
+        timeDomains.put(1, new TimeDomains(123, 1, "[(y2020M1d15)(y2022M12d5)]"));
+        when(timeDomainsProvider.getSectionTimeDomains(123)).thenReturn(timeDomains);
+        assertThat(restrictionTagger.tag(MemoryFeature.onlyTags(ImmutableMap.of("ID", "123"))))
+                .containsOnly(
+                        entry("construction", "backward"),
+                        entry("construction_start_expected", "2020-01-15"),
+                        entry("construction_end_expected", "2022-12-05")
+                );
+    }
 }

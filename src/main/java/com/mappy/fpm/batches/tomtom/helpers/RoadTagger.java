@@ -95,10 +95,10 @@ public class RoadTagger {
 
         Long id = feature.getLong("ID");
 
-        Map<String, String> directionTags = restrictionTagger.tag(feature);
-        Boolean isOneway = directionTags.containsKey("oneway");
-        Boolean isReversed = directionTags.containsKey("reversed:tomtom");
-        tags.putAll(directionTags);
+        Map<String, String> restrictionsTags = restrictionTagger.tag(feature);
+        Boolean isOneway = restrictionsTags.containsKey("oneway");
+        Boolean isReversed = restrictionsTags.containsKey("reversed:tomtom");
+        tags.putAll(restrictionsTags);
         tagTomtomSpecial(feature, tags, id);
 
         tags.putAll(level(feature, isReversed));
@@ -161,6 +161,42 @@ public class RoadTagger {
         }
     }
 
+    public boolean is_oneway(Map<String, String> tags){
+        return tags.containsKey("oneway") && tags.get("oneway").equals("yes");
+    }
+
+    public void tagConstruction(Map<String, String> tags){
+        String construction_tag = "";
+        if (tags.containsKey("construction")) {
+            switch (tags.get("construction")) {
+                case "both":
+                    construction_tag = "construction";
+                    break;
+                case "forward":
+                    if (is_oneway(tags)){
+                        construction_tag = "construction";
+                    }
+                    else{
+                        construction_tag = "construction:forward";
+                    }
+                    break;
+                case "backward":
+                    if (is_oneway(tags)){
+                        construction_tag = "construction";
+                    }
+                    else{
+                        construction_tag = "construction:backward";
+                    }
+                    break;
+                default:
+                    break;
+            }
+            tags.remove("construction");
+            tags.put(construction_tag, tags.get("highway"));
+            tags.put("highway", "construction");
+        }
+    }
+
     private void tagRoute(Feature feature, Map<String, String> tags, Long id, Boolean isOneway, Boolean isReversed) {
         tags.putAll(speedProfiles.getTags(feature));
         tags.putAll(speedRestriction.tag(feature, isReversed));
@@ -184,6 +220,7 @@ public class RoadTagger {
         poiProvider.getPoiNameByType(id, FeatureType.MOUNTAIN_PASS.getValue()).ifPresent(value -> {
             tags.put("mountain_pass", value);
         });
+        tagConstruction(tags);
     }
 
     private void tagTomtomSpecial(Feature feature, Map<String, String> tags, Long id) {
