@@ -15,7 +15,7 @@ public class RouteNumbers {
     public static RouteNumbers fromDbf(DbfRow entry) {
         return new RouteNumbers(
                 entry.getLong("ID"),
-                entry.getString("ROUTENUM", UTF_8),
+                entry.getString("SHIELDNUM", UTF_8),
                 entry.getInt("RTETYP"),
                 entry.getInt("RTEPRIOR")
                 );
