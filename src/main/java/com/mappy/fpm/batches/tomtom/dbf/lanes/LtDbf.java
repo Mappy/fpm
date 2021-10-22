@@ -75,8 +75,9 @@ public class LtDbf {
                 int sequenceNumber = timeDomain.getSequenceNumber();
                 TimeDomains existingTimeDomain = sectionTimeDomains.putIfAbsent(sequenceNumber, timeDomain);
                 if (existingTimeDomain != null) {
-                    String message = "Several time domains for the same restriction (section id: %d, sequence number %d)";
-                    throw new RuntimeException(String.format(message, sectionId, sequenceNumber));
+                    String message = "Several time domains for the same restriction (section id: %d, sequence number %d). Only take the first one into consideration";
+                    log.warn(message);
+                    continue;
                 }
                 typeEntryCount.put(restrictionType, typeEntryCount.get(restrictionType) + 1);
             }
