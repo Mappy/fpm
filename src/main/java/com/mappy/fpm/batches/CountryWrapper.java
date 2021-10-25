@@ -26,7 +26,13 @@ class CountryWrapper {
             .add("Faroe-Islands") //
             .add("Finland") //
             .add("France") //
+            .add("French-Guiana") //
+            .add("French-Polynesia") //
+            .add("French-Southern-Territories") //
+            .add("Guadeloupe") //
             .add("Georgia") //
+            .add("Gibraltar") //
+            .add("Greenland") //
             .add("UK") //
             .add("Greece") //
             .add("Croatia") //
@@ -34,29 +40,39 @@ class CountryWrapper {
             .add("Ireland") //
             .add("Iceland") //
             .add("Italy") //
+            .add("Kosovo") //
+            .add("Liechtenstein") //
             .add("Lithuania") //
             .add("Luxembourg") //
             .add("Latvia") //
             .add("Moldova") //
             .add("Macedonia") //
             .add("Malta") //
+            .add("Martinique") //
+            .add("Mayotte") //
+            .add("Monaco") //
             .add("Montenegro") //
             .add("Netherlands") //
+            .add("New-Caledonia") //
             .add("Norway") //
+            .add("Reunion") //
+            .add("Poland") //
             .add("Portugal") //
             .add("Romania") //
             .add("Russia") //
+            .add("Saint-Barthelemy") //
+            .add("Saint-Martin") //
+            .add("Saint-Pierre-et-Miquelon") //
             .add("San-Marino") //
             .add("Serbia") //
+            .add("Sint-Maarten") //
             .add("Slovakia") //
             .add("Slovenia") //
             .add("Sweden") //
             .add("Turkey") //
-            .add("French-West-Indies") //
-            .add("Reunion-and-Mayotte") //
-            .add("French-Guiana") //
-            .add("Poland") //
             .add("Ukraine") //
+            .add("Vatican") //
+            .add("Wallis-and-Futuna-Islands") //
             .add("Outerworld-Atlantic") //
             .add("Outerworld-Australia") //
             .add("Outerworld-Belgium") //
@@ -84,5 +100,9 @@ class CountryWrapper {
             .add("Outerworld-UK") //
             .add("Outerworld-USA-Atlantic-Ocean") //
             .add("Outerworld-USA-Pacific-Ocean") //
+            .add("Pacific-Ocean-NCL-New-Caledonia") //
+            .add("Pacific-Ocean-PYF-French-Polynesia") //
+            .add("Pacific-Ocean-PYF-French-Polynesia-2") //
+            .add("Pacific Ocean PYF-French-Polynesia-3") //
             .build();
 }
